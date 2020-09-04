@@ -21,7 +21,7 @@ extension Networking.App {
         let token: String
     }
     
-    private struct LoginParam: Codable {
+    private struct LoginParam: Encodable {
         let appType = "Kasa_Android"
         let cloudUserName: String
         let cloudPassword: String
