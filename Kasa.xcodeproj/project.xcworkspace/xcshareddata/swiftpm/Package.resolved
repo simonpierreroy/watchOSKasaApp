@@ -2,6 +2,15 @@
   "object": {
     "pins": [
       {
+        "package": "combine-schedulers",
+        "repositoryURL": "https://github.com/pointfreeco/combine-schedulers",
+        "state": {
+          "branch": null,
+          "revision": "ff42ec9061d864de7982162011321d3df5080c10",
+          "version": "0.1.2"
+        }
+      },
+      {
         "package": "swift-case-paths",
         "repositoryURL": "https://github.com/pointfreeco/swift-case-paths",
         "state": {
@@ -14,9 +23,9 @@
         "package": "swift-composable-architecture",
         "repositoryURL": "https://github.com/pointfreeco/swift-composable-architecture.git",
         "state": {
-          "branch": "master",
-          "revision": "5d741bf99675c1c0a8cdb2fdb6e3ad0cfccc7bb8",
-          "version": null
+          "branch": null,
+          "revision": "7f482acbf4c108655ae269a6445831ce1890762e",
+          "version": "0.7.0"
         }
       },
       {

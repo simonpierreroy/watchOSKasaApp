@@ -41,9 +41,9 @@ struct UserLoginView: View {
                     viewStore.send(.tappedLogingButton(email: self.email, password: self.password))
                 }) {
                     HStack {
-                        Image(
-                            systemName: viewStore.isLoadingUser ? "slowmo" : ""
-                        )
+                        if viewStore.isLoadingUser {
+                            Image(systemName: "slowmo")
+                        }
                         Text("Login")
                     }
                 }
@@ -102,14 +102,25 @@ extension UserAction {
 #if DEBUG
 struct UserLoginView_Previews: PreviewProvider {
     static var previews: some View {
-        UserLoginView(store:
-            .init(
-                initialState:
-                UserState.init(user: nil, isLoading: false),
-                reducer: userReducer,
-                environment: UserEnvironment.mockUserEnv
-            )
-        )
+        Group {
+            UserLoginView(store:
+                .init(
+                    initialState:
+                    UserState.init(user: nil, isLoading: false),
+                    reducer: userReducer,
+                    environment: UserEnvironment.mockUserEnv
+                )
+            ).previewDisplayName("Login")
+            
+            UserLoginView(store:
+                .init(
+                    initialState:
+                    UserState.init(user: nil, isLoading: true),
+                    reducer: userReducer,
+                    environment: UserEnvironment.mockUserEnv
+                )
+            ).previewDisplayName("Loading")
+        }
     }
 }
 #endif

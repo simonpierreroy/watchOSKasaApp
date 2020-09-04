@@ -20,7 +20,13 @@ enum DevicesAtion {
 }
 
 struct DevicesState {
-    static let empty = DevicesState(_devices: [], isLoading: false, error: nil, token: nil)
+    static let empty = DevicesState(_devices: [], isLoading: .nerverLoaded, error: nil, token: nil)
+    
+    enum Loading {
+        case nerverLoaded
+        case loading
+        case loaded
+    }
     
     private var _devices: [DeviceSate]
     var devices: [DeviceSate] {
@@ -33,7 +39,7 @@ struct DevicesState {
         }
         set { self._devices = newValue }
     }
-    var isLoading: Bool
+    var isLoading: Loading
     var error: Error?
     var token: User.Token?
 }
@@ -57,19 +63,19 @@ extension DevicesEnvironment {
 let devicesReducer = Reducer<DevicesState, DevicesAtion, DevicesEnvironment> { state, action, environment in
     switch action {
     case .set(let devices):
-        state.isLoading = false
+        state.isLoading = .loaded
         state.devices = devices
         return .none
     case .fetchFromRemote:
         guard let token = state.token else { return .none }
-        state.isLoading = true
+        state.isLoading = .loading
         return environment.loadDevices(token)
             .map(DevicesAtion.set)
             .catch(DevicesAtion.send >>> Just.init)
             .receive(on: environment.mainQueue)
             .eraseToEffect()
     case .send(let error):
-        state.isLoading = false
+        state.isLoading = .loaded
         state.error = error
         return .none
     case .errorHandled:

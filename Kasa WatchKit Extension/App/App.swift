@@ -52,16 +52,29 @@ let appReducer: Reducer<AppState, AppAction, AppEnv> = userReducer
         action: /AppAction.devicesAction,
         environment:DevicesEnvironment.init(appEnv:)
     )
-).debug()
+)//.debug()
 
 #if DEBUG
 extension AppState {
-    static let mockAppStateLogged: AppState = {
+    static let mockAppStateLoggedNotLoadingDevices: AppState = {
         var state = AppState.empty
         state.userState.user = User.init(token: "test")
         state.devicesState.devices = [
             DeviceSate.init(id: "1", name: "Test device 1"),
         ]
+        state.devicesState.isLoading = .loaded
+        return state
+    }()
+    
+    static let mockAppStateLoggedLoadingDevices: AppState = {
+        var state = AppState.mockAppStateLoggedNotLoadingDevices
+        state.devicesState.isLoading = .loading
+        return state
+    }()
+    
+    static let mockAppStateLoggedNerverLoaded: AppState = {
+        var state = AppState.mockAppStateLoggedNotLoadingDevices
+        state.devicesState.isLoading = .nerverLoaded
         return state
     }()
 }

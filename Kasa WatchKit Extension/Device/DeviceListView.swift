@@ -12,7 +12,6 @@ import ComposableArchitecture
 struct DeviceListView: View {
     
     let store: Store<StateView, Action>
-    @State var isfirstTimeViewAppears = true
     
     init(store: Store<StateView, Action>) {
         self.store = store
@@ -32,11 +31,11 @@ struct DeviceListView: View {
                     
                     Button(action: { viewStore.send(.tappedRefreshButton)}) {
                         HStack {
-                            LoadingImage(loading: .constant( viewStore.isRefreshingDevices), systemName: "arrow.clockwise.circle.fill")
+                            LoadingImage(loading: .constant(viewStore.isRefreshingDevices == .loading), systemName: "arrow.clockwise.circle.fill")
                             Text("Refresh")
                         }
                     }
-                }.disabled(viewStore.isRefreshingDevices)
+                }.disabled(viewStore.isRefreshingDevices == .loading)
                 
                 Button("Logout") { viewStore.send(.tappedLogoutButton) }
                 
@@ -47,9 +46,8 @@ struct DeviceListView: View {
                 ),
                 content: { Alert(title: Text($0.title)) }
             ).onAppear{
-                if self.isfirstTimeViewAppears {
-                    self.isfirstTimeViewAppears.toggle()
-                    viewStore.send(.viewAppearedFirstTime)
+                if case .nerverLoaded = viewStore.isRefreshingDevices {
+                    viewStore.send(.viewAppearReload)
                 }
             }
         }
@@ -97,7 +95,7 @@ extension DeviceListView {
     
     struct StateView: Equatable {
         let errorMessageToDisplayText: String?
-        let isRefreshingDevices: Bool
+        let isRefreshingDevices: DevicesState.Loading
         let devicesToDisplay: [DeviceSate]
     }
     
@@ -108,8 +106,8 @@ extension DeviceListView {
             case tappedErrorAlert
         }
         
-        case viewAppearedFirstTime
         case tappedErrorAlert
+        case viewAppearReload
         case tappedLogoutButton
         case tappedRefreshButton
         case tappedDevice(index: Int, action: DeviceAction)
@@ -119,8 +117,8 @@ extension DeviceListView {
 extension DeviceListView.StateView {
     init(appState: AppState) {
         self.errorMessageToDisplayText = appState.devicesState.error?.localizedDescription
-        self.isRefreshingDevices = appState.devicesState.isLoading
         self.devicesToDisplay = appState.devicesState.devices
+        self.isRefreshingDevices = appState.devicesState.isLoading
     }
 }
 
@@ -145,7 +143,7 @@ extension AppAction {
             self = .devicesAction(.errorHandled)
         case .tappedLogoutButton:
             self = .userAction(.logout)
-        case .tappedRefreshButton, .viewAppearedFirstTime:
+        case .tappedRefreshButton, .viewAppearReload:
             self = .devicesAction(.fetchFromRemote)
         }
     }
@@ -158,11 +156,27 @@ struct DeviceListView_Previews: PreviewProvider {
         Group {
             DeviceListView(
                 store: Store<AppState, AppAction>.init(
-                    initialState: AppState.mockAppStateLogged,
+                    initialState: AppState.mockAppStateLoggedNotLoadingDevices,
                     reducer: appReducer,
                     environment: AppEnv.mockAppEnv
                 ).scope(state: DeviceListView.StateView.init(appState:), action: AppAction.init(deviceAction:))
-            ).previewDisplayName("List Preview")
+            ).previewDisplayName("List")
+            
+            DeviceListView(
+                store: Store<AppState, AppAction>.init(
+                    initialState: AppState.mockAppStateLoggedLoadingDevices,
+                    reducer: appReducer,
+                    environment: AppEnv.mockAppEnv
+                ).scope(state: DeviceListView.StateView.init(appState:), action: AppAction.init(deviceAction:))
+            ).previewDisplayName("List Loading")
+            
+            DeviceListView(
+                store: Store<AppState, AppAction>.init(
+                    initialState: AppState.mockAppStateLoggedNerverLoaded,
+                    reducer: appReducer,
+                    environment: AppEnv.mockAppEnv
+                ).scope(state: DeviceListView.StateView.init(appState:), action: AppAction.init(deviceAction:))
+            ).previewDisplayName("List First Load")
             
             DeviceDetailView(
                 store: Store<DeviceSate, DeviceDetailAction>.init(
