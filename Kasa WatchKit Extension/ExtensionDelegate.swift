@@ -48,7 +48,7 @@ class ExtensionDelegate: NSObject, WKExtensionDelegate {
                 .scope(
                     state: always,
                     action: AppAction.init(delegateAction:)
-            ),
+                ),
             removeDuplicates: { _,_ in true }
         )
     }()
@@ -57,16 +57,16 @@ class ExtensionDelegate: NSObject, WKExtensionDelegate {
         case applicationDidFinishLaunching
         case applicationWillResignActive
     }
-
-
+    
+    
     func applicationDidFinishLaunching() {
         ExtensionDelegate.viewStore.send(.applicationDidFinishLaunching)
     }
-
+    
     func applicationWillResignActive() {
         ExtensionDelegate.viewStore.send(.applicationWillResignActive)
     }
-
+    
     func handle(_ backgroundTasks: Set<WKRefreshBackgroundTask>) {
         // Sent when the system needs to launch the application in the background to process tasks. Tasks arrive in a set, so loop through and process each one.
         for task in backgroundTasks {
@@ -96,5 +96,5 @@ class ExtensionDelegate: NSObject, WKExtensionDelegate {
             }
         }
     }
-
+    
 }

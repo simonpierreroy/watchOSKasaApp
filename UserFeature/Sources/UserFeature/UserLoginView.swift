@@ -18,7 +18,7 @@ public struct UserLoginView: View {
             .scope(
                 state: UserLoginView.StateView.init(userState:),
                 action: UserAction.init(userViewAction:)
-        )
+            )
     }
     
     @State var email: String = ""
@@ -105,21 +105,21 @@ struct UserLoginView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
             UserLoginView(store:
-                .init(
-                    initialState:
-                    UserState.init(user: nil, isLoading: false),
-                    reducer: userReducer,
-                    environment: UserEnvironment.mockUserEnv
-                )
+                            .init(
+                                initialState:
+                                    UserState.init(user: nil, isLoading: false),
+                                reducer: userReducer,
+                                environment: UserEnvironment.mockUserEnv
+                            )
             ).previewDisplayName("Login")
             
             UserLoginView(store:
-                .init(
-                    initialState:
-                    UserState.init(user: nil, isLoading: true),
-                    reducer: userReducer,
-                    environment: UserEnvironment.mockUserEnv
-                )
+                            .init(
+                                initialState:
+                                    UserState.init(user: nil, isLoading: true),
+                                reducer: userReducer,
+                                environment: UserEnvironment.mockUserEnv
+                            )
             ).previewDisplayName("Loading")
         }
     }

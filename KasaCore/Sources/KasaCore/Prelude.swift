@@ -18,9 +18,9 @@ public func over<S, T, A, B>(
     _ setter: (@escaping (A) -> B) -> (S) -> T,
     _ f: @escaping (A) -> B
 )
-    -> (S) -> T {
-        
-        return setter(f)
+-> (S) -> T {
+    
+    return setter(f)
 }
 
 /// Applies a value to an immutable setter function.
@@ -33,9 +33,9 @@ public func set<S, T, A, B>(
     _ setter: (@escaping (A) -> B) -> (S) -> T,
     _ value: B
 )
-    -> (S) -> T {
-        
-        return over(setter) { _ in value }
+-> (S) -> T {
+    
+    return over(setter) { _ in value }
 }
 
 // MARK: - Mutation
@@ -49,9 +49,9 @@ public func mver<S, A>(
     _ setter: (@escaping (inout A) -> Void) -> (inout S) -> Void,
     _ f: @escaping (inout A) -> Void
 )
-    -> (inout S) -> Void {
-        
-        return setter(f)
+-> (inout S) -> Void {
+    
+    return setter(f)
 }
 
 /// Applies a mutable value transformation to a reference-mutable setter function.
@@ -64,10 +64,10 @@ public func mver<S, A>(
     _ setter: (@escaping (inout A) -> Void) -> (S) -> Void,
     _ f: @escaping (inout A) -> Void
 )
-    -> (S) -> Void
-    where S: AnyObject {
-        
-        return setter(f)
+-> (S) -> Void
+where S: AnyObject {
+    
+    return setter(f)
 }
 
 /// Applies a reference-mutable value transformation to a reference-mutable setter function.
@@ -80,10 +80,10 @@ public func mver<S, A>(
     _ setter: (@escaping (A) -> Void) -> (S) -> Void,
     _ f: @escaping (A) -> Void
 )
-    -> (S) -> Void
-    where S: AnyObject, A: AnyObject {
-        
-        return setter(f)
+-> (S) -> Void
+where S: AnyObject, A: AnyObject {
+    
+    return setter(f)
 }
 
 /// Applies a value to a mutable setter function.
@@ -96,9 +96,9 @@ public func mut<S, A>(
     _ setter: (@escaping (inout A) -> Void) -> (inout S) -> Void,
     _ value: A
 )
-    -> (inout S) -> Void {
-        
-        return mver(setter) { $0 = value }
+-> (inout S) -> Void {
+    
+    return mver(setter) { $0 = value }
 }
 
 /// Applies a value to a reference-mutable setter function.
@@ -111,10 +111,10 @@ public func mut<S, A>(
     _ setter: (@escaping (inout A) -> Void) -> (S) -> Void,
     _ value: A
 )
-    -> (S) -> Void
-    where S: AnyObject {
-        
-        return mver(setter) { $0 = value }
+-> (S) -> Void
+where S: AnyObject {
+    
+    return mver(setter) { $0 = value }
 }
 
 /// Produces a getter function for a given key path. Useful for composing property access with functions.
@@ -135,16 +135,16 @@ public func get<Root, Value>(_ keyPath: KeyPath<Root, Value>) -> (Root) -> Value
 public func prop<Root, Value>(
     _ keyPath: WritableKeyPath<Root, Value>
 )
-    -> (@escaping (Value) -> Value)
-    -> (Root) -> Root {
-        
-        return { update in
-            { root in
-                var copy = root
-                copy[keyPath: keyPath] = update(copy[keyPath: keyPath])
-                return copy
-            }
+-> (@escaping (Value) -> Value)
+-> (Root) -> Root {
+    
+    return { update in
+        { root in
+            var copy = root
+            copy[keyPath: keyPath] = update(copy[keyPath: keyPath])
+            return copy
         }
+    }
 }
 
 
@@ -226,22 +226,22 @@ public prefix func ^ <Root, Value>(kp: KeyPath<Root, Value>) -> (Root) -> Value 
 }
 
 public prefix func ^ <Root, Value>(kp: WritableKeyPath<Root, Value>)
-    -> (@escaping (Value) -> Value)
-    -> (Root) -> Root {
-        
-        return prop(kp)
+-> (@escaping (Value) -> Value)
+-> (Root) -> Root {
+    
+    return prop(kp)
 }
 public prefix func ^ <Root, Value>(
     _ kp: WritableKeyPath<Root, Value>
-    )
-    -> (@escaping (inout Value) -> Void)
-    -> (inout Root) -> Void {
-        
-        return { update in
-            { root in
-                update(&root[keyPath: kp])
-            }
+)
+-> (@escaping (inout Value) -> Void)
+-> (inout Root) -> Void {
+    
+    return { update in
+        { root in
+            update(&root[keyPath: kp])
         }
+    }
 }
 
 public func absurd<A>(_ :Never) -> A {}
@@ -256,5 +256,5 @@ public extension Empty {
 }
 
 public func map<A, B>(_ f: @escaping (A) -> B) -> ([A]) -> [B] {
-  return { $0.map(f) }
+    return { $0.map(f) }
 }

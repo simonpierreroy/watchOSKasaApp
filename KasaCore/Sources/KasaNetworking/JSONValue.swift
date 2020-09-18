@@ -22,7 +22,7 @@ public extension JSONValue {
     subscript(dynamicMember key: JSONValue) -> JSONValue? {
         self[key]
     }
-
+    
     subscript(_ key: JSONValue) -> JSONValue? {
         if case let .number(key) = key {
             return self[Int(key)]
@@ -31,14 +31,14 @@ public extension JSONValue {
         }
         return nil
     }
-
+    
     subscript(_ index: Int) -> JSONValue? {
         guard case let .array(array) = self else {
             return nil
         }
         return array[index]
     }
-
+    
     subscript(_ key: String) -> JSONValue? {
         guard case let .object(object) = self else {
             return nil
@@ -72,7 +72,7 @@ extension JSONValue: Encodable {
 extension JSONValue: Decodable {
     public init(from decoder: Decoder) throws {
         let singleValueContainer = try decoder.singleValueContainer()
-
+        
         if singleValueContainer.decodeNil() {
             self = .null
         } else if let boolValue = try? singleValueContainer.decode(Bool.self) {
@@ -146,8 +146,8 @@ struct RawStringJSONContainer: Codable {
         let data = try RawStringJSONContainer.rawEncoder.encode(self.wrapping)
         guard let rawString = String(bytes: data, encoding: .utf8) else {
             throw EncodingError.invalidValue("", .init(
-                codingPath: container.codingPath,
-                debugDescription: "RawStringJSONContainer: Impossible to convert the encoded JSONValue data to a string.")
+                                                codingPath: container.codingPath,
+                                                debugDescription: "RawStringJSONContainer: Impossible to convert the encoded JSONValue data to a string.")
             )
         }
         try container.encode(rawString)
@@ -162,8 +162,8 @@ struct RawStringJSONContainer: Codable {
         let rawJSON = try container.decode(String.self)
         guard let data = rawJSON.data(using: .utf8) else {
             throw DecodingError.dataCorruptedError(
-            in: container,
-            debugDescription: "RawStringJSONContainer: Impossible to convert the JSON string to data."
+                in: container,
+                debugDescription: "RawStringJSONContainer: Impossible to convert the JSON string to data."
             )
         }
         self.wrapping = try RawStringJSONContainer.rawDecoder.decode(JSONValue.self, from: data)

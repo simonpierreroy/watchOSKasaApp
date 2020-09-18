@@ -17,8 +17,8 @@ extension Networking.App {
     
     private struct DeviceStateParam: Encodable {
         let deviceId: String
-        let requestData: RawStringJSONContainer = .init(wrapping:
-            ["system": ["get_sysinfo": nil]] //"{\"system\":{\"get_sysinfo\":null}}"
+        let requestData: RawStringJSONContainer = .init(
+            wrapping: ["system": ["get_sysinfo": nil]] //"{\"system\":{\"get_sysinfo\":null}}"
         )
     }
     
@@ -64,7 +64,7 @@ extension Networking.App {
         init(deviceId: String, state: RelayIsOn) {
             self.deviceId = deviceId
             self.requestData = .init(wrapping:
-                ["system": ["set_relay_state": ["state": .bool(state.rawValue)]]] //"{\"system\":{\"set_relay_state\":{\"state\":\(boolState)}}}"
+                                        ["system": ["set_relay_state": ["state": .bool(state.rawValue)]]] //"{\"system\":{\"set_relay_state\":{\"state\":\(boolState)}}}"
             )
         }
         let deviceId: String
@@ -100,6 +100,6 @@ extension Networking.App {
         getDevicesState(token: token, id: id)
             .flatMap { state in
                 return changeDevicesState(token: token, id: id, state: state.toggle())
-        }.eraseToAnyPublisher()
+            }.eraseToAnyPublisher()
     }
 }

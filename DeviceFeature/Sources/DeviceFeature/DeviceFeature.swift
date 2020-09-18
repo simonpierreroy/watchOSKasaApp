@@ -78,11 +78,11 @@ public let devicesReducer = Reducer<DevicesState, DevicesAtion, DevicesEnvironme
     case .empty: return .none
     }
 }.combined(with:
-    deviceDetailStateReducer.forEach(
-        state: \DevicesState.devices,
-        action: /DevicesAtion.deviceDetail(index:action:),
-        environment: DeviceDetailEvironment.init(devicesEnv:)
-    )
+            deviceDetailStateReducer.forEach(
+                state: \DevicesState.devices,
+                action: /DevicesAtion.deviceDetail(index:action:),
+                environment: DeviceDetailEvironment.init(devicesEnv:)
+            )
 )
 
 #if DEBUG

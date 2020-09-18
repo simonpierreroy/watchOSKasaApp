@@ -20,7 +20,7 @@ struct AppState {
     
     var userState: UserState
     private var _devicesState: DevicesState
-
+    
     var devicesState: DevicesState {
         get {
             var copy = self._devicesState
@@ -75,13 +75,13 @@ let appReducer: Reducer<AppState, AppAction, AppEnv> = userReducer
         state: \.userState,
         action: /AppAction.userAction,
         environment: UserEnvironment.init(appEnv:)
-).combined(with:
-    devicesReducer.pullback(
-        state: \.devicesState,
-        action: /AppAction.devicesAction,
-        environment:DevicesEnvironment.init(appEnv:)
-    )
-)//.debug()
+    ).combined(with:
+                devicesReducer.pullback(
+                    state: \.devicesState,
+                    action: /AppAction.devicesAction,
+                    environment:DevicesEnvironment.init(appEnv:)
+                )
+    )//.debug()
 
 extension AppAction {
     init(deviceAction: DeviceListView.Action) {
@@ -102,9 +102,9 @@ extension AppAction {
 extension DeviceListView.StateView {
     init(appState: AppState) {
         self.init(
-        errorMessageToDisplayText: appState.devicesState.error?.localizedDescription,
-        isRefreshingDevices: appState.devicesState.isLoading,
-        devicesToDisplay: appState.devicesState.devices
+            errorMessageToDisplayText: appState.devicesState.error?.localizedDescription,
+            isRefreshingDevices: appState.devicesState.isLoading,
+            devicesToDisplay: appState.devicesState.devices
         )
     }
 }

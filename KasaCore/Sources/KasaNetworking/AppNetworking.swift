@@ -50,7 +50,7 @@ extension Networking {
                     }
                     return result
                     
-            }.eraseToAnyPublisher()
+                }.eraseToAnyPublisher()
         }
         
         static let baseRequest = guaranteeHeaders

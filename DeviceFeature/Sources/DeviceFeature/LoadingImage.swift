@@ -18,7 +18,7 @@ public struct LoadingImage: View {
             .animation(
                 loading ? Animation.linear(duration: 2).repeatForever(autoreverses: false)
                     :  Animation.default
-        )
+            )
     }
 }
 

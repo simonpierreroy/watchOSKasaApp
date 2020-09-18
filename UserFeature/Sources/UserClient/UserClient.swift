@@ -64,7 +64,7 @@ public extension UserEnvironment {
         login:  { _ in Effect.future { $0(.success(User.init(token: "1"))) }
             .delay(for: 2, scheduler: DispatchQueue.main)
             .eraseToAnyPublisher()
-    },
+        },
         cache: UserCache(
             save: { _ in Effect<Void, Never>.fireAndForget {} } ,
             load: Just(Optional.some(User.init(token: "1")))

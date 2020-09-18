@@ -26,12 +26,12 @@ public enum Networking {
             .receive(on: workQueue)
             .tryMap { data, reponse in
                 if let httpResponse = reponse as? HTTPURLResponse,
-                    !(200...299).contains(httpResponse.statusCode) {
+                   !(200...299).contains(httpResponse.statusCode) {
                     throw CodeError(statusCode: httpResponse.statusCode)
                 }
                 return data
-        }
-        .eraseToAnyPublisher()
+            }
+            .eraseToAnyPublisher()
     }
     
     static func modelFetcher<Model: Decodable>(decoder: JSONDecoder, fetcher: DataFetcher) -> ModelFetcher<Model> {
@@ -67,14 +67,14 @@ public enum Networking {
     }
     
     static func setQuery(items: [String: String]) -> (URL) -> URL? {
-    { url in
-        Optional.some(url)
-            .flatMap(URLComponents.from(url:))
-            .map { old in
-                var new = old
-                new.queryItems = items.map(URLQueryItem.init(name:value:))
-                return new
-        }.flatMap(^\URLComponents.url)
+        { url in
+            Optional.some(url)
+                .flatMap(URLComponents.from(url:))
+                .map { old in
+                    var new = old
+                    new.queryItems = items.map(URLQueryItem.init(name:value:))
+                    return new
+                }.flatMap(^\URLComponents.url)
         }
     }
 }
