@@ -7,9 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		322E2A93248411C5008E6D72 /* DeviceListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 322E2A92248411C5008E6D72 /* DeviceListView.swift */; };
-		3238DCF92485EA5C001F6164 /* Tagged in Frameworks */ = {isa = PBXBuildFile; productRef = 3238DCF82485EA5C001F6164 /* Tagged */; };
-		3274AAFD248D6594001794E8 /* JSONValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3274AAFC248D6594001794E8 /* JSONValue.swift */; };
 		328950E024821A3800EC3A49 /* Kasa.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 328950DF24821A3800EC3A49 /* Kasa.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		328950E624821A3800EC3A49 /* Interface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 328950E424821A3800EC3A49 /* Interface.storyboard */; };
 		328950E824821A3900EC3A49 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 328950E724821A3900EC3A49 /* Assets.xcassets */; };
@@ -20,18 +17,7 @@
 		328950FA24821A3A00EC3A49 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 328950F924821A3A00EC3A49 /* Assets.xcassets */; };
 		328950FD24821A3A00EC3A49 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 328950FC24821A3A00EC3A49 /* Preview Assets.xcassets */; };
 		328951282482245D00EC3A49 /* App.swift in Sources */ = {isa = PBXBuildFile; fileRef = 328951272482245D00EC3A49 /* App.swift */; };
-		3289512A2482256E00EC3A49 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 328951292482256E00EC3A49 /* User.swift */; };
-		3289512E2482333100EC3A49 /* UserLoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3289512D2482333100EC3A49 /* UserLoginView.swift */; };
-		32C8424F2484A4B000F15B97 /* LoadingImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32C8424E2484A4B000F15B97 /* LoadingImage.swift */; };
-		32EE973B2482AC2F00C2E7E5 /* DeviceDetail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32EE973A2482AC2F00C2E7E5 /* DeviceDetail.swift */; };
-		32EE97412483FB0E00C2E7E5 /* ComposableArchitecture in Frameworks */ = {isa = PBXBuildFile; productRef = 32EE97402483FB0E00C2E7E5 /* ComposableArchitecture */; };
-		32EE97442483FBC500C2E7E5 /* AppNetworking.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3289512124821D1100EC3A49 /* AppNetworking.swift */; };
-		32EE97452483FBC800C2E7E5 /* Networking.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3289512324821D1D00EC3A49 /* Networking.swift */; };
-		32EE97472483FC4F00C2E7E5 /* Prelude.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3289512524821D4900EC3A49 /* Prelude.swift */; };
-		32F3E105248747DC00C9773B /* Devices.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32F3E104248747DC00C9773B /* Devices.swift */; };
-		32F3E10724875A9900C9773B /* Loggin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32F3E10624875A9900C9773B /* Loggin.swift */; };
-		32F3E10924875B1000C9773B /* DevicesList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32F3E10824875B1000C9773B /* DevicesList.swift */; };
-		32F3E10B24875B7200C9773B /* DeviceState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32F3E10A24875B7200C9773B /* DeviceState.swift */; };
+		32D3F93525156CC300A8446C /* AppPackage in Frameworks */ = {isa = PBXBuildFile; productRef = 32D3F93425156CC300A8446C /* AppPackage */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -87,8 +73,6 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		322E2A92248411C5008E6D72 /* DeviceListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceListView.swift; sourceTree = "<group>"; };
-		3274AAFC248D6594001794E8 /* JSONValue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSONValue.swift; sourceTree = "<group>"; };
 		328950DB24821A3800EC3A49 /* Kasa.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Kasa.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		328950DF24821A3800EC3A49 /* Kasa.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Kasa.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		328950E524821A3800EC3A49 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Interface.storyboard; sourceTree = "<group>"; };
@@ -101,18 +85,12 @@
 		328950F924821A3A00EC3A49 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		328950FC24821A3A00EC3A49 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		328950FE24821A3A00EC3A49 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		3289512124821D1100EC3A49 /* AppNetworking.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppNetworking.swift; sourceTree = "<group>"; };
-		3289512324821D1D00EC3A49 /* Networking.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Networking.swift; sourceTree = "<group>"; };
-		3289512524821D4900EC3A49 /* Prelude.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Prelude.swift; sourceTree = "<group>"; };
 		328951272482245D00EC3A49 /* App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = App.swift; sourceTree = "<group>"; };
-		328951292482256E00EC3A49 /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
-		3289512D2482333100EC3A49 /* UserLoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserLoginView.swift; sourceTree = "<group>"; };
-		32C8424E2484A4B000F15B97 /* LoadingImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingImage.swift; sourceTree = "<group>"; };
-		32EE973A2482AC2F00C2E7E5 /* DeviceDetail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceDetail.swift; sourceTree = "<group>"; };
-		32F3E104248747DC00C9773B /* Devices.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Devices.swift; sourceTree = "<group>"; };
-		32F3E10624875A9900C9773B /* Loggin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Loggin.swift; sourceTree = "<group>"; };
-		32F3E10824875B1000C9773B /* DevicesList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevicesList.swift; sourceTree = "<group>"; };
-		32F3E10A24875B7200C9773B /* DeviceState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceState.swift; sourceTree = "<group>"; };
+		32D3F90425155FED00A8446C /* Screen Shot 2020-09-18 at 5.35.02 PM.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Screen Shot 2020-09-18 at 5.35.02 PM.png"; path = "../Screen Shot 2020-09-18 at 5.35.02 PM.png"; sourceTree = "<group>"; };
+		32D3F920251566C200A8446C /* UserFeature */ = {isa = PBXFileReference; lastKnownFileType = folder; path = UserFeature; sourceTree = "<group>"; };
+		32D3F9232515679100A8446C /* KasaCore */ = {isa = PBXFileReference; lastKnownFileType = folder; path = KasaCore; sourceTree = "<group>"; };
+		32D3F926251568BC00A8446C /* DeviceFeature */ = {isa = PBXFileReference; lastKnownFileType = folder; path = DeviceFeature; sourceTree = "<group>"; };
+		32D3F93125156C1F00A8446C /* AppPackage */ = {isa = PBXFileReference; lastKnownFileType = folder; path = AppPackage; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -120,8 +98,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3238DCF92485EA5C001F6164 /* Tagged in Frameworks */,
-				32EE97412483FB0E00C2E7E5 /* ComposableArchitecture in Frameworks */,
+				32D3F93525156CC300A8446C /* AppPackage in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -131,6 +108,10 @@
 		328950D424821A3800EC3A49 = {
 			isa = PBXGroup;
 			children = (
+				32D3F93125156C1F00A8446C /* AppPackage */,
+				32D3F9232515679100A8446C /* KasaCore */,
+				32D3F926251568BC00A8446C /* DeviceFeature */,
+				32D3F920251566C200A8446C /* UserFeature */,
 				328950E324821A3800EC3A49 /* Kasa WatchKit App */,
 				328950F224821A3900EC3A49 /* Kasa WatchKit Extension */,
 				328950DC24821A3800EC3A49 /* Products */,
@@ -161,12 +142,7 @@
 		328950F224821A3900EC3A49 /* Kasa WatchKit Extension */ = {
 			isa = PBXGroup;
 			children = (
-				32C8424D2484A48400F15B97 /* Shared Views */,
-				32EE97462483FBD700C2E7E5 /* Prelude */,
-				32EE97422483FB5E00C2E7E5 /* Networking */,
-				32EE97392482AC1300C2E7E5 /* Device */,
 				3289512C2482321800EC3A49 /* App */,
-				3289512B2482320B00EC3A49 /* User */,
 				328950F524821A3900EC3A49 /* HostingController.swift */,
 				328950F724821A3900EC3A49 /* ExtensionDelegate.swift */,
 				328950F924821A3A00EC3A49 /* Assets.xcassets */,
@@ -184,15 +160,6 @@
 			path = "Preview Content";
 			sourceTree = "<group>";
 		};
-		3289512B2482320B00EC3A49 /* User */ = {
-			isa = PBXGroup;
-			children = (
-				328951292482256E00EC3A49 /* User.swift */,
-				3289512D2482333100EC3A49 /* UserLoginView.swift */,
-			);
-			path = User;
-			sourceTree = "<group>";
-		};
 		3289512C2482321800EC3A49 /* App */ = {
 			isa = PBXGroup;
 			children = (
@@ -202,50 +169,12 @@
 			path = App;
 			sourceTree = "<group>";
 		};
-		32C8424D2484A48400F15B97 /* Shared Views */ = {
-			isa = PBXGroup;
-			children = (
-				32C8424E2484A4B000F15B97 /* LoadingImage.swift */,
-			);
-			path = "Shared Views";
-			sourceTree = "<group>";
-		};
-		32EE97392482AC1300C2E7E5 /* Device */ = {
-			isa = PBXGroup;
-			children = (
-				32EE973A2482AC2F00C2E7E5 /* DeviceDetail.swift */,
-				32F3E104248747DC00C9773B /* Devices.swift */,
-				322E2A92248411C5008E6D72 /* DeviceListView.swift */,
-			);
-			path = Device;
-			sourceTree = "<group>";
-		};
 		32EE973C248368AC00C2E7E5 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				32D3F90425155FED00A8446C /* Screen Shot 2020-09-18 at 5.35.02 PM.png */,
 			);
 			name = Frameworks;
-			sourceTree = "<group>";
-		};
-		32EE97422483FB5E00C2E7E5 /* Networking */ = {
-			isa = PBXGroup;
-			children = (
-				3289512124821D1100EC3A49 /* AppNetworking.swift */,
-				32F3E10A24875B7200C9773B /* DeviceState.swift */,
-				32F3E10824875B1000C9773B /* DevicesList.swift */,
-				32F3E10624875A9900C9773B /* Loggin.swift */,
-				3289512324821D1D00EC3A49 /* Networking.swift */,
-				3274AAFC248D6594001794E8 /* JSONValue.swift */,
-			);
-			path = Networking;
-			sourceTree = "<group>";
-		};
-		32EE97462483FBD700C2E7E5 /* Prelude */ = {
-			isa = PBXGroup;
-			children = (
-				3289512524821D4900EC3A49 /* Prelude.swift */,
-			);
-			path = Prelude;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -300,8 +229,7 @@
 			);
 			name = "Kasa WatchKit Extension";
 			packageProductDependencies = (
-				32EE97402483FB0E00C2E7E5 /* ComposableArchitecture */,
-				3238DCF82485EA5C001F6164 /* Tagged */,
+				32D3F93425156CC300A8446C /* AppPackage */,
 			);
 			productName = "Kasa WatchKit Extension";
 			productReference = 328950EE24821A3900EC3A49 /* Kasa WatchKit Extension.appex */;
@@ -338,8 +266,6 @@
 			);
 			mainGroup = 328950D424821A3800EC3A49;
 			packageReferences = (
-				32EE973F2483FB0E00C2E7E5 /* XCRemoteSwiftPackageReference "swift-composable-architecture" */,
-				3238DCF72485EA5C001F6164 /* XCRemoteSwiftPackageReference "swift-tagged" */,
 			);
 			productRefGroup = 328950DC24821A3800EC3A49 /* Products */;
 			projectDirPath = "";
@@ -386,22 +312,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				328950F624821A3900EC3A49 /* HostingController.swift in Sources */,
-				32EE97452483FBC800C2E7E5 /* Networking.swift in Sources */,
-				32F3E10924875B1000C9773B /* DevicesList.swift in Sources */,
 				328951282482245D00EC3A49 /* App.swift in Sources */,
-				3289512E2482333100EC3A49 /* UserLoginView.swift in Sources */,
 				328950F424821A3900EC3A49 /* ContentView.swift in Sources */,
-				32F3E10724875A9900C9773B /* Loggin.swift in Sources */,
-				3289512A2482256E00EC3A49 /* User.swift in Sources */,
-				32EE973B2482AC2F00C2E7E5 /* DeviceDetail.swift in Sources */,
-				32F3E105248747DC00C9773B /* Devices.swift in Sources */,
-				3274AAFD248D6594001794E8 /* JSONValue.swift in Sources */,
-				322E2A93248411C5008E6D72 /* DeviceListView.swift in Sources */,
 				328950F824821A3900EC3A49 /* ExtensionDelegate.swift in Sources */,
-				32EE97442483FBC500C2E7E5 /* AppNetworking.swift in Sources */,
-				32F3E10B24875B7200C9773B /* DeviceState.swift in Sources */,
-				32C8424F2484A4B000F15B97 /* LoadingImage.swift in Sources */,
-				32EE97472483FC4F00C2E7E5 /* Prelude.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -707,35 +620,10 @@
 		};
 /* End XCConfigurationList section */
 
-/* Begin XCRemoteSwiftPackageReference section */
-		3238DCF72485EA5C001F6164 /* XCRemoteSwiftPackageReference "swift-tagged" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/pointfreeco/swift-tagged.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 0.5.0;
-			};
-		};
-		32EE973F2483FB0E00C2E7E5 /* XCRemoteSwiftPackageReference "swift-composable-architecture" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/pointfreeco/swift-composable-architecture.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 0.7.0;
-			};
-		};
-/* End XCRemoteSwiftPackageReference section */
-
 /* Begin XCSwiftPackageProductDependency section */
-		3238DCF82485EA5C001F6164 /* Tagged */ = {
+		32D3F93425156CC300A8446C /* AppPackage */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 3238DCF72485EA5C001F6164 /* XCRemoteSwiftPackageReference "swift-tagged" */;
-			productName = Tagged;
-		};
-		32EE97402483FB0E00C2E7E5 /* ComposableArchitecture */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 32EE973F2483FB0E00C2E7E5 /* XCRemoteSwiftPackageReference "swift-composable-architecture" */;
-			productName = ComposableArchitecture;
+			productName = AppPackage;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

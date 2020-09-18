@@ -8,12 +8,21 @@
 
 import SwiftUI
 import ComposableArchitecture
+import KasaCore
+import DeviceFeature
+import UserFeature
+
+//struct ContentView: View {
+//    var body: some View {
+//        Text("hi")
+//    }
+//}
 
 struct ContentView: View {
-    
+
     let store: Store<StateView, Never>
     let globalStore: Store<AppState, AppAction>
-    
+
     init(store: Store<AppState, AppAction> = ExtensionDelegate.store) {
         self.globalStore = store
         self.store = store
@@ -22,7 +31,7 @@ struct ContentView: View {
                 action: absurd(_:)
         )
     }
-    
+
     var body: some View {
         WithViewStore(self.store) { viewStore in
             HStack {
@@ -48,7 +57,7 @@ struct ContentView: View {
 
 
 extension ContentView {
-    
+
     struct StateView: Equatable {
         let isUserLogged: Bool
     }

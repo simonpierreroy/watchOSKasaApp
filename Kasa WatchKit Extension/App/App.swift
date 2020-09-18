@@ -7,8 +7,13 @@
 //
 
 import Foundation
-import ComposableArchitecture
 import Combine
+import UserFeature
+import DeviceFeature
+import DeviceClient
+import UserClient
+import ComposableArchitecture
+import KasaCore
 
 struct AppState {
     static let empty = AppState(userState: .empty, _devicesState: .empty)
@@ -32,14 +37,38 @@ enum AppAction {
     case devicesAction(DevicesAtion)
 }
 
+
 struct AppEnv {
     let mainQueue: AnySchedulerOf<DispatchQueue>
     let backgroundQueue: AnySchedulerOf<DispatchQueue>
-    let login: (Networking.App.Credential) -> AnyPublisher<User, Error>
+    let login: (User.Credential) -> AnyPublisher<User, Error>
     let cache: UserCache
-    let loadDevices: (User.Token) -> AnyPublisher<[DeviceSate], Error>
+    let loadDevices: (Token) -> AnyPublisher<[Device], Error>
     let toggleDevicesState: DeviceDetailEvironment.ToggleEffect
 }
+
+extension UserEnvironment {
+    init(appEnv: AppEnv) {
+        self.init(
+            mainQueue: appEnv.mainQueue,
+            backgroundQueue: appEnv.backgroundQueue,
+            login: appEnv.login,
+            cache: appEnv.cache
+        )
+    }
+}
+
+extension DevicesEnvironment {
+    init(appEnv: AppEnv) {
+        self.init(
+            mainQueue: appEnv.mainQueue,
+            backgroundQueue: appEnv.backgroundQueue,
+            loadDevices: appEnv.loadDevices,
+            toggleDevicesState: appEnv.toggleDevicesState
+        )
+    }
+}
+
 
 let appReducer: Reducer<AppState, AppAction, AppEnv> = userReducer
     .pullback(
@@ -54,31 +83,34 @@ let appReducer: Reducer<AppState, AppAction, AppEnv> = userReducer
     )
 )//.debug()
 
-#if DEBUG
-extension AppState {
-    static let mockAppStateLoggedNotLoadingDevices: AppState = {
-        var state = AppState.empty
-        state.userState.user = User.init(token: "test")
-        state.devicesState.devices = [
-            DeviceSate.init(id: "1", name: "Test device 1"),
-        ]
-        state.devicesState.isLoading = .loaded
-        return state
-    }()
-    
-    static let mockAppStateLoggedLoadingDevices: AppState = {
-        var state = AppState.mockAppStateLoggedNotLoadingDevices
-        state.devicesState.isLoading = .loading
-        return state
-    }()
-    
-    static let mockAppStateLoggedNerverLoaded: AppState = {
-        var state = AppState.mockAppStateLoggedNotLoadingDevices
-        state.devicesState.isLoading = .nerverLoaded
-        return state
-    }()
+extension AppAction {
+    init(deviceAction: DeviceListView.Action) {
+        switch deviceAction {
+        case .tappedDevice(index: let idx, action: let action):
+            let deviceDetailAction = DeviceDetailAction.init(viewDetailAction: action)
+            self = .devicesAction(.deviceDetail(index: idx, action: deviceDetailAction))
+        case .tappedErrorAlert:
+            self = .devicesAction(.errorHandled)
+        case .tappedLogoutButton:
+            self = .userAction(.logout)
+        case .tappedRefreshButton, .viewAppearReload:
+            self = .devicesAction(.fetchFromRemote)
+        }
+    }
 }
 
+extension DeviceListView.StateView {
+    init(appState: AppState) {
+        self.init(
+        errorMessageToDisplayText: appState.devicesState.error?.localizedDescription,
+        isRefreshingDevices: appState.devicesState.isLoading,
+        devicesToDisplay: appState.devicesState.devices
+        )
+    }
+}
+
+
+#if DEBUG
 extension AppEnv {
     static let mockAppEnv = AppEnv(
         mainQueue: DevicesEnvironment.mockDevicesEnv.mainQueue,
@@ -90,3 +122,5 @@ extension AppEnv {
     )
 }
 #endif
+
+

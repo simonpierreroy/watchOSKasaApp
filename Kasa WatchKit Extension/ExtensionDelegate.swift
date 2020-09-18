@@ -8,6 +8,12 @@
 
 import WatchKit
 import ComposableArchitecture
+import UserClient
+import UserClientLive
+import DeviceClient
+import DeviceClientLive
+import KasaCore
+
 
 extension AppAction {
     init(delegateAction: ExtensionDelegate.Action) {
@@ -19,6 +25,7 @@ extension AppAction {
         }
     }
 }
+
 
 class ExtensionDelegate: NSObject, WKExtensionDelegate {
     

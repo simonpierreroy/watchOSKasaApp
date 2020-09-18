@@ -24,17 +24,17 @@
         "repositoryURL": "https://github.com/pointfreeco/swift-composable-architecture.git",
         "state": {
           "branch": null,
-          "revision": "7f482acbf4c108655ae269a6445831ce1890762e",
-          "version": "0.7.0"
+          "revision": "47a9d368d1f314a630bf91b71acfb5054420eeb3",
+          "version": "0.8.0"
         }
       },
       {
-        "package": "Tagged",
+        "package": "swift-tagged",
         "repositoryURL": "https://github.com/pointfreeco/swift-tagged.git",
         "state": {
           "branch": null,
-          "revision": "592e1eb4255c571ebffc29955011e352217501b4",
-          "version": "0.5.0"
+          "revision": "6c36cf66f58553d0481a2628e3e27177f698a897",
+          "version": null
         }
       }
     ]
