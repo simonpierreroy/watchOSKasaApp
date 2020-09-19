@@ -23,6 +23,7 @@ public enum DeviceDetailAction {
     case didToggle
 }
 
+struct CancelInFlightToggle: Hashable {}
 
 let deviceDetailStateReducer = Reducer<DeviceSate, DeviceDetailAction, DeviceDetailEvironment> { state, action, env in
     switch action {
@@ -36,6 +37,7 @@ let deviceDetailStateReducer = Reducer<DeviceSate, DeviceDetailAction, DeviceDet
             .catch (DeviceDetailAction.send >>> Just.init)
             .receive(on: env.mainQueue)
             .eraseToEffect()
+            .cancellable(id: CancelInFlightToggle())
     case .didToggle:
         state.isLoading = false
         return .none

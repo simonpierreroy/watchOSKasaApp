@@ -66,6 +66,7 @@ public let devicesReducer = Reducer<DevicesState, DevicesAtion, DevicesEnvironme
             .map(DevicesAtion.set)
             .catch(DevicesAtion.send >>> Just.init)
             .receive(on: environment.mainQueue)
+            .merge(with: Effect.cancel(id: CancelInFlightToggle()))
             .eraseToEffect()
     case .send(let error):
         state.isLoading = .loaded
