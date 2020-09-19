@@ -216,7 +216,8 @@ struct DeviceListView_Previews: PreviewProvider {
                     state: DeviceListView.StateView.init(devices:),
                     action: DevicesAtion.init(deviceAction:)
                 )
-            ).previewDisplayName("1 item")
+            ).preferredColorScheme(.dark)
+            .previewDisplayName("1 item")
             
             DeviceListView(
                 store: Store<DevicesState, DevicesAtion>.init(
