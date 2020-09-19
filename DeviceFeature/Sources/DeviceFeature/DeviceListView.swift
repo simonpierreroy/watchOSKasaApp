@@ -35,12 +35,18 @@ public struct DeviceListView: View {
                     Button(action: { viewStore.send(.tappedRefreshButton)}) {
                         HStack {
                             LoadingImage(loading: .constant(viewStore.isRefreshingDevices == .loading), systemName: "arrow.clockwise.circle.fill")
-                            Text("Refresh")
-                        }
+                            Text(Strings.refresh_list.key, bundle: .module)
+                        }.foregroundColor(Color.valid)
                     }
                 }.disabled(viewStore.isRefreshingDevices == .loading)
                 
-                Button("Logout") { viewStore.send(.tappedLogoutButton) }
+                Button {
+                    viewStore.send(.tappedLogoutButton)
+                } label: {
+                    Text(Strings.logout_app.key, bundle: .module)
+                        .foregroundColor(Color.logout)
+                }
+                    
                 
             }.alert(
                 item: viewStore.binding(
@@ -211,6 +217,19 @@ struct DeviceListView_Previews: PreviewProvider {
                     action: DevicesAtion.init(deviceAction:)
                 )
             ).previewDisplayName("1 item")
+            
+            DeviceListView(
+                store: Store<DevicesState, DevicesAtion>.init(
+                    initialState: DevicesState.oneDeviceLoaded,
+                    reducer: devicesReducer,
+                    environment: DevicesEnvironment.mockDevicesEnv
+                ).scope(
+                    state: DeviceListView.StateView.init(devices:),
+                    action: DevicesAtion.init(deviceAction:)
+                )
+            )
+            .environment(\.locale, .init(identifier: "fr"))
+            .previewDisplayName("1 item french")
         }
     }
 }

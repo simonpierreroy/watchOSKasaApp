@@ -5,6 +5,7 @@ import PackageDescription
 
 let package = Package(
     name: "UserFeature",
+    defaultLocalization: "en",
     platforms: [.iOS(.v13), .watchOS(.v6)],
     products: [
         .library(

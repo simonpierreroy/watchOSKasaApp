@@ -33,9 +33,12 @@ public struct UserLoginView: View {
                     .foregroundColor(Color.orange)
                     .padding()
                 
-                TextField("Email", text: self.$email)
-                    .textContentType(.emailAddress)
-                SecureField("Password", text: self.$password)
+                TextField(
+                    Strings.log_email.string,
+                    text: self.$email
+                )
+                .textContentType(.emailAddress)
+                SecureField(Strings.log_password.string, text: self.$password)
                     .textContentType(.password)
                 
                 Button(action: {
@@ -45,7 +48,7 @@ public struct UserLoginView: View {
                         if viewStore.isLoadingUser {
                             Image(systemName: "slowmo")
                         }
-                        Text("Login")
+                        Text(Strings.login_app.key, bundle: .module)
                     }
                 }
             }
@@ -112,6 +115,17 @@ struct UserLoginView_Previews: PreviewProvider {
                                 environment: UserEnvironment.mockUserEnv
                             )
             ).previewDisplayName("Login")
+            
+            UserLoginView(store:
+                            .init(
+                                initialState:
+                                    UserState.init(user: nil, isLoading: false),
+                                reducer: userReducer,
+                                environment: UserEnvironment.mockUserEnv
+                            )
+            )
+            .environment(\.locale, .init(identifier: "fr"))
+            .previewDisplayName("Login French")
             
             UserLoginView(store:
                             .init(
