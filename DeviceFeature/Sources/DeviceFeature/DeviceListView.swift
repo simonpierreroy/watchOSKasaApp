@@ -36,8 +36,9 @@ public struct DeviceListView: View {
                         HStack {
                             LoadingImage(loading: .constant(viewStore.isRefreshingDevices == .loading), systemName: "arrow.clockwise.circle.fill")
                             Text(Strings.refresh_list.key, bundle: .module)
-                        }.foregroundColor(Color.valid)
+                        }
                     }
+                    .foregroundColor(Color.valid).listRowPlatterColor(Color.valid.opacity(0.14))
                 }.disabled(viewStore.isRefreshingDevices == .loading)
                 
                 Button {
@@ -45,7 +46,7 @@ public struct DeviceListView: View {
                 } label: {
                     Text(Strings.logout_app.key, bundle: .module)
                         .foregroundColor(Color.logout)
-                }
+                }.listRowPlatterColor(Color.logout.opacity(0.17))
                     
                 
             }.alert(
