@@ -39,7 +39,10 @@ class ExtensionDelegate: NSObject, WKExtensionDelegate {
             login: UserEnvironment.liveLogginEffect,
             cache: UserCache(save: UserEnvironment.liveSave, load: UserEnvironment.liveLoadUser),
             loadDevices: DevicesEnvironment.liveDevicesCall(token:),
-            toggleDevicesState: DeviceDetailEvironment.liveToggleDeviceState)
+            toggleDevicesState: DeviceDetailEvironment.liveToggleDeviceState,
+            getDevicesState: DevicesEnvironment.liveGetDevicesState(token:id:),
+            changeDevicesState: DevicesEnvironment.liveChangeDevicesState(token:id:newState:)
+        )
     )
     
     private static let viewStore: ViewStore<Void, Action> = {

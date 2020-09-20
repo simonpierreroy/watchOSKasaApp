@@ -45,6 +45,8 @@ struct AppEnv {
     let cache: UserCache
     let loadDevices: (Token) -> AnyPublisher<[Device], Error>
     let toggleDevicesState: DeviceDetailEvironment.ToggleEffect
+    let getDevicesState: (Token, Device.ID) -> AnyPublisher<RelayIsOn, Error>
+    let changeDevicesState: (Token, Device.ID, RelayIsOn) -> AnyPublisher<RelayIsOn, Error>
 }
 
 extension UserEnvironment {
@@ -64,7 +66,9 @@ extension DevicesEnvironment {
             mainQueue: appEnv.mainQueue,
             backgroundQueue: appEnv.backgroundQueue,
             loadDevices: appEnv.loadDevices,
-            toggleDevicesState: appEnv.toggleDevicesState
+            toggleDevicesState: appEnv.toggleDevicesState,
+            getDevicesState: appEnv.getDevicesState,
+            changeDevicesState: appEnv.changeDevicesState
         )
     }
 }
@@ -84,7 +88,7 @@ let appReducer: Reducer<AppState, AppAction, AppEnv> = userReducer
     )//.debug()
 
 extension AppAction {
-    init(deviceAction: DeviceListView.Action) {
+    init(deviceAction: DeviceListViewWatch.Action) {
         switch deviceAction {
         case .tappedDevice(index: let idx, action: let action):
             let deviceDetailAction = DeviceDetailAction.init(viewDetailAction: action)
@@ -95,11 +99,13 @@ extension AppAction {
             self = .userAction(.logout)
         case .tappedRefreshButton, .viewAppearReload:
             self = .devicesAction(.fetchFromRemote)
+        case .tappedCloseAll:
+            self = .devicesAction(.closeAll)
         }
     }
 }
 
-extension DeviceListView.StateView {
+extension DeviceListViewWatch.StateView {
     init(appState: AppState) {
         self.init(
             errorMessageToDisplayText: appState.devicesState.error?.localizedDescription,
@@ -118,7 +124,9 @@ extension AppEnv {
         login: UserEnvironment.mockUserEnv.login,
         cache: UserEnvironment.mockUserEnv.cache,
         loadDevices: DevicesEnvironment.mockDevicesEnv.loadDevices,
-        toggleDevicesState: DevicesEnvironment.mockDevicesEnv.toggleDevicesState
+        toggleDevicesState: DevicesEnvironment.mockDevicesEnv.toggleDevicesState,
+        getDevicesState: DevicesEnvironment.mockDevicesEnv.getDevicesState,
+        changeDevicesState: DevicesEnvironment.mockDevicesEnv.changeDevicesState
     )
 }
 #endif

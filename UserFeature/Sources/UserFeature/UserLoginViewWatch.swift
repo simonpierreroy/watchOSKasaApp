@@ -11,12 +11,13 @@ import SwiftUI
 import ComposableArchitecture
 import UserClient
 
-public struct UserLoginView: View {
+#if os(watchOS)
+public struct UserLoginViewWatch: View {
     
     public init(store: Store<UserState, UserAction>) {
         self.store = store
             .scope(
-                state: UserLoginView.StateView.init(userState:),
+                state: UserLoginViewWatch.StateView.init(userState:),
                 action: UserAction.init(userViewAction:)
             )
     }
@@ -65,14 +66,14 @@ public struct UserLoginView: View {
     }
 }
 
-extension UserLoginView {
+extension UserLoginViewWatch {
     struct AlertInfo: Identifiable {
         var title: String
         var id: String { self.title }
     }
 }
 
-extension UserLoginView {
+extension UserLoginViewWatch {
     
     struct StateView: Equatable {
         let errorMessageToDisplayText: String?
@@ -85,7 +86,7 @@ extension UserLoginView {
     }
 }
 
-extension UserLoginView.StateView {
+extension UserLoginViewWatch.StateView {
     init(userState: UserState) {
         self.errorMessageToDisplayText = userState.error?.localizedDescription
         self.isLoadingUser = userState.isLoading
@@ -93,7 +94,7 @@ extension UserLoginView.StateView {
 }
 
 extension UserAction {
-    init(userViewAction: UserLoginView.Action) {
+    init(userViewAction: UserLoginViewWatch.Action) {
         switch userViewAction {
         case .tappedErrorAlert:
             self = .errorHandled
@@ -107,7 +108,7 @@ extension UserAction {
 struct UserLoginView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
-            UserLoginView(store:
+            UserLoginViewWatch(store:
                             .init(
                                 initialState:
                                     UserState.init(user: nil, isLoading: false),
@@ -116,7 +117,7 @@ struct UserLoginView_Previews: PreviewProvider {
                             )
             ).previewDisplayName("Login")
             
-            UserLoginView(store:
+            UserLoginViewWatch(store:
                             .init(
                                 initialState:
                                     UserState.init(user: nil, isLoading: false),
@@ -127,7 +128,7 @@ struct UserLoginView_Previews: PreviewProvider {
             .environment(\.locale, .init(identifier: "fr"))
             .previewDisplayName("Login French")
             
-            UserLoginView(store:
+            UserLoginViewWatch(store:
                             .init(
                                 initialState:
                                     UserState.init(user: nil, isLoading: true),
@@ -138,4 +139,5 @@ struct UserLoginView_Previews: PreviewProvider {
         }
     }
 }
+#endif
 #endif

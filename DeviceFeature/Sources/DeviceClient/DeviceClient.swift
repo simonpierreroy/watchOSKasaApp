@@ -22,18 +22,24 @@ public struct DevicesEnvironment {
         mainQueue: AnySchedulerOf<DispatchQueue>,
         backgroundQueue: AnySchedulerOf<DispatchQueue>,
         loadDevices: @escaping (Token) -> AnyPublisher<[Device], Error>,
-        toggleDevicesState: @escaping DeviceDetailEvironment.ToggleEffect
+        toggleDevicesState: @escaping DeviceDetailEvironment.ToggleEffect,
+        getDevicesState: @escaping (Token, Device.ID) -> AnyPublisher<RelayIsOn, Error>,
+        changeDevicesState: @escaping (Token, Device.ID, RelayIsOn) -> AnyPublisher<RelayIsOn, Error>
     ) {
         self.mainQueue = mainQueue
         self.backgroundQueue = backgroundQueue
         self.loadDevices = loadDevices
         self.toggleDevicesState = toggleDevicesState
+        self.getDevicesState = getDevicesState
+        self.changeDevicesState = changeDevicesState
     }
     
     public let mainQueue: AnySchedulerOf<DispatchQueue>
     public let backgroundQueue: AnySchedulerOf<DispatchQueue>
     public let loadDevices: (Token) -> AnyPublisher<[Device], Error>
     public let toggleDevicesState: DeviceDetailEvironment.ToggleEffect
+    public let getDevicesState: (Token, Device.ID) -> AnyPublisher<RelayIsOn, Error>
+    public let changeDevicesState: (Token, Device.ID, RelayIsOn) -> AnyPublisher<RelayIsOn, Error>
 }
 
 #if DEBUG
@@ -53,7 +59,17 @@ public extension DevicesEnvironment {
         Just(RelayIsOn.init(rawValue: true))
             .mapError(absurd)
             .delay(for: 2, scheduler: DispatchQueue.main)
-            .eraseToAnyPublisher() }
+            .eraseToAnyPublisher() },
+        getDevicesState: { (_,_) in
+            Just(RelayIsOn.init(rawValue: true))
+                .mapError(absurd)
+                .delay(for: 2, scheduler: DispatchQueue.main)
+                .eraseToAnyPublisher() },
+        changeDevicesState: { (_,_, state) in
+            Just(state.toggle())
+                .mapError(absurd)
+                .delay(for: 2, scheduler: DispatchQueue.main)
+                .eraseToAnyPublisher() }
     )
 }
 #endif

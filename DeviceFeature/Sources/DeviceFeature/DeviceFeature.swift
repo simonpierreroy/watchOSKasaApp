@@ -18,6 +18,8 @@ public enum DevicesAtion {
     case send(Error)
     case errorHandled
     case deviceDetail(index: Int, action: DeviceDetailAction)
+    case closeAll
+    case doneClosingAll(())
     case empty
 }
 
@@ -26,8 +28,18 @@ public struct DevicesState {
     
     public enum Loading {
         case nerverLoaded
-        case loading
+        case loadingDevices
+        case closingAll
         case loaded
+        
+        var isInFlight: Bool {
+            switch self {
+            case .loadingDevices, .closingAll:
+                return true
+            case .loaded, .nerverLoaded:
+                return false
+            }
+        }
     }
     
     private var _devices: [DeviceSate]
@@ -60,7 +72,7 @@ public let devicesReducer = Reducer<DevicesState, DevicesAtion, DevicesEnvironme
         return .none
     case .fetchFromRemote:
         guard let token = state.token else { return .none }
-        state.isLoading = .loading
+        state.isLoading = .loadingDevices
         return environment.loadDevices(token)
             .map(map(DeviceSate.init(device:)))
             .map(DevicesAtion.set)
@@ -74,6 +86,30 @@ public let devicesReducer = Reducer<DevicesState, DevicesAtion, DevicesEnvironme
         return .none
     case .errorHandled:
         state.error = nil
+        return .none
+    case .closeAll:
+        guard let token = state.token, state.isLoading != .nerverLoaded else { return .none }
+        state.isLoading = .closingAll
+        
+        func stateInfo(device: DeviceSate) ->  AnyPublisher<(Device.ID, RelayIsOn), Error> {
+            return environment.getDevicesState(token , device.id)
+                .map { isOn in return (device.id, isOn) }
+                .eraseToAnyPublisher()
+        }
+        
+        return Publishers.MergeMany.init(
+            state.devices.map(stateInfo)
+        ).filter(\.1.rawValue)
+        .map { (token, $0.0, false) }
+        .flatMap(environment.changeDevicesState)
+        .map(always)
+        .map(DevicesAtion.doneClosingAll)
+        .last()
+        .catch(DevicesAtion.send >>> Just.init)
+        .replaceEmpty(with: DevicesAtion.doneClosingAll(()))
+        .eraseToEffect()
+    case .doneClosingAll:
+        state.isLoading = .loaded
         return .none
     case .deviceDetail: return .none
     case .empty: return .none
@@ -89,7 +125,7 @@ public let devicesReducer = Reducer<DevicesState, DevicesAtion, DevicesEnvironme
 #if DEBUG
 extension DevicesState {
     static let emptyLogged = DevicesState(_devices: [], isLoading: .nerverLoaded, error: nil, token: "logged")
-    static let emptyLoading = DevicesState(_devices: [], isLoading: .loading, error: nil, token: "logged")
+    static let emptyLoading = DevicesState(_devices: [], isLoading: .loadingDevices, error: nil, token: "logged")
     static let emptyNeverLoaded = DevicesState(_devices: [], isLoading: .nerverLoaded, error: nil, token: "logged")
     static let oneDeviceLoaded = DevicesState(_devices: [.init(id: "1", name: "Test 1")], isLoading: .loaded, error: nil, token: "logged")
 }

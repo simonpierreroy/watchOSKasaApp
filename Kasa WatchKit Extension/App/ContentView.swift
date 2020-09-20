@@ -36,14 +36,14 @@ struct ContentView: View {
         WithViewStore(self.store) { viewStore in
             HStack {
                 if viewStore.isUserLogged {
-                    DeviceListView(store: self.globalStore.scope(
-                        state: DeviceListView.StateView.init(appState:),
+                    DeviceListViewWatch(store: self.globalStore.scope(
+                        state: DeviceListViewWatch.StateView.init(appState:),
                         action: AppAction.init(deviceAction:)
                     )
                     )
                     .transition(.slide)
                 } else {
-                    UserLoginView(
+                    UserLoginViewWatch(
                         store: self.globalStore.scope(
                             state: \.userState,
                             action: AppAction.userAction

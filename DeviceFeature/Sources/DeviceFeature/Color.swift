@@ -11,13 +11,31 @@ extension Color {
     static let logout = Color.init("logout", bundle: .module)
     static let valid = Color.init("valid", bundle: .module)
     
+    static let moon = Color.init("moon", bundle: .module)
+    
 }
 
+#if DEBUG
 struct Color_Previews: PreviewProvider {
     static var previews: some View {
-        VStack {
-            Text("logout").foregroundColor(.logout)
-            Text("valid").foregroundColor(.valid)
+        Group{
+            VStack {
+                Text("logout").foregroundColor(.logout)
+                Text("valid").foregroundColor(.valid)
+                Text("moon").foregroundColor(.moon)
+            }.preferredColorScheme(.light)
+            .previewDisplayName("light")
+            
+            VStack {
+                Text("logout").foregroundColor(.logout)
+                Text("valid").foregroundColor(.valid)
+                Text("moon").foregroundColor(.moon)
+            }
+            .preferredColorScheme(.dark)
+            .previewDisplayName("dark")
+            
         }
     }
 }
+
+#endif

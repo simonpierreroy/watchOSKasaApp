@@ -28,7 +28,7 @@ extension Networking.App {
     
     public typealias DeviceID = Tagged<Networking.App, String>
     
-    static func getDevicesState(token: Token, id: DeviceID) -> Networking.ModelFetcher<RelayIsOn> {
+    public static func getDevicesState(token: Token, id: DeviceID) -> Networking.ModelFetcher<RelayIsOn> {
         return Effect.catching {
             let data = try encoder.encode(
                 Request<DeviceStateParam>.init(method: .passthrough, params: .init(deviceId: id.rawValue))
@@ -72,7 +72,7 @@ extension Networking.App {
     }
     
     
-    static func changeDevicesState(token: Token, id: DeviceID, state: RelayIsOn) -> Networking.ModelFetcher<RelayIsOn> {
+    public static func changeDevicesState(token: Token, id: DeviceID, state: RelayIsOn) -> Networking.ModelFetcher<RelayIsOn> {
         return Effect.catching {
             let data = try encoder.encode(
                 Request<ChangeDeviceStateParam>(method: .passthrough, params: .init(deviceId: id.rawValue, state: state))

@@ -6,11 +6,11 @@
 //
 
 import Foundation
-import SwiftUI
 
 enum Strings: String {
     case logout_app
     case refresh_list
+    case close_all
 }
 
 
@@ -24,18 +24,25 @@ extension Strings {
     }
 }
 
+#if DEBUG 
+import SwiftUI
+
 struct Strings_Previews: PreviewProvider {
     static var previews: some View {
         Group{
             VStack {
                 Text(Strings.logout_app.key, bundle: .module)
                 Text(Strings.refresh_list.key, bundle: .module)
+                Text(Strings.close_all.key, bundle: .module)
             }.previewDisplayName("English")
             VStack {
                 Text(Strings.logout_app.key, bundle: .module)
                 Text(Strings.refresh_list.key, bundle: .module)
+                Text(Strings.close_all.key, bundle: .module)
             }.environment(\.locale, .init(identifier: "fr"))
             .previewDisplayName("Français")
         }
     }
 }
+#endif
+

@@ -25,7 +25,7 @@ extension Device {
 }
 
 public extension DevicesEnvironment {
-    static func liveDevicesCall(token : Token) -> AnyPublisher<[Device], Error> {
+    static func liveDevicesCall(token: Token) -> AnyPublisher<[Device], Error> {
         return Networking.App
             .getDevices(token: token)
             .map(\.deviceList)
@@ -33,3 +33,18 @@ public extension DevicesEnvironment {
             .eraseToAnyPublisher()
     }
 }
+
+public extension DevicesEnvironment {
+    static func liveChangeDevicesState(token:Token, id: Device.ID, newState: RelayIsOn) -> AnyPublisher<RelayIsOn, Error> {
+        Networking.App
+            .changeDevicesState(token: token, id: id.networkDeviceID(), state: newState)
+    }
+}
+
+public extension DevicesEnvironment {
+    static func liveGetDevicesState(token:Token, id: Device.ID) -> AnyPublisher<RelayIsOn, Error> {
+        Networking.App
+            .getDevicesState(token: token, id: id.networkDeviceID())
+    }
+}
+
