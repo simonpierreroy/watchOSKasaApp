@@ -118,7 +118,7 @@ public extension DeviceListViewWatch {
         public init(
             errorMessageToDisplayText: String?,
             isRefreshingDevices: DevicesState.Loading,
-            devicesToDisplay: [DeviceSate]
+            devicesToDisplay: IdentifiedArrayOf<DeviceSate>
         ) {
             self.errorMessageToDisplayText = errorMessageToDisplayText
             self.isRefreshingDevices = isRefreshingDevices
@@ -127,7 +127,7 @@ public extension DeviceListViewWatch {
         
         let errorMessageToDisplayText: String?
         let isRefreshingDevices: DevicesState.Loading
-        let devicesToDisplay: [DeviceSate]
+        let devicesToDisplay: IdentifiedArrayOf<DeviceSate>
     }
     
     enum Action {
@@ -142,7 +142,7 @@ public extension DeviceListViewWatch {
         case viewAppearReload
         case tappedLogoutButton
         case tappedRefreshButton
-        case tappedDevice(index: Int, action: DeviceAction)
+        case tappedDevice(index: DeviceSate.ID, action: DeviceAction)
     }
 }
 

@@ -13,18 +13,25 @@ import KasaCore
 import DeviceClient
 
 public enum DevicesAtion {
-    case set(to: [DeviceSate])
+    case set(to: IdentifiedArrayOf<DeviceSate>)
     case fetchFromRemote
     case send(Error)
     case errorHandled
-    case deviceDetail(index: Int, action: DeviceDetailAction)
+    case deviceDetail(index: DeviceSate.ID, action: DeviceDetailAction)
     case closeAll
     case doneClosingAll(())
     case empty
 }
 
 public struct DevicesState {
-    public static let empty = DevicesState(_devices: [], isLoading: .nerverLoaded, error: nil, token: nil)
+    public static let empty = DevicesState(devices: [], isLoading: .nerverLoaded, error: nil, token: nil)
+    
+    init(devices: [DeviceSate], isLoading: Loading, error: Error?, token: Token?) {
+        self._devices = .init(devices)
+        self.isLoading = isLoading
+        self.error = error
+        self.token = token
+    }
     
     public enum Loading {
         case nerverLoaded
@@ -42,14 +49,14 @@ public struct DevicesState {
         }
     }
     
-    private var _devices: [DeviceSate]
-    public var devices: [DeviceSate] {
+    private var _devices: IdentifiedArrayOf<DeviceSate>
+    public var devices: IdentifiedArrayOf<DeviceSate> {
         get {
-            _devices.map {
+            return .init (_devices.elements.map {
                 var copy = $0
                 copy.token = self.token
                 return copy
-            }
+            })
         }
         set { self._devices = newValue }
     }
@@ -75,10 +82,11 @@ public let devicesReducer = Reducer<DevicesState, DevicesAtion, DevicesEnvironme
         state.isLoading = .loadingDevices
         return environment.loadDevices(token)
             .map(map(DeviceSate.init(device:)))
+            .map(IdentifiedArrayOf<DeviceSate>.init)
             .map(DevicesAtion.set)
             .catch(DevicesAtion.send >>> Just.init)
-            .receive(on: environment.mainQueue)
             .merge(with: Effect.cancel(id: CancelInFlightToggle()))
+            .receive(on: environment.mainQueue)
             .eraseToEffect()
     case .send(let error):
         state.isLoading = .loaded
@@ -107,6 +115,7 @@ public let devicesReducer = Reducer<DevicesState, DevicesAtion, DevicesEnvironme
         .last()
         .catch(DevicesAtion.send >>> Just.init)
         .replaceEmpty(with: DevicesAtion.doneClosingAll(()))
+        .receive(on: environment.mainQueue)
         .eraseToEffect()
     case .doneClosingAll:
         state.isLoading = .loaded
@@ -124,10 +133,10 @@ public let devicesReducer = Reducer<DevicesState, DevicesAtion, DevicesEnvironme
 
 #if DEBUG
 extension DevicesState {
-    static let emptyLogged = DevicesState(_devices: [], isLoading: .nerverLoaded, error: nil, token: "logged")
-    static let emptyLoading = DevicesState(_devices: [], isLoading: .loadingDevices, error: nil, token: "logged")
-    static let emptyNeverLoaded = DevicesState(_devices: [], isLoading: .nerverLoaded, error: nil, token: "logged")
-    static let oneDeviceLoaded = DevicesState(_devices: [.init(id: "1", name: "Test 1")], isLoading: .loaded, error: nil, token: "logged")
+    static let emptyLogged = DevicesState(devices: [], isLoading: .nerverLoaded, error: nil, token: "logged")
+    static let emptyLoading = DevicesState(devices: [], isLoading: .loadingDevices, error: nil, token: "logged")
+    static let emptyNeverLoaded = DevicesState(devices: [], isLoading: .nerverLoaded, error: nil, token: "logged")
+    static let oneDeviceLoaded = DevicesState(devices: [.init(id: "1", name: "Test 1")], isLoading: .loaded, error: nil, token: "logged")
 }
 #endif
 
