@@ -12,12 +12,6 @@ import KasaCore
 import DeviceFeature
 import UserFeature
 
-//struct ContentView: View {
-//    var body: some View {
-//        Text("hi")
-//    }
-//}
-
 struct ContentView: View {
     
     let store: Store<StateView, Never>
