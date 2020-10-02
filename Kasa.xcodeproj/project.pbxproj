@@ -7,6 +7,15 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		32821CEF2526DB50005E9623 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32821CEE2526DB50005E9623 /* AppDelegate.swift */; };
+		32821CF12526DB50005E9623 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32821CF02526DB50005E9623 /* SceneDelegate.swift */; };
+		32821CF32526DB50005E9623 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32821CF22526DB50005E9623 /* ContentView.swift */; };
+		32821CF52526DB50005E9623 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 32821CF42526DB50005E9623 /* Assets.xcassets */; };
+		32821CF82526DB50005E9623 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 32821CF72526DB50005E9623 /* Preview Assets.xcassets */; };
+		32821CFB2526DB50005E9623 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 32821CF92526DB50005E9623 /* LaunchScreen.storyboard */; };
+		32821D062526DB50005E9623 /* KasaAppTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32821D052526DB50005E9623 /* KasaAppTests.swift */; };
+		32821D112526DB50005E9623 /* KasaAppUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32821D102526DB50005E9623 /* KasaAppUITests.swift */; };
+		32821D222526DB97005E9623 /* AppPackage in Frameworks */ = {isa = PBXBuildFile; productRef = 32821D212526DB97005E9623 /* AppPackage */; };
 		328950E024821A3800EC3A49 /* Kasa.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 328950DF24821A3800EC3A49 /* Kasa.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		328950E624821A3800EC3A49 /* Interface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 328950E424821A3800EC3A49 /* Interface.storyboard */; };
 		328950E824821A3900EC3A49 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 328950E724821A3900EC3A49 /* Assets.xcassets */; };
@@ -16,11 +25,24 @@
 		328950F824821A3900EC3A49 /* ExtensionDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 328950F724821A3900EC3A49 /* ExtensionDelegate.swift */; };
 		328950FA24821A3A00EC3A49 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 328950F924821A3A00EC3A49 /* Assets.xcassets */; };
 		328950FD24821A3A00EC3A49 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 328950FC24821A3A00EC3A49 /* Preview Assets.xcassets */; };
-		328951282482245D00EC3A49 /* App.swift in Sources */ = {isa = PBXBuildFile; fileRef = 328951272482245D00EC3A49 /* App.swift */; };
 		32D3F93525156CC300A8446C /* AppPackage in Frameworks */ = {isa = PBXBuildFile; productRef = 32D3F93425156CC300A8446C /* AppPackage */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		32821D022526DB50005E9623 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 328950D524821A3800EC3A49 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 32821CEB2526DB50005E9623;
+			remoteInfo = KasaApp;
+		};
+		32821D0D2526DB50005E9623 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 328950D524821A3800EC3A49 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 32821CEB2526DB50005E9623;
+			remoteInfo = KasaApp;
+		};
 		328950E124821A3800EC3A49 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 328950D524821A3800EC3A49 /* Project object */;
@@ -73,6 +95,20 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		32821CEC2526DB50005E9623 /* KasaApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = KasaApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		32821CEE2526DB50005E9623 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		32821CF02526DB50005E9623 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
+		32821CF22526DB50005E9623 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		32821CF42526DB50005E9623 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		32821CF72526DB50005E9623 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		32821CFA2526DB50005E9623 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		32821CFC2526DB50005E9623 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		32821D012526DB50005E9623 /* KasaAppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = KasaAppTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		32821D052526DB50005E9623 /* KasaAppTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KasaAppTests.swift; sourceTree = "<group>"; };
+		32821D072526DB50005E9623 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		32821D0C2526DB50005E9623 /* KasaAppUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = KasaAppUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		32821D102526DB50005E9623 /* KasaAppUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KasaAppUITests.swift; sourceTree = "<group>"; };
+		32821D122526DB50005E9623 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		328950DB24821A3800EC3A49 /* Kasa.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Kasa.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		328950DF24821A3800EC3A49 /* Kasa.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Kasa.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		328950E524821A3800EC3A49 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Interface.storyboard; sourceTree = "<group>"; };
@@ -85,7 +121,6 @@
 		328950F924821A3A00EC3A49 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		328950FC24821A3A00EC3A49 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		328950FE24821A3A00EC3A49 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		328951272482245D00EC3A49 /* App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = App.swift; sourceTree = "<group>"; };
 		32D3F90425155FED00A8446C /* Screen Shot 2020-09-18 at 5.35.02 PM.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Screen Shot 2020-09-18 at 5.35.02 PM.png"; path = "../Screen Shot 2020-09-18 at 5.35.02 PM.png"; sourceTree = "<group>"; };
 		32D3F920251566C200A8446C /* UserFeature */ = {isa = PBXFileReference; lastKnownFileType = folder; path = UserFeature; sourceTree = "<group>"; };
 		32D3F9232515679100A8446C /* KasaCore */ = {isa = PBXFileReference; lastKnownFileType = folder; path = KasaCore; sourceTree = "<group>"; };
@@ -94,6 +129,28 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		32821CE92526DB50005E9623 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				32821D222526DB97005E9623 /* AppPackage in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		32821CFE2526DB50005E9623 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		32821D092526DB50005E9623 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		328950EB24821A3900EC3A49 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -105,6 +162,46 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		32821CED2526DB50005E9623 /* KasaApp */ = {
+			isa = PBXGroup;
+			children = (
+				32821CEE2526DB50005E9623 /* AppDelegate.swift */,
+				32821CF02526DB50005E9623 /* SceneDelegate.swift */,
+				32821CF22526DB50005E9623 /* ContentView.swift */,
+				32821CF42526DB50005E9623 /* Assets.xcassets */,
+				32821CF92526DB50005E9623 /* LaunchScreen.storyboard */,
+				32821CFC2526DB50005E9623 /* Info.plist */,
+				32821CF62526DB50005E9623 /* Preview Content */,
+			);
+			path = KasaApp;
+			sourceTree = "<group>";
+		};
+		32821CF62526DB50005E9623 /* Preview Content */ = {
+			isa = PBXGroup;
+			children = (
+				32821CF72526DB50005E9623 /* Preview Assets.xcassets */,
+			);
+			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		32821D042526DB50005E9623 /* KasaAppTests */ = {
+			isa = PBXGroup;
+			children = (
+				32821D052526DB50005E9623 /* KasaAppTests.swift */,
+				32821D072526DB50005E9623 /* Info.plist */,
+			);
+			path = KasaAppTests;
+			sourceTree = "<group>";
+		};
+		32821D0F2526DB50005E9623 /* KasaAppUITests */ = {
+			isa = PBXGroup;
+			children = (
+				32821D102526DB50005E9623 /* KasaAppUITests.swift */,
+				32821D122526DB50005E9623 /* Info.plist */,
+			);
+			path = KasaAppUITests;
+			sourceTree = "<group>";
+		};
 		328950D424821A3800EC3A49 = {
 			isa = PBXGroup;
 			children = (
@@ -114,6 +211,9 @@
 				32D3F920251566C200A8446C /* UserFeature */,
 				328950E324821A3800EC3A49 /* Kasa WatchKit App */,
 				328950F224821A3900EC3A49 /* Kasa WatchKit Extension */,
+				32821CED2526DB50005E9623 /* KasaApp */,
+				32821D042526DB50005E9623 /* KasaAppTests */,
+				32821D0F2526DB50005E9623 /* KasaAppUITests */,
 				328950DC24821A3800EC3A49 /* Products */,
 				32EE973C248368AC00C2E7E5 /* Frameworks */,
 			);
@@ -125,6 +225,9 @@
 				328950DB24821A3800EC3A49 /* Kasa.app */,
 				328950DF24821A3800EC3A49 /* Kasa.app */,
 				328950EE24821A3900EC3A49 /* Kasa WatchKit Extension.appex */,
+				32821CEC2526DB50005E9623 /* KasaApp.app */,
+				32821D012526DB50005E9623 /* KasaAppTests.xctest */,
+				32821D0C2526DB50005E9623 /* KasaAppUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -163,7 +266,6 @@
 		3289512C2482321800EC3A49 /* App */ = {
 			isa = PBXGroup;
 			children = (
-				328951272482245D00EC3A49 /* App.swift */,
 				328950F324821A3900EC3A49 /* ContentView.swift */,
 			);
 			path = App;
@@ -180,6 +282,62 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		32821CEB2526DB50005E9623 /* KasaApp */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 32821D192526DB50005E9623 /* Build configuration list for PBXNativeTarget "KasaApp" */;
+			buildPhases = (
+				32821CE82526DB50005E9623 /* Sources */,
+				32821CE92526DB50005E9623 /* Frameworks */,
+				32821CEA2526DB50005E9623 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = KasaApp;
+			packageProductDependencies = (
+				32821D212526DB97005E9623 /* AppPackage */,
+			);
+			productName = KasaApp;
+			productReference = 32821CEC2526DB50005E9623 /* KasaApp.app */;
+			productType = "com.apple.product-type.application";
+		};
+		32821D002526DB50005E9623 /* KasaAppTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 32821D1A2526DB50005E9623 /* Build configuration list for PBXNativeTarget "KasaAppTests" */;
+			buildPhases = (
+				32821CFD2526DB50005E9623 /* Sources */,
+				32821CFE2526DB50005E9623 /* Frameworks */,
+				32821CFF2526DB50005E9623 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				32821D032526DB50005E9623 /* PBXTargetDependency */,
+			);
+			name = KasaAppTests;
+			productName = KasaAppTests;
+			productReference = 32821D012526DB50005E9623 /* KasaAppTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		32821D0B2526DB50005E9623 /* KasaAppUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 32821D1B2526DB50005E9623 /* Build configuration list for PBXNativeTarget "KasaAppUITests" */;
+			buildPhases = (
+				32821D082526DB50005E9623 /* Sources */,
+				32821D092526DB50005E9623 /* Frameworks */,
+				32821D0A2526DB50005E9623 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				32821D0E2526DB50005E9623 /* PBXTargetDependency */,
+			);
+			name = KasaAppUITests;
+			productName = KasaAppUITests;
+			productReference = 32821D0C2526DB50005E9623 /* KasaAppUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
 		328950DA24821A3800EC3A49 /* Kasa */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 3289510924821A3A00EC3A49 /* Build configuration list for PBXNativeTarget "Kasa" */;
@@ -241,10 +399,21 @@
 		328950D524821A3800EC3A49 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastSwiftUpdateCheck = 1140;
+				LastSwiftUpdateCheck = 1200;
 				LastUpgradeCheck = 1200;
 				ORGANIZATIONNAME = Simon;
 				TargetAttributes = {
+					32821CEB2526DB50005E9623 = {
+						CreatedOnToolsVersion = 12.0;
+					};
+					32821D002526DB50005E9623 = {
+						CreatedOnToolsVersion = 12.0;
+						TestTargetID = 32821CEB2526DB50005E9623;
+					};
+					32821D0B2526DB50005E9623 = {
+						CreatedOnToolsVersion = 12.0;
+						TestTargetID = 32821CEB2526DB50005E9623;
+					};
 					328950DA24821A3800EC3A49 = {
 						CreatedOnToolsVersion = 11.4.1;
 					};
@@ -274,11 +443,38 @@
 				328950DA24821A3800EC3A49 /* Kasa */,
 				328950DE24821A3800EC3A49 /* Kasa WatchKit App */,
 				328950ED24821A3900EC3A49 /* Kasa WatchKit Extension */,
+				32821CEB2526DB50005E9623 /* KasaApp */,
+				32821D002526DB50005E9623 /* KasaAppTests */,
+				32821D0B2526DB50005E9623 /* KasaAppUITests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		32821CEA2526DB50005E9623 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				32821CFB2526DB50005E9623 /* LaunchScreen.storyboard in Resources */,
+				32821CF82526DB50005E9623 /* Preview Assets.xcassets in Resources */,
+				32821CF52526DB50005E9623 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		32821CFF2526DB50005E9623 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		32821D0A2526DB50005E9623 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		328950D924821A3800EC3A49 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -307,12 +503,37 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		32821CE82526DB50005E9623 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				32821CEF2526DB50005E9623 /* AppDelegate.swift in Sources */,
+				32821CF12526DB50005E9623 /* SceneDelegate.swift in Sources */,
+				32821CF32526DB50005E9623 /* ContentView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		32821CFD2526DB50005E9623 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				32821D062526DB50005E9623 /* KasaAppTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		32821D082526DB50005E9623 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				32821D112526DB50005E9623 /* KasaAppUITests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		328950EA24821A3900EC3A49 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 				328950F624821A3900EC3A49 /* HostingController.swift in Sources */,
-				328951282482245D00EC3A49 /* App.swift in Sources */,
 				328950F424821A3900EC3A49 /* ContentView.swift in Sources */,
 				328950F824821A3900EC3A49 /* ExtensionDelegate.swift in Sources */,
 			);
@@ -321,6 +542,16 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		32821D032526DB50005E9623 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 32821CEB2526DB50005E9623 /* KasaApp */;
+			targetProxy = 32821D022526DB50005E9623 /* PBXContainerItemProxy */;
+		};
+		32821D0E2526DB50005E9623 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 32821CEB2526DB50005E9623 /* KasaApp */;
+			targetProxy = 32821D0D2526DB50005E9623 /* PBXContainerItemProxy */;
+		};
 		328950E224821A3800EC3A49 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 328950DE24821A3800EC3A49 /* Kasa WatchKit App */;
@@ -334,6 +565,14 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
+		32821CF92526DB50005E9623 /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				32821CFA2526DB50005E9623 /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
 		328950E424821A3800EC3A49 /* Interface.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -345,6 +584,132 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		32821D132526DB50005E9623 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_ASSET_PATHS = "\"KasaApp/Preview Content\"";
+				DEVELOPMENT_TEAM = K7R4MCZ9EX;
+				ENABLE_PREVIEWS = YES;
+				INFOPLIST_FILE = KasaApp/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.kasa.KasaApp.KasaApp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		32821D142526DB50005E9623 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_ASSET_PATHS = "\"KasaApp/Preview Content\"";
+				DEVELOPMENT_TEAM = K7R4MCZ9EX;
+				ENABLE_PREVIEWS = YES;
+				INFOPLIST_FILE = KasaApp/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.kasa.KasaApp.KasaApp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		32821D152526DB50005E9623 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				INFOPLIST_FILE = KasaAppTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.kasa.KasaApp.KasaAppTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/KasaApp.app/KasaApp";
+			};
+			name = Debug;
+		};
+		32821D162526DB50005E9623 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				INFOPLIST_FILE = KasaAppTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.kasa.KasaApp.KasaAppTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/KasaApp.app/KasaApp";
+			};
+			name = Release;
+		};
+		32821D172526DB50005E9623 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				INFOPLIST_FILE = KasaAppUITests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.kasa.KasaApp.KasaAppUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = KasaApp;
+			};
+			name = Debug;
+		};
+		32821D182526DB50005E9623 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				INFOPLIST_FILE = KasaAppUITests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.kasa.KasaApp.KasaAppUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = KasaApp;
+			};
+			name = Release;
+		};
 		328950FF24821A3A00EC3A49 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -481,7 +846,7 @@
 				SKIP_INSTALL = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 4;
-				WATCHOS_DEPLOYMENT_TARGET = 6.0;
+				WATCHOS_DEPLOYMENT_TARGET = 7.0;
 			};
 			name = Debug;
 		};
@@ -507,7 +872,7 @@
 				SKIP_INSTALL = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 4;
-				WATCHOS_DEPLOYMENT_TARGET = 6.0;
+				WATCHOS_DEPLOYMENT_TARGET = 7.0;
 			};
 			name = Release;
 		};
@@ -526,7 +891,7 @@
 				SKIP_INSTALL = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 4;
-				WATCHOS_DEPLOYMENT_TARGET = 6.0;
+				WATCHOS_DEPLOYMENT_TARGET = 7.0;
 			};
 			name = Debug;
 		};
@@ -545,7 +910,7 @@
 				SKIP_INSTALL = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 4;
-				WATCHOS_DEPLOYMENT_TARGET = 6.0;
+				WATCHOS_DEPLOYMENT_TARGET = 7.0;
 			};
 			name = Release;
 		};
@@ -582,6 +947,33 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		32821D192526DB50005E9623 /* Build configuration list for PBXNativeTarget "KasaApp" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				32821D132526DB50005E9623 /* Debug */,
+				32821D142526DB50005E9623 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		32821D1A2526DB50005E9623 /* Build configuration list for PBXNativeTarget "KasaAppTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				32821D152526DB50005E9623 /* Debug */,
+				32821D162526DB50005E9623 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		32821D1B2526DB50005E9623 /* Build configuration list for PBXNativeTarget "KasaAppUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				32821D172526DB50005E9623 /* Debug */,
+				32821D182526DB50005E9623 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		328950D824821A3800EC3A49 /* Build configuration list for PBXProject "Kasa" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -621,6 +1013,10 @@
 /* End XCConfigurationList section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		32821D212526DB97005E9623 /* AppPackage */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = AppPackage;
+		};
 		32D3F93425156CC300A8446C /* AppPackage */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = AppPackage;

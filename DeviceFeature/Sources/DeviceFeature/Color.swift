@@ -10,7 +10,7 @@ import SwiftUI
 extension Color {
     static let logout = Color.init("logout", bundle: .module)
     static let valid = Color.init("valid", bundle: .module)
-    
+    static let tile = Color.init("tile", bundle: .module)
     static let moon = Color.init("moon", bundle: .module)
     
 }
@@ -23,6 +23,7 @@ struct Color_Previews: PreviewProvider {
                 Text("logout").foregroundColor(.logout)
                 Text("valid").foregroundColor(.valid)
                 Text("moon").foregroundColor(.moon)
+                Text("tile").foregroundColor(.tile)
             }.preferredColorScheme(.light)
             .previewDisplayName("light")
             
@@ -30,6 +31,7 @@ struct Color_Previews: PreviewProvider {
                 Text("logout").foregroundColor(.logout)
                 Text("valid").foregroundColor(.valid)
                 Text("moon").foregroundColor(.moon)
+                Text("tile").foregroundColor(.tile)
             }
             .preferredColorScheme(.dark)
             .previewDisplayName("dark")

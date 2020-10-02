@@ -5,7 +5,7 @@ import PackageDescription
 
 let package = Package(
     name: "KasaCore",
-    platforms: [.iOS(.v13), .watchOS(.v6)],
+    platforms: [.iOS(.v14), .watchOS(.v7)],
     products: [
         .library(
             name: "KasaCore",
@@ -13,6 +13,9 @@ let package = Package(
         .library(
             name: "KasaNetworking",
             targets: ["KasaNetworking"]),
+        .library(
+            name: "BaseUI",
+            targets: ["BaseUI"]),
     ],
     dependencies: [
         .package(
@@ -36,6 +39,9 @@ let package = Package(
             dependencies: [
                 "KasaCore"
             ]),
+        .target(
+            name: "BaseUI",
+            dependencies: []),
         .testTarget(
             name: "KasaCoreTests",
             dependencies: ["KasaCore"]),

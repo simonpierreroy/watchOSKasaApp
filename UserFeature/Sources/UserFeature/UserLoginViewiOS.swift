@@ -12,8 +12,8 @@ import ComposableArchitecture
 import UserClient
 import BaseUI
 
-#if os(watchOS)
-public struct UserLoginViewWatch: View {
+#if os(iOS)
+public struct UserLoginViewiOS: View {
     
     public init(store: Store<StateView, Action>) {
         self.store = store
@@ -26,27 +26,49 @@ public struct UserLoginViewWatch: View {
     public var body: some View {
         WithViewStore(self.store) { viewStore in
             ScrollView {
-                Image(systemName: "person.circle")
-                    .font(.title)
-                    .foregroundColor(Color.orange)
-                    .padding()
                 
-                TextField(
-                    Strings.log_email.string,
-                    text: self.$email
-                )
-                .textContentType(.emailAddress)
-                SecureField(Strings.log_password.string, text: self.$password)
-                    .textContentType(.password)
-                
-                Button(action: {
-                    viewStore.send(.tappedLogingButton(email: self.email, password: self.password))
-                }) {
-                    LoadingView(.constant(viewStore.isLoadingUser)) {
-                        Text(Strings.login_app.key, bundle: .module)
-                    }
-                }
-            }
+                Text("Kasa").font(.largeTitle)
+                Image(systemName: "light.max").font(.largeTitle)
+                Spacer(minLength: 32)
+
+                VStack {
+                    HStack {
+                        Image(systemName: "person.icloud")
+                            .font(.title2)
+                        TextField(
+                            Strings.log_email.string,
+                            text: self.$email
+                        )
+                        .textContentType(.emailAddress)
+                        
+                    }.padding()
+                    .background(Color.orange.opacity(0.2))
+                    .cornerRadius(8)
+                    
+                    HStack {
+                        Image(systemName: "key.icloud")
+                            .font(.title2)
+                        
+                        SecureField(Strings.log_password.string, text: self.$password)
+                            .textContentType(.password)
+                    }.padding()
+                    .background(Color.orange.opacity(0.2))
+                    .cornerRadius(8)
+                    
+                    Spacer(minLength: 16)
+                    
+                    
+                    Button(action: {
+                        viewStore.send(.tappedLogingButton(email: self.email, password: self.password))
+                    }) {
+                        LoadingView(.constant(viewStore.isLoadingUser)) {
+                            Text(Strings.login_app.key, bundle: .module).foregroundColor(Color.green)
+                        }.padding()
+                    }.frame(maxWidth: .infinity)
+                    .background(Color.green.opacity(0.2))
+                    .cornerRadius(32)
+                }.frame(maxWidth: 500).padding()
+            }.frame(maxWidth: .infinity)
             .disabled(viewStore.isLoadingUser)
             .alert(
                 item: viewStore.binding(
@@ -56,18 +78,18 @@ public struct UserLoginViewWatch: View {
                 content: { Alert(title: Text($0.title)) }
             )
             
-        }
+        }.foregroundColor(.orange)
     }
 }
 
-extension UserLoginViewWatch {
+extension UserLoginViewiOS {
     struct AlertInfo: Identifiable {
         var title: String
         var id: String { self.title }
     }
 }
 
-public extension UserLoginViewWatch {
+public extension UserLoginViewiOS {
     
     struct StateView: Equatable {
         let errorMessageToDisplayText: String?
@@ -80,7 +102,7 @@ public extension UserLoginViewWatch {
     }
 }
 
-public extension UserLoginViewWatch.StateView {
+public extension UserLoginViewiOS.StateView {
     init(userState: UserState) {
         self.errorMessageToDisplayText = userState.error?.localizedDescription
         self.isLoadingUser = userState.isLoading
@@ -88,7 +110,7 @@ public extension UserLoginViewWatch.StateView {
 }
 
 public extension UserAction {
-    init(userViewAction: UserLoginViewWatch.Action) {
+    init(userViewAction: UserLoginViewiOS.Action) {
         switch userViewAction {
         case .tappedErrorAlert:
             self = .errorHandled
@@ -102,40 +124,41 @@ public extension UserAction {
 struct UserLoginView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
-            UserLoginViewWatch(store:
+            UserLoginViewiOS(store:
                                 Store<UserState, UserAction>.init(
                                     initialState:
                                         UserState.init(user: nil, isLoading: false),
                                     reducer: userReducer,
                                     environment: UserEnvironment.mockUserEnv
                                 ).scope(
-                                    state: UserLoginViewWatch.StateView.init(userState:),
+                                    state: UserLoginViewiOS.StateView.init(userState:),
                                     action: UserAction.init(userViewAction:)
                                 )
-            ).previewDisplayName("Login")
+            ).preferredColorScheme(.dark)
+            .previewDisplayName("Login")
             
-            UserLoginViewWatch(store:
+            UserLoginViewiOS(store:
                                 Store<UserState, UserAction>.init(
                                     initialState:
                                         UserState.init(user: nil, isLoading: false),
                                     reducer: userReducer,
                                     environment: UserEnvironment.mockUserEnv
                                 ).scope(
-                                    state: UserLoginViewWatch.StateView.init(userState:),
+                                    state: UserLoginViewiOS.StateView.init(userState:),
                                     action: UserAction.init(userViewAction:)
                                 )
             )
             .environment(\.locale, .init(identifier: "fr"))
             .previewDisplayName("Login French")
             
-            UserLoginViewWatch(store:
+            UserLoginViewiOS(store:
                                 Store<UserState, UserAction>.init(
                                     initialState:
                                         UserState.init(user: nil, isLoading: true),
                                     reducer: userReducer,
                                     environment: UserEnvironment.mockUserEnv
                                 ).scope(
-                                    state: UserLoginViewWatch.StateView.init(userState:),
+                                    state: UserLoginViewiOS.StateView.init(userState:),
                                     action: UserAction.init(userViewAction:)
                                 )
             ).previewDisplayName("Loading")

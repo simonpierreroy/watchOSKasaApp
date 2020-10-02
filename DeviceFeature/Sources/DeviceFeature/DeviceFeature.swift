@@ -65,6 +65,23 @@ public struct DevicesState {
     public var token: Token?
 }
 
+#if DEBUG
+extension DevicesState {
+    static let emptyLogged = DevicesState(devices: [], isLoading: .nerverLoaded, error: nil, token: "logged")
+    static let emptyLoading = DevicesState(devices: [], isLoading: .loadingDevices, error: nil, token: "logged")
+    static let emptyNeverLoaded = DevicesState(devices: [], isLoading: .nerverLoaded, error: nil, token: "logged")
+    static let oneDeviceLoaded = DevicesState(devices: [.init(id: "1", name: "Test 1")], isLoading: .loaded, error: nil, token: "logged")
+    static func nDeviceLoaded(n: Int) -> DevicesState {
+        DevicesState(
+            devices: (1...n).map{ DeviceSate.init(id: "\($0)", name: "Test device number \($0)") },
+            isLoading: .loaded,
+            error: nil,
+            token: "logged")
+    }
+}
+#endif
+
+
 extension DeviceSate {
     init(device: Device) {
         self.init(id: device.id, name: device.name)
@@ -130,13 +147,3 @@ public let devicesReducer = Reducer<DevicesState, DevicesAtion, DevicesEnvironme
                 environment: DeviceDetailEvironment.init(devicesEnv:)
             )
 )
-
-#if DEBUG
-extension DevicesState {
-    static let emptyLogged = DevicesState(devices: [], isLoading: .nerverLoaded, error: nil, token: "logged")
-    static let emptyLoading = DevicesState(devices: [], isLoading: .loadingDevices, error: nil, token: "logged")
-    static let emptyNeverLoaded = DevicesState(devices: [], isLoading: .nerverLoaded, error: nil, token: "logged")
-    static let oneDeviceLoaded = DevicesState(devices: [.init(id: "1", name: "Test 1")], isLoading: .loaded, error: nil, token: "logged")
-}
-#endif
-

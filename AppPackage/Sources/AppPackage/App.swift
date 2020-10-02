@@ -15,10 +15,10 @@ import UserClient
 import ComposableArchitecture
 import KasaCore
 
-struct AppState {
-    static let empty = AppState(userState: .empty, _devicesState: .empty)
+public struct AppState {
+    public static let empty = AppState(userState: .empty, _devicesState: .empty)
     
-    var userState: UserState
+    public var userState: UserState
     private var _devicesState: DevicesState
     
     var devicesState: DevicesState {
@@ -32,13 +32,34 @@ struct AppState {
     
 }
 
-enum AppAction {
+public enum AppAction {
     case userAction(UserAction)
     case devicesAction(DevicesAtion)
 }
 
 
-struct AppEnv {
+public struct AppEnv {
+    
+    public init(
+        mainQueue: AnySchedulerOf<DispatchQueue>,
+        backgroundQueue: AnySchedulerOf<DispatchQueue>,
+        login: @escaping (User.Credential) -> AnyPublisher<User, Error>,
+        cache: UserCache,
+        loadDevices: @escaping (Token) -> AnyPublisher<[Device], Error>,
+        toggleDevicesState: @escaping DeviceDetailEvironment.ToggleEffect,
+        getDevicesState: @escaping (Token, Device.ID) -> AnyPublisher<RelayIsOn, Error>,
+        changeDevicesState: @escaping (Token, Device.ID, RelayIsOn) -> AnyPublisher<RelayIsOn, Error>
+    ) {
+        self.mainQueue = mainQueue
+        self.backgroundQueue = backgroundQueue
+        self.login = login
+        self.cache = cache
+        self.loadDevices = loadDevices
+        self.toggleDevicesState = toggleDevicesState
+        self.getDevicesState = getDevicesState
+        self.changeDevicesState = changeDevicesState
+    }
+    
     let mainQueue: AnySchedulerOf<DispatchQueue>
     let backgroundQueue: AnySchedulerOf<DispatchQueue>
     let login: (User.Credential) -> AnyPublisher<User, Error>
@@ -49,7 +70,7 @@ struct AppEnv {
     let changeDevicesState: (Token, Device.ID, RelayIsOn) -> AnyPublisher<RelayIsOn, Error>
 }
 
-extension UserEnvironment {
+public extension UserEnvironment {
     init(appEnv: AppEnv) {
         self.init(
             mainQueue: appEnv.mainQueue,
@@ -60,7 +81,7 @@ extension UserEnvironment {
     }
 }
 
-extension DevicesEnvironment {
+public extension DevicesEnvironment {
     init(appEnv: AppEnv) {
         self.init(
             mainQueue: appEnv.mainQueue,
@@ -74,7 +95,7 @@ extension DevicesEnvironment {
 }
 
 
-let appReducer: Reducer<AppState, AppAction, AppEnv> = userReducer
+public let appReducer: Reducer<AppState, AppAction, AppEnv> = userReducer
     .pullback(
         state: \.userState,
         action: /AppAction.userAction,
@@ -87,7 +108,8 @@ let appReducer: Reducer<AppState, AppAction, AppEnv> = userReducer
                 )
     )//.debug()
 
-extension AppAction {
+#if os(watchOS)
+public extension AppAction {
     init(deviceAction: DeviceListViewWatch.Action) {
         switch deviceAction {
         case .tappedDevice(index: let idx, action: let action):
@@ -105,7 +127,7 @@ extension AppAction {
     }
 }
 
-extension DeviceListViewWatch.StateView {
+public extension DeviceListViewWatch.StateView {
     init(appState: AppState) {
         self.init(
             errorMessageToDisplayText: appState.devicesState.error?.localizedDescription,
@@ -114,10 +136,38 @@ extension DeviceListViewWatch.StateView {
         )
     }
 }
+#elseif os(iOS)
+public extension AppAction {
+    init(deviceAction: DeviceListViewiOS.Action) {
+        switch deviceAction {
+        case .tappedDevice(index: let idx, action: let action):
+            let deviceDetailAction = DeviceDetailAction.init(viewDetailAction: action)
+            self = .devicesAction(.deviceDetail(index: idx, action: deviceDetailAction))
+        case .tappedErrorAlert:
+            self = .devicesAction(.errorHandled)
+        case .tappedLogout:
+            self = .userAction(.logout)
+        case .tappedRefreshButton, .viewAppearReload:
+            self = .devicesAction(.fetchFromRemote)
+        case .tappedCloseAll:
+            self = .devicesAction(.closeAll)
+        }
+    }
+}
 
+public extension DeviceListViewiOS.StateView {
+    init(appState: AppState) {
+        self.init(
+            errorMessageToDisplayText: appState.devicesState.error?.localizedDescription,
+            isRefreshingDevices: appState.devicesState.isLoading,
+            devicesToDisplay: appState.devicesState.devices
+        )
+    }
+}
+#endif
 
 #if DEBUG
-extension AppEnv {
+public extension AppEnv {
     static let mockAppEnv = AppEnv(
         mainQueue: DevicesEnvironment.mockDevicesEnv.mainQueue,
         backgroundQueue: DevicesEnvironment.mockDevicesEnv.backgroundQueue,

@@ -10,13 +10,15 @@ import ComposableArchitecture
 import Combine
 import KasaCore
 import DeviceClient
+import BaseUI
+
 
 #if os(watchOS)
 import SwiftUI
 
 public struct DeviceListViewWatch: View {
     
-    let store: Store<StateView, Action>
+    private let store: Store<StateView, Action>
     
     public init(store: Store<StateView, Action>) {
         self.store = store
@@ -37,17 +39,21 @@ public struct DeviceListViewWatch: View {
                     
                     
                     Button(action: { viewStore.send(.tappedCloseAll)}) {
-                        HStack {
-                            LoadingImage(loading: .constant(viewStore.isRefreshingDevices == .closingAll), systemName: "moon.fill")
-                            Text(Strings.close_all.key, bundle: .module)
+                        LoadingView(.constant(viewStore.isRefreshingDevices == .closingAll)) {
+                            HStack {
+                                Image(systemName: "moon.fill")
+                                Text(Strings.close_all.key, bundle: .module)
+                            }
                         }
                     }
                     .foregroundColor(Color.moon).listRowPlatterColor(Color.moon.opacity(0.17))
                     
                     Button(action: { viewStore.send(.tappedRefreshButton)}) {
                         HStack {
-                            LoadingImage(loading: .constant(viewStore.isRefreshingDevices == .loadingDevices), systemName: "arrow.clockwise.circle.fill")
-                            Text(Strings.refresh_list.key, bundle: .module)
+                            LoadingView(.constant(viewStore.isRefreshingDevices == .loadingDevices)) {
+                                Image(systemName: "arrow.clockwise.circle.fill")
+                                Text(Strings.refresh_list.key, bundle: .module)
+                            }
                         }
                     }
                     .foregroundColor(Color.valid).listRowPlatterColor(Color.valid.opacity(0.14))
@@ -59,7 +65,7 @@ public struct DeviceListViewWatch: View {
                     Text(Strings.logout_app.key, bundle: .module)
                         .foregroundColor(Color.logout)
                 }.listRowPlatterColor(Color.logout.opacity(0.17))
-            
+                
             }.alert(
                 item: viewStore.binding(
                     get: { $0.errorMessageToDisplayText.map(AlertInfo.init(title:))},
@@ -89,9 +95,11 @@ struct DeviceDetailViewWatch: View {
     var body: some View {
         WithViewStore(self.store) { viewStore in
             Button(action: { viewStore.send(.tapped) }) {
-                HStack {
-                    LoadingImage(loading: .constant(viewStore.isLoading), systemName: "lightbulb.fill")
-                    Text(viewStore.name)
+                LoadingView(.constant(viewStore.isLoading)){
+                    HStack {
+                        Image(systemName: "lightbulb.fill")
+                        Text(viewStore.name)
+                    }
                 }
             }.disabled(viewStore.isLoading)
             .alert(

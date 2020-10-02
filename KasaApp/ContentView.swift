@@ -1,8 +1,8 @@
 //
 //  ContentView.swift
-//  Kasa WatchKit Extension
+//  KasaApp
 //
-//  Created by Simon-Pierre Roy on 5/30/20.
+//  Created by Simon-Pierre Roy on 10/1/20.
 //  Copyright © 2020 Simon. All rights reserved.
 //
 
@@ -18,7 +18,7 @@ struct ContentView: View {
     let store: Store<StateView, Never>
     let globalStore: Store<AppState, AppAction>
     
-    init(store: Store<AppState, AppAction> = ExtensionDelegate.store) {
+    init(store: Store<AppState, AppAction> = AppDelegate.store) {
         self.globalStore = store
         self.store = store
             .scope(
@@ -31,18 +31,18 @@ struct ContentView: View {
         WithViewStore(self.store) { viewStore in
             HStack {
                 if viewStore.isUserLogged {
-                    DeviceListViewWatch(store: self.globalStore.scope(
-                        state: DeviceListViewWatch.StateView.init(appState:),
+                    DeviceListViewiOS(store: self.globalStore.scope(
+                        state: DeviceListViewiOS.StateView.init(appState:),
                         action: AppAction.init(deviceAction:)
                     )
                     )
                 } else {
-                    UserLoginViewWatch(
+                    UserLoginViewiOS(
                         store: self.globalStore.scope(
                             state: \.userState,
                             action: AppAction.userAction
                         ).scope(
-                            state: UserLoginViewWatch.StateView.init(userState:),
+                            state: UserLoginViewiOS.StateView.init(userState:),
                             action: UserAction.init(userViewAction:)
                         )
                     )

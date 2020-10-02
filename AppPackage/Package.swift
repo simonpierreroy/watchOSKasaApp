@@ -5,7 +5,7 @@ import PackageDescription
 
 let package = Package(
     name: "AppPackage",
-    platforms: [.iOS(.v13), .watchOS(.v6)],
+    platforms: [.iOS(.v14), .watchOS(.v7)],
     products: [
         .library(
             name: "AppPackage",

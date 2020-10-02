@@ -54,12 +54,12 @@ public extension DevicesEnvironment {
                     Device.init(id: "45", name: "Test device 2")
                 ]))
             }.delay(for: 2, scheduler: DispatchQueue.main)
-                .eraseToAnyPublisher()
-    }, toggleDevicesState: { (_,_) in
-        Just(RelayIsOn.init(rawValue: true))
-            .mapError(absurd)
-            .delay(for: 2, scheduler: DispatchQueue.main)
-            .eraseToAnyPublisher() },
+            .eraseToAnyPublisher()
+        }, toggleDevicesState: { (_,_) in
+            Just(RelayIsOn.init(rawValue: true))
+                .mapError(absurd)
+                .delay(for: 2, scheduler: DispatchQueue.main)
+                .eraseToAnyPublisher() },
         getDevicesState: { (_,_) in
             Just(RelayIsOn.init(rawValue: true))
                 .mapError(absurd)
@@ -71,6 +71,35 @@ public extension DevicesEnvironment {
                 .delay(for: 2, scheduler: DispatchQueue.main)
                 .eraseToAnyPublisher() }
     )
+}
+
+public extension DevicesEnvironment {
+    static func devicesEnvError(loadError: String, toggleError: String, getDevicesError: String, changeDevicesError: String) -> DevicesEnvironment {
+        return DevicesEnvironment.init(
+            mainQueue: mockDevicesEnv.mainQueue,
+            backgroundQueue: mockDevicesEnv.backgroundQueue,
+            loadDevices:{ _ in
+                return Just([])
+                    .tryMap{ _ in throw NSError(domain: loadError, code: 1, userInfo: nil) }
+                    .eraseToAnyPublisher()
+            },
+            toggleDevicesState: { _, _ in
+                return Just(RelayIsOn.init(rawValue: true))
+                    .tryMap{ _ in throw NSError(domain: toggleError, code: 1, userInfo: nil) }
+                    .eraseToAnyPublisher()
+            },
+            getDevicesState:{ token, id in
+                return Just(RelayIsOn.init(rawValue: true))
+                    .tryMap{ _ in throw NSError(domain: getDevicesError, code: 2, userInfo: nil) }
+                    .eraseToAnyPublisher()
+            },
+            changeDevicesState: { token, id, state in
+                return  Just(RelayIsOn.init(rawValue: true))
+                    .tryMap{ _ in throw NSError(domain: changeDevicesError, code: 3, userInfo: nil) }
+                    .eraseToAnyPublisher()
+            }
+        )
+    }
 }
 #endif
 

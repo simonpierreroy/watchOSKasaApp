@@ -13,6 +13,7 @@ import UserClientLive
 import DeviceClient
 import DeviceClientLive
 import KasaCore
+import AppPackage
 
 
 extension AppAction {

@@ -6,7 +6,7 @@ import PackageDescription
 let package = Package(
     name: "DeviceFeature",
     defaultLocalization: "en",
-    platforms: [.iOS(.v13), .watchOS(.v6)],
+    platforms: [.iOS(.v14), .watchOS(.v7)],
     products: [
         .library(
             name: "DeviceClient",
@@ -24,7 +24,10 @@ let package = Package(
     targets: [
         .target(
             name: "DeviceFeature",
-            dependencies: ["DeviceClient"]),
+            dependencies: [
+                "DeviceClient",
+                .product(name: "BaseUI", package: "KasaCore")
+            ]),
         .target(
             name: "DeviceClient",
             dependencies: ["KasaCore"]),
