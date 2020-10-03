@@ -89,73 +89,31 @@ struct KasaAppWidgetEntryView : View {
     var entry: Provider.Entry
     @Environment(\.widgetFamily) var widgetFamily
     
-    func grid(_ family: WidgetFamily ) ->  [GridItem] {
-        switch family {
-        case .systemLarge:
-            return [GridItem(.flexible()), GridItem(.flexible())]
-        case .systemMedium:
-            return [GridItem(.flexible()), GridItem(.flexible())]
-        case .systemSmall:
-            return [GridItem(.flexible())]
-        @unknown default:
-            return [GridItem(.flexible())]
-        }
-    }
-    
-    
-    func data(_ family: WidgetFamily, _ devices: [Device]) ->  ArraySlice<Device>{
-        guard devices.count > 0 else { return [] }
-        
-        let maxSize: Int
-        switch family {
-        case .systemLarge:
-            maxSize = 6
-        case .systemMedium:
-            maxSize = 4
-        case .systemSmall:
-            maxSize = 1
-        @unknown default:
-            maxSize = 1
-        }
-        
-        let size = min(devices.count, maxSize)
-        return devices[0..<size]
-    }
-    
-    func deviceSize(_ family: WidgetFamily) ->  (Font, Font){
-        
-        switch family {
-        case .systemLarge:
-            return (.title, .body)
-        case .systemMedium:
-            return (.title, .caption)
-        case .systemSmall:
-            return (.title, .body)
-        @unknown default:
-            return (.title, .body)
-        }
-    }
     
     var body: some View {
         VStack {
             if entry.userIsLogged {
                 if  entry.devices.count > 0 {
-                    LazyVGrid(columns: grid(self.widgetFamily)){
-                        ForEach(
-                            data(self.widgetFamily, self.entry.devices)
-                        ) { device in
-                            VStack {
-                                Image(systemName: "light.max")
-                                    .font(deviceSize(self.widgetFamily).0)
-                                Text("\(device.name)")
-                                    .multilineTextAlignment(.center)
-                                    .font(deviceSize(self.widgetFamily).1)
-                            }.padding()
-                            .frame(maxWidth: .infinity)
-                            .background(Color.white.opacity(0.2))
-                            .cornerRadius(16)
+                    VStack {
+                        switch widgetFamily {
+                        case .systemSmall:
+                            DeviceViewMaybe(device: entry.devices[safeIndex: 0])
+                        case .systemMedium :
+                            VStack{
+                                DeviceRowMaybe(devices: (entry.devices[safeIndex: 0], entry.devices[safeIndex: 1]))
+                                DeviceRowMaybe(devices: (entry.devices[safeIndex: 2], entry.devices[safeIndex: 3]))
+                            }
+                        case .systemLarge:
+                            VStack{
+                                DeviceRowMaybe(devices: (entry.devices[safeIndex: 0], entry.devices[safeIndex: 1]))
+                                DeviceRowMaybe(devices: (entry.devices[safeIndex: 2], entry.devices[safeIndex: 3]))
+                                DeviceRowMaybe(devices: (entry.devices[safeIndex: 4], entry.devices[safeIndex: 5]))
+                            }
+                        @unknown default:
+                            EmptyView()
                         }
                     }.padding()
+                    
                 } else {
                     VStack {
                         Image(systemName: "lightbulb.slash.fill")
@@ -187,6 +145,68 @@ struct KasaAppWidgetEntryView : View {
         ))
     }
 }
+
+struct DeviceRowMaybe : View {
+    
+    let devices: (Device?,Device?)
+    
+    var body: some View {
+        HStack {
+            DeviceViewMaybe(device: devices.0)
+            DeviceViewMaybe(device: devices.1)
+        }
+    }
+}
+
+struct DeviceViewMaybe : View {
+    
+    let device: Device?
+    
+    var body: some View {
+        if let device = device {
+            DeviceView(device: device)
+        } else {
+            EmptyView()
+        }
+    }
+}
+
+struct DeviceView : View {
+    
+    @Environment(\.widgetFamily) var widgetFamily
+
+    let device: Device
+    
+    func fontDevice(_ family: WidgetFamily) ->  (Font, Font){
+        
+        switch family {
+        case .systemLarge:
+            return (.title, .body)
+        case .systemMedium:
+            return (.title, .caption)
+        case .systemSmall:
+            return (.title, .body)
+        @unknown default:
+            return (.title, .body)
+        }
+    }
+    
+    var body: some View {
+        VStack {
+            Image(systemName: "light.max")
+                .font(fontDevice(widgetFamily).0)
+            Text("\(device.name)")
+                .multilineTextAlignment(.center)
+                .font(fontDevice(widgetFamily).1)
+        }.padding()
+        .frame(maxWidth: .infinity,maxHeight: .infinity, alignment: .center)
+        .frame(maxWidth: .infinity)
+        .background(Color.white.opacity(0.2))
+        .cornerRadius(16)
+        
+    }
+}
+
 
 @main
 struct KasaAppWidget: Widget {
