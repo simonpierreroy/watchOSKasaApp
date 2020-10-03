@@ -102,19 +102,7 @@ struct KasaAppWidgetEntryView : View {
         }
     }
     
-    func box(_ family: WidgetFamily) ->  CGSize {
-        switch family {
-        case .systemLarge:
-            return CGSize(width: 150, height: 110)
-        case .systemMedium:
-            return CGSize(width: 150, height: 70)
-        case .systemSmall:
-            return CGSize(width: 135, height: 135)
-        @unknown default:
-            return CGSize(width: 125, height: 125)
-        }
-    }
-     
+    
     func data(_ family: WidgetFamily, _ devices: [Device]) ->  ArraySlice<Device>{
         guard devices.count > 0 else { return [] }
         
@@ -163,10 +151,7 @@ struct KasaAppWidgetEntryView : View {
                                     .multilineTextAlignment(.center)
                                     .font(deviceSize(self.widgetFamily).1)
                             }.padding()
-                            .frame(
-                                width: box(self.widgetFamily).width,
-                                height: box(self.widgetFamily).height,
-                                alignment: .center)
+                            .frame(maxWidth: .infinity)
                             .background(Color.white.opacity(0.2))
                             .cornerRadius(16)
                         }
