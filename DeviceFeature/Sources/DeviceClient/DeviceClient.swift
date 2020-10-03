@@ -4,7 +4,7 @@ import Combine
 import Tagged
 import KasaCore
 
-public struct Device: Equatable, Identifiable {
+public struct Device: Equatable, Identifiable, Codable {
     public init(id: Id, name: String) {
         self.id = id
         self.name = name
@@ -24,7 +24,8 @@ public struct DevicesEnvironment {
         loadDevices: @escaping (Token) -> AnyPublisher<[Device], Error>,
         toggleDevicesState: @escaping DeviceDetailEvironment.ToggleEffect,
         getDevicesState: @escaping (Token, Device.ID) -> AnyPublisher<RelayIsOn, Error>,
-        changeDevicesState: @escaping (Token, Device.ID, RelayIsOn) -> AnyPublisher<RelayIsOn, Error>
+        changeDevicesState: @escaping (Token, Device.ID, RelayIsOn) -> AnyPublisher<RelayIsOn, Error>,
+        devicesCache: DevicesCache
     ) {
         self.mainQueue = mainQueue
         self.backgroundQueue = backgroundQueue
@@ -32,6 +33,7 @@ public struct DevicesEnvironment {
         self.toggleDevicesState = toggleDevicesState
         self.getDevicesState = getDevicesState
         self.changeDevicesState = changeDevicesState
+        self.devicesCache = devicesCache
     }
     
     public let mainQueue: AnySchedulerOf<DispatchQueue>
@@ -40,6 +42,20 @@ public struct DevicesEnvironment {
     public let toggleDevicesState: DeviceDetailEvironment.ToggleEffect
     public let getDevicesState: (Token, Device.ID) -> AnyPublisher<RelayIsOn, Error>
     public let changeDevicesState: (Token, Device.ID, RelayIsOn) -> AnyPublisher<RelayIsOn, Error>
+    public let devicesCache: DevicesCache
+}
+
+public struct DevicesCache {
+    public init(
+        save: @escaping ([Device]) ->  AnyPublisher<Void, Error>,
+        load: AnyPublisher<[Device], Error>
+    ) {
+        self.save = save
+        self.load = load
+    }
+    
+    public let save: ([Device]) ->  AnyPublisher<Void, Error>
+    public let load: AnyPublisher<[Device], Error>
 }
 
 #if DEBUG
@@ -69,7 +85,15 @@ public extension DevicesEnvironment {
             Just(state.toggle())
                 .mapError(absurd)
                 .delay(for: 2, scheduler: DispatchQueue.main)
-                .eraseToAnyPublisher() }
+                .eraseToAnyPublisher() },
+        devicesCache:  DevicesCache(
+            save: { _ in Empty(completeImmediately: true).eraseToAnyPublisher() } ,
+            load: Just([
+                Device.init(id: "34", name: "Test device 1"),
+                Device.init(id: "45", name: "Test device 2")
+            ]).mapError(absurd)
+            .eraseToAnyPublisher()
+        )
     )
 }
 
@@ -97,7 +121,7 @@ public extension DevicesEnvironment {
                 return  Just(RelayIsOn.init(rawValue: true))
                     .tryMap{ _ in throw NSError(domain: changeDevicesError, code: 3, userInfo: nil) }
                     .eraseToAnyPublisher()
-            }
+            }, devicesCache: mockDevicesEnv.devicesCache
         )
     }
 }

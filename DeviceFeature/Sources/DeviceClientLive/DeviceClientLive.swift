@@ -3,6 +3,9 @@ import DeviceClient
 import ComposableArchitecture
 import Combine
 import KasaCore
+#if canImport(WidgetKit)
+import WidgetKit
+#endif
 
 extension Device.ID {
     func networkDeviceID() -> Networking.App.DeviceID {
@@ -46,5 +49,31 @@ public extension DevicesEnvironment {
         Networking.App
             .getDevicesState(token: token, id: id.networkDeviceID())
     }
+}
+
+public extension DevicesEnvironment {
+    static let encoder = JSONEncoder()
+    static let decoder = JSONDecoder()
+    
+    static func liveSave(devices: [Device]) -> AnyPublisher<Void, Error> {
+        return Effect.catching {
+            let data = try encoder.encode(devices)
+            let string = String(data: data, encoding: .utf8)
+            UserDefaults.kasaAppGroup.setValue(string, forKeyPath: "cacheDevices")
+            #if canImport(WidgetKit)
+                WidgetCenter.shared.reloadAllTimelines()
+            #endif
+        }.eraseToAnyPublisher()
+    }
+    
+    
+    static let liveLoadCache: AnyPublisher<[Device], Error> = Effect.catching {
+        
+        let data = try
+            UserDefaults.kasaAppGroup.string(forKey: "cacheDevices")?.data(using: .utf8)
+            .map { try decoder.decode([Device].self, from: $0) }
+        
+        return data ?? []
+    }.eraseToAnyPublisher()
 }
 

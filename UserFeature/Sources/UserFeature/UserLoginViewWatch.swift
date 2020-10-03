@@ -43,6 +43,7 @@ public struct UserLoginViewWatch: View {
                     viewStore.send(.tappedLogingButton(email: self.email, password: self.password))
                 }) {
                     LoadingView(.constant(viewStore.isLoadingUser)) {
+                        Image(systemName: "terminal")
                         Text(Strings.login_app.key, bundle: .module)
                     }
                 }

@@ -21,6 +21,7 @@ public enum DevicesAtion {
     case closeAll
     case doneClosingAll(())
     case empty
+    case saveDevicesToCache
 }
 
 public struct DevicesState {
@@ -88,12 +89,26 @@ extension DeviceSate {
     }
 }
 
+extension Device {
+    init(deviceSate: DeviceSate) {
+        self.init(id: deviceSate.id, name: deviceSate.name)
+    }
+}
+
 public let devicesReducer = Reducer<DevicesState, DevicesAtion, DevicesEnvironment> { state, action, environment in
     switch action {
     case .set(let devices):
         state.isLoading = .loaded
         state.devices = devices
-        return .none
+        return Just(DevicesAtion.saveDevicesToCache).eraseToEffect()
+    case .saveDevicesToCache:
+        return  environment.devicesCache.save(
+            state.devices.map(Device.init)
+        ).flatMap(Empty.completeImmediately)
+        .catch(DevicesAtion.send >>> Just.init)
+        .subscribe(on: environment.backgroundQueue)
+        .receive(on: environment.mainQueue)
+        .eraseToEffect()
     case .fetchFromRemote:
         guard let token = state.token else { return .none }
         state.isLoading = .loadingDevices

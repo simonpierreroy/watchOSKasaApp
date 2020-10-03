@@ -38,6 +38,7 @@ public let userReducer = Reducer<UserState, UserAction, UserEnvironment>  { stat
             .cache
             .save(state.user)
             .flatMap(Empty.completeImmediately)
+            .subscribe(on: environment.backgroundQueue)
             .receive(on: environment.mainQueue)
             .eraseToEffect()
         

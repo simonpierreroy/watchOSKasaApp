@@ -48,7 +48,8 @@ public struct AppEnv {
         loadDevices: @escaping (Token) -> AnyPublisher<[Device], Error>,
         toggleDevicesState: @escaping DeviceDetailEvironment.ToggleEffect,
         getDevicesState: @escaping (Token, Device.ID) -> AnyPublisher<RelayIsOn, Error>,
-        changeDevicesState: @escaping (Token, Device.ID, RelayIsOn) -> AnyPublisher<RelayIsOn, Error>
+        changeDevicesState: @escaping (Token, Device.ID, RelayIsOn) -> AnyPublisher<RelayIsOn, Error>,
+        deviceCache: DevicesCache
     ) {
         self.mainQueue = mainQueue
         self.backgroundQueue = backgroundQueue
@@ -58,6 +59,7 @@ public struct AppEnv {
         self.toggleDevicesState = toggleDevicesState
         self.getDevicesState = getDevicesState
         self.changeDevicesState = changeDevicesState
+        self.deviceCache = deviceCache
     }
     
     let mainQueue: AnySchedulerOf<DispatchQueue>
@@ -68,6 +70,7 @@ public struct AppEnv {
     let toggleDevicesState: DeviceDetailEvironment.ToggleEffect
     let getDevicesState: (Token, Device.ID) -> AnyPublisher<RelayIsOn, Error>
     let changeDevicesState: (Token, Device.ID, RelayIsOn) -> AnyPublisher<RelayIsOn, Error>
+    let deviceCache: DevicesCache
 }
 
 public extension UserEnvironment {
@@ -89,7 +92,8 @@ public extension DevicesEnvironment {
             loadDevices: appEnv.loadDevices,
             toggleDevicesState: appEnv.toggleDevicesState,
             getDevicesState: appEnv.getDevicesState,
-            changeDevicesState: appEnv.changeDevicesState
+            changeDevicesState: appEnv.changeDevicesState,
+            devicesCache: appEnv.deviceCache
         )
     }
 }
@@ -176,7 +180,8 @@ public extension AppEnv {
         loadDevices: DevicesEnvironment.mockDevicesEnv.loadDevices,
         toggleDevicesState: DevicesEnvironment.mockDevicesEnv.toggleDevicesState,
         getDevicesState: DevicesEnvironment.mockDevicesEnv.getDevicesState,
-        changeDevicesState: DevicesEnvironment.mockDevicesEnv.changeDevicesState
+        changeDevicesState: DevicesEnvironment.mockDevicesEnv.changeDevicesState,
+        deviceCache: DevicesEnvironment.mockDevicesEnv.devicesCache
     )
 }
 #endif

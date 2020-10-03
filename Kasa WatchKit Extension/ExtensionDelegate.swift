@@ -42,7 +42,8 @@ class ExtensionDelegate: NSObject, WKExtensionDelegate {
             loadDevices: DevicesEnvironment.liveDevicesCall(token:),
             toggleDevicesState: DeviceDetailEvironment.liveToggleDeviceState,
             getDevicesState: DevicesEnvironment.liveGetDevicesState(token:id:),
-            changeDevicesState: DevicesEnvironment.liveChangeDevicesState(token:id:newState:)
+            changeDevicesState: DevicesEnvironment.liveChangeDevicesState(token:id:newState:),
+            deviceCache: .init(save: DevicesEnvironment.liveSave(devices:), load: DevicesEnvironment.liveLoadCache)
         )
     )
     
