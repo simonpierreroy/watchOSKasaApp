@@ -107,7 +107,7 @@ struct KasaAppWidgetEntryView : View {
         case .systemLarge:
             return CGSize(width: 150, height: 110)
         case .systemMedium:
-            return CGSize(width: 150, height: 130)
+            return CGSize(width: 150, height: 70)
         case .systemSmall:
             return CGSize(width: 135, height: 135)
         @unknown default:
@@ -123,7 +123,7 @@ struct KasaAppWidgetEntryView : View {
         case .systemLarge:
             maxSize = 6
         case .systemMedium:
-            maxSize = 2
+            maxSize = 4
         case .systemSmall:
             maxSize = 1
         @unknown default:
@@ -132,6 +132,20 @@ struct KasaAppWidgetEntryView : View {
         
         let size = min(devices.count, maxSize)
         return devices[0..<size]
+    }
+    
+    func deviceSize(_ family: WidgetFamily) ->  (Font, Font){
+        
+        switch family {
+        case .systemLarge:
+            return (.title, .body)
+        case .systemMedium:
+            return (.title, .caption)
+        case .systemSmall:
+            return (.title, .body)
+        @unknown default:
+            return (.title, .body)
+        }
     }
     
     var body: some View {
@@ -144,8 +158,10 @@ struct KasaAppWidgetEntryView : View {
                         ) { device in
                             VStack {
                                 Image(systemName: "light.max")
+                                    .font(deviceSize(self.widgetFamily).0)
                                 Text("\(device.name)")
                                     .multilineTextAlignment(.center)
+                                    .font(deviceSize(self.widgetFamily).1)
                             }.padding()
                             .frame(
                                 width: box(self.widgetFamily).width,
