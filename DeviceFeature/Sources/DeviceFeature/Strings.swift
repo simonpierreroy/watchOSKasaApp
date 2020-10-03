@@ -16,7 +16,7 @@ enum Strings: String {
 
 extension Strings {
     var key: LocalizedStringKey {
-       .init(self.rawValue)
+        .init(self.rawValue)
     }
     
     var string: String {

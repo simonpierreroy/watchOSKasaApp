@@ -28,13 +28,14 @@ public struct DeviceListViewiOS: View {
                 if horizontalSizeClass == .compact {
                     NavigationView {
                         DeviceListViewBase(store: store)
-                            .navigationBarItems(trailing:
-                                                    Button {
-                                                        viewStore.send(.tappedLogout)
-                                                    } label: {
-                                                        Text(Strings.logout_app.key, bundle: .module)
-                                                            .foregroundColor(Color.logout)
-                                                    }
+                            .navigationBarItems(
+                                trailing:
+                                    Button {
+                                        viewStore.send(.tappedLogout)
+                                    } label: {
+                                        Text(Strings.logout_app.key, bundle: .module)
+                                            .foregroundColor(Color.logout)
+                                    }
                             )
                     }
                 } else {
@@ -143,7 +144,13 @@ private struct DeviceListViewBase: View {
                             state: \.devicesToDisplay,
                             action: DeviceListViewiOS.Action.tappedDevice(index:action:)
                         ),
-                        content: { DeviceDetailViewiOS(store: $0).modifier(ContentStyle(isLoading: viewStore.isRefreshingDevices.isInFlight)) }
+                        content: {
+                            DeviceDetailViewiOS(store: $0)
+                                .modifier(
+                                    ContentStyle(isLoading: viewStore.isRefreshingDevices.isInFlight)
+                                )
+                            
+                        }
                     )
                     
                     if horizontalSizeClass == .compact {
