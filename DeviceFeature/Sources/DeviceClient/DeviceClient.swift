@@ -13,8 +13,19 @@ public struct Device: Equatable, Identifiable, Codable {
     
     public let id: Id
     public let name: String
+    
+    public func deepLinkURL() -> URL {
+        return deepLink(from: self.id)
+    }
 }
 
+func deepLink(from id: Device.ID) -> URL {
+    if let url = URL(string: "link/device/\(id.rawValue)") {
+        return url
+    } else {
+        return URL(string: "link/device/invalid")!
+    }
+}
 
 public struct DevicesEnvironment {
     

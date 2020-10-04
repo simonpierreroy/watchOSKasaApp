@@ -8,36 +8,37 @@
 
 import WidgetKit
 import SwiftUI
-import UserFeature
-import DeviceFeature
 import UserClientLive
+import UserClient
 import DeviceClientLive
 import DeviceClient
-import UserClient
 import KasaCore
 import Combine
+import ComposableArchitecture
 
 struct Provider: TimelineProvider {
     
-    static var entryLoading: AnyCancellable? = nil
+    static var cancels: Set<AnyCancellable> = Set()
+    
+    static let prodEnv = WidgetEnvironment.init(
+        loadDevices: DevicesEnvironment.liveLoadCache,
+        loadUser: UserEnvironment.liveLoadUser)
+    
     
     func newEntry(for context: Context,  completion: @escaping (DataDeviceEntry) -> ()) {
-        Provider.entryLoading = UserEnvironment
-            .liveLoadUser
-            .mapError(absurd)
-            .zip(DevicesEnvironment.liveLoadCache) { (user: User?, devices: [Device]) -> DataDeviceEntry in
-                if user == nil {
-                    return DataDeviceEntry(date: Date(), userIsLogged: false, devices: [])
-                } else {
-                    return DataDeviceEntry(date: Date(), userIsLogged: true, devices: devices)
+        var cancel: AnyCancellable? = nil
+        cancel = getCacheState(environment: Provider.prodEnv)
+            .sink { _ in Provider.cancels.remove(cancel!) }
+                receiveValue:  { state in
+                    let entry: DataDeviceEntry
+                    if state.user == nil {
+                        entry = DataDeviceEntry(date: Date(), userIsLogged: false, devices: [])
+                    } else {
+                        entry = DataDeviceEntry(date: Date(), userIsLogged: true, devices: state.device)
+                    }
+                    completion(entry)
                 }
-            }.receive(on: DispatchQueue.main)
-            .eraseToAnyPublisher()
-            .sink { (comp) in
-                print(comp)
-            } receiveValue: { (entry) in
-                completion(entry)
-            }        
+        Provider.cancels.insert(cancel!)
     }
     
     func placeholder(in context: Context) -> DataDeviceEntry {
@@ -98,6 +99,7 @@ struct KasaAppWidgetEntryView : View {
                         switch widgetFamily {
                         case .systemSmall:
                             DeviceViewMaybe(device: entry.devices[safeIndex: 0])
+                                .widgetURL(entry.devices[safeIndex: 0]?.deepLinkURL())
                         case .systemMedium :
                             VStack{
                                 DeviceRowMaybe(devices: (entry.devices[safeIndex: 0], entry.devices[safeIndex: 1]))
@@ -174,7 +176,7 @@ struct DeviceViewMaybe : View {
 struct DeviceView : View {
     
     @Environment(\.widgetFamily) var widgetFamily
-
+    
     let device: Device
     
     func fontDevice(_ family: WidgetFamily) ->  (Font, Font){
@@ -192,18 +194,20 @@ struct DeviceView : View {
     }
     
     var body: some View {
-        VStack {
-            Image(systemName: "light.max")
-                .font(fontDevice(widgetFamily).0)
-            Text("\(device.name)")
-                .multilineTextAlignment(.center)
-                .font(fontDevice(widgetFamily).1)
-        }.padding()
-        .frame(maxWidth: .infinity,maxHeight: .infinity, alignment: .center)
-        .frame(maxWidth: .infinity)
-        .background(Color.white.opacity(0.2))
-        .cornerRadius(16)
-        
+        Link(destination: device.deepLinkURL()) {
+            VStack {
+                Image(systemName: "light.max")
+                    .font(fontDevice(widgetFamily).0)
+                Text("\(device.name)")
+                    .multilineTextAlignment(.center)
+                    .font(fontDevice(widgetFamily).1)
+            }.padding()
+            .frame(maxWidth: .infinity,maxHeight: .infinity, alignment: .center)
+            .frame(maxWidth: .infinity)
+            .background(Color.white.opacity(0.2))
+            .cornerRadius(16)
+            
+        }
     }
 }
 
