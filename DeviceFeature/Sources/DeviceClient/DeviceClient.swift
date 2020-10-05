@@ -14,16 +14,29 @@ public struct Device: Equatable, Identifiable, Codable {
     public let id: Id
     public let name: String
     
-    public func deepLinkURL() -> URL {
-        return deepLink(from: self.id)
+    public func deepLink() -> Link {
+        return Link.device(self.id)
     }
 }
 
-func deepLink(from id: Device.ID) -> URL {
-    if let url = URL(string: "link/device/\(id.rawValue)") {
-        return url
-    } else {
-        return URL(string: "link/device/invalid")!
+public enum Link {
+    case device(Device.ID)
+    case invalid
+    case error
+    
+    public static let errorURL = URL(string: "link/error")!
+    public static let baseURL = URL(string: "link/device/")!
+    public static let invalidURL = Link.baseURL.appendingPathComponent("invalid")
+    
+    public func getURL() -> URL {
+        switch self {
+        case .device(let id):
+            return Link.baseURL.appendingPathComponent("\(id.rawValue)")
+        case .invalid:
+            return Link.invalidURL
+        case .error:
+            return Link.errorURL
+        }
     }
 }
 

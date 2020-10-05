@@ -99,7 +99,7 @@ struct KasaAppWidgetEntryView : View {
                         switch widgetFamily {
                         case .systemSmall:
                             DeviceViewMaybe(device: entry.devices[safeIndex: 0])
-                                .widgetURL(entry.devices[safeIndex: 0]?.deepLinkURL())
+                                .widgetURL(entry.devices[safeIndex: 0]?.deepLink().getURL())
                         case .systemMedium :
                             VStack{
                                 DeviceRowMaybe(devices: (entry.devices[safeIndex: 0], entry.devices[safeIndex: 1]))
@@ -194,7 +194,7 @@ struct DeviceView : View {
     }
     
     var body: some View {
-        Link(destination: device.deepLinkURL()) {
+        Link(destination: device.deepLink().getURL()) {
             VStack {
                 Image(systemName: "light.max")
                     .font(fontDevice(widgetFamily).0)
