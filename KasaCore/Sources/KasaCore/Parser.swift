@@ -154,7 +154,7 @@ public extension Parser where A == Character {
 
 
 public extension Parser where A == Void {
-    static func literal(_ p: String) -> Parser<Void> {
+    static func prefix(_ p: String) -> Parser<Void> {
         return Parser<Void> { str in
             guard str.hasPrefix(p) else { return nil }
             str.removeFirst(p.count)

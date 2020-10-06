@@ -17,14 +17,14 @@ public extension Link {
     )
 
     private static let validDeviceLink: Parser<Link> = zip(
-        .literal(Link.baseURL.absoluteString),
+        .prefix(Link.baseURL.absoluteString),
         validDeviceID
     ).map(\.1)
     .map{ String.init($0) }
     .map(Device.ID.init(rawValue:))
     .map(Link.device)
 
-    private static let invalidLink: Parser<Link> = Parser<Void>.literal(Link.invalidURL.absoluteString).map{ Link.invalid }
+    private static let invalidLink: Parser<Link> = Parser<Void>.prefix(Link.invalidURL.absoluteString).map{ Link.invalid }
 
     private static let deviceLink: Parser<Link> = .oneOf([invalidLink, validDeviceLink])
 

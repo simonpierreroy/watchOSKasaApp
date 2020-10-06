@@ -319,8 +319,18 @@ struct DeviceListViewiOS_Previews: PreviewProvider {
                     state: DeviceListViewiOS.StateView.init(devices:),
                     action: DevicesAtion.init(deviceAction:)
                 )
-            )//.preferredColorScheme(.dark)
-            .previewDisplayName("4 item")
+            ).previewDisplayName("empty")
+            
+            DeviceListViewiOS(
+                store: Store<DevicesState, DevicesAtion>.init(
+                    initialState: DevicesState.emptyLoggedLink,
+                    reducer: devicesReducer,
+                    environment: DevicesEnvironment.mockDevicesEnv
+                ).scope(
+                    state: DeviceListViewiOS.StateView.init(devices:),
+                    action: DevicesAtion.init(deviceAction:)
+                )
+            ).previewDisplayName("Link")
             
             DeviceListViewiOS(
                 store: Store<DevicesState, DevicesAtion>.init(
@@ -331,8 +341,7 @@ struct DeviceListViewiOS_Previews: PreviewProvider {
                     state: DeviceListViewiOS.StateView.init(devices:),
                     action: DevicesAtion.init(deviceAction:)
                 )
-            )//.preferredColorScheme(.dark)
-            .previewDisplayName("4 item")
+            ).previewDisplayName("5 item")
             
             DeviceListViewiOS(
                 store: Store<DevicesState, DevicesAtion>.init(

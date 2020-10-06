@@ -8,8 +8,37 @@
 
 import UIKit
 import SwiftUI
+import DeviceFeature
+import ComposableArchitecture
+import AppPackage
+import KasaCore
+import DeviceClient
+
+extension AppAction {
+    init(delegateAction: SceneDelegate.Action) {
+        switch delegateAction {
+        case .deepLink(let link):
+            self = AppAction.devicesAction(.attempDeepLink(link))
+        }
+    }
+}
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
+    
+    enum Action {
+        case deepLink(DeviceClient.Link)
+    }
+    
+    private static let viewStore: ViewStore<Void, Action> = {
+        ViewStore(
+            AppDelegate.store
+                .scope(
+                    state: always,
+                    action: AppAction.init(delegateAction:)
+                ),
+            removeDuplicates: { _,_ in true }
+        )
+    }()
     
     var window: UIWindow?
     
@@ -28,37 +57,22 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             window.rootViewController = UIHostingController(rootView: contentView)
             self.window = window
             window.makeKeyAndVisible()
+            SceneDelegate.parse(context: connectionOptions.urlContexts)
         }
     }
     
-    func sceneDidDisconnect(_ scene: UIScene) {
-        // Called as the scene is being released by the system.
-        // This occurs shortly after the scene enters the background, or when its session is discarded.
-        // Release any resources associated with this scene that can be re-created the next time the scene connects.
-        // The scene may re-connect later, as its session was not necessarily discarded (see `application:didDiscardSceneSessions` instead).
+    func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
+        SceneDelegate.parse(context: URLContexts)
     }
     
-    func sceneDidBecomeActive(_ scene: UIScene) {
-        // Called when the scene has moved from an inactive state to an active state.
-        // Use this method to restart any tasks that were paused (or not yet started) when the scene was inactive.
+    static func parse(context URLContexts: Set<UIOpenURLContext>) {
+        for context in URLContexts{
+            let link = DeviceClient.Link.parserDeepLink(url: context.url)
+            if case .device = link {
+                SceneDelegate.viewStore.send(.deepLink(link))
+                break
+            }
+        }
     }
-    
-    func sceneWillResignActive(_ scene: UIScene) {
-        // Called when the scene will move from an active state to an inactive state.
-        // This may occur due to temporary interruptions (ex. an incoming phone call).
-    }
-    
-    func sceneWillEnterForeground(_ scene: UIScene) {
-        // Called as the scene transitions from the background to the foreground.
-        // Use this method to undo the changes made on entering the background.
-    }
-    
-    func sceneDidEnterBackground(_ scene: UIScene) {
-        // Called as the scene transitions from the foreground to the background.
-        // Use this method to save data, release shared resources, and store enough scene-specific state information
-        // to restore the scene back to its current state.
-    }
-    
-    
 }
 

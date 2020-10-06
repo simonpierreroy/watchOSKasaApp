@@ -19,7 +19,7 @@ public struct Device: Equatable, Identifiable, Codable {
     }
 }
 
-public enum Link {
+public enum Link: Equatable {
     case device(Device.ID)
     case invalid
     case error
@@ -84,14 +84,18 @@ public struct DevicesCache {
 
 #if DEBUG
 public extension DevicesEnvironment {
+    
+    static let debugDevice1 = Device.init(id: "1", name: "Test device 1")
+    static let debugDevice2 = Device.init(id: "2", name: "Test device 2")
+
     static let mockDevicesEnv = DevicesEnvironment (
         mainQueue: DispatchQueue.main.eraseToAnyScheduler(),
         backgroundQueue: DispatchQueue.main.eraseToAnyScheduler(),
         loadDevices: { token in
             return Effect.future{ (work) in
                 work(.success([
-                    Device.init(id: "34", name: "Test device 1"),
-                    Device.init(id: "45", name: "Test device 2")
+                    DevicesEnvironment.debugDevice1,
+                    DevicesEnvironment.debugDevice2
                 ]))
             }.delay(for: 2, scheduler: DispatchQueue.main)
             .eraseToAnyPublisher()
@@ -113,8 +117,8 @@ public extension DevicesEnvironment {
         devicesCache:  DevicesCache(
             save: { _ in Empty(completeImmediately: true).eraseToAnyPublisher() } ,
             load: Just([
-                Device.init(id: "34", name: "Test device 1"),
-                Device.init(id: "45", name: "Test device 2")
+                DevicesEnvironment.debugDevice1,
+                DevicesEnvironment.debugDevice2
             ]).mapError(absurd)
             .eraseToAnyPublisher()
         )
@@ -133,17 +137,17 @@ public extension DevicesEnvironment {
             },
             toggleDevicesState: { _, _ in
                 return Just(RelayIsOn.init(rawValue: true))
-                    .tryMap{ _ in throw NSError(domain: toggleError, code: 1, userInfo: nil) }
+                    .tryMap{ _ in throw NSError(domain: toggleError, code: 2, userInfo: nil) }
                     .eraseToAnyPublisher()
             },
             getDevicesState:{ token, id in
                 return Just(RelayIsOn.init(rawValue: true))
-                    .tryMap{ _ in throw NSError(domain: getDevicesError, code: 2, userInfo: nil) }
+                    .tryMap{ _ in throw NSError(domain: getDevicesError, code: 3, userInfo: nil) }
                     .eraseToAnyPublisher()
             },
             changeDevicesState: { token, id, state in
                 return  Just(RelayIsOn.init(rawValue: true))
-                    .tryMap{ _ in throw NSError(domain: changeDevicesError, code: 3, userInfo: nil) }
+                    .tryMap{ _ in throw NSError(domain: changeDevicesError, code: 4, userInfo: nil) }
                     .eraseToAnyPublisher()
             }, devicesCache: mockDevicesEnv.devicesCache
         )

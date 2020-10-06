@@ -22,16 +22,18 @@ public enum DevicesAtion {
     case doneClosingAll(())
     case empty
     case saveDevicesToCache
+    case attempDeepLink(Link)
 }
 
 public struct DevicesState {
     public static let empty = DevicesState(devices: [], isLoading: .nerverLoaded, error: nil, token: nil)
     
-    init(devices: [DeviceSate], isLoading: Loading, error: Error?, token: Token?) {
+    init(devices: [DeviceSate], isLoading: Loading, error: Error?, token: Token?, link: Link? = nil) {
         self._devices = .init(devices)
         self.isLoading = isLoading
         self.error = error
         self.token = token
+        self.linkToComplete = link
     }
     
     public enum Loading {
@@ -64,14 +66,16 @@ public struct DevicesState {
     public var isLoading: Loading
     public var error: Error?
     public var token: Token?
+    public var linkToComplete: Link?
 }
 
 #if DEBUG
 extension DevicesState {
     static let emptyLogged = DevicesState(devices: [], isLoading: .nerverLoaded, error: nil, token: "logged")
+    static let emptyLoggedLink = DevicesState(devices: [], isLoading: .nerverLoaded, error: nil, token: "logged", link: DevicesEnvironment.debugDevice1.deepLink())
     static let emptyLoading = DevicesState(devices: [], isLoading: .loadingDevices, error: nil, token: "logged")
     static let emptyNeverLoaded = DevicesState(devices: [], isLoading: .nerverLoaded, error: nil, token: "logged")
-    static let oneDeviceLoaded = DevicesState(devices: [.init(id: "1", name: "Test 1")], isLoading: .loaded, error: nil, token: "logged")
+    static let oneDeviceLoaded = DevicesState(devices: [.init(device: DevicesEnvironment.debugDevice1)], isLoading: .loaded, error: nil, token: "logged")
     static func nDeviceLoaded(n: Int) -> DevicesState {
         DevicesState(
             devices: (1...n).map{ DeviceSate.init(id: "\($0)", name: "Test device number \($0)") },
@@ -97,10 +101,35 @@ extension Device {
 
 public let devicesReducer = Reducer<DevicesState, DevicesAtion, DevicesEnvironment> { state, action, environment in
     switch action {
+    case .attempDeepLink(let link):
+        guard case let .device(id) = link else {
+            state.linkToComplete = nil
+            return .none
+        }
+        
+        if state.devices[id: id] != nil { // Link is in list
+            state.linkToComplete = nil
+            return Just(DevicesAtion.deviceDetail(index: id, action: .toggle)).eraseToEffect()
+        } else if state.linkToComplete == link  { // Link is not in list and already tried
+            state.linkToComplete = nil
+            return .none
+        } else { // not in list, not tried
+            state.linkToComplete = link
+            return .none
+        }
+        
     case .set(let devices):
         state.isLoading = .loaded
         state.devices = devices
-        return Just(DevicesAtion.saveDevicesToCache).eraseToEffect()
+        
+        let linkPub: AnyPublisher<DevicesAtion, Never> // If a link failed to run the first time.
+        if let link = state.linkToComplete {
+            linkPub = Just(DevicesAtion.attempDeepLink(link)).eraseToAnyPublisher()
+        } else {
+            linkPub = Empty(completeImmediately: true).eraseToAnyPublisher()
+        }
+        
+        return Just(DevicesAtion.saveDevicesToCache).flatMap{ _ in  return linkPub }.eraseToEffect()
     case .saveDevicesToCache:
         return  environment.devicesCache.save(
             state.devices.map(Device.init)
