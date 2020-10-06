@@ -129,7 +129,7 @@ public let devicesReducer = Reducer<DevicesState, DevicesAtion, DevicesEnvironme
             linkPub = Empty(completeImmediately: true).eraseToAnyPublisher()
         }
         
-        return Just(DevicesAtion.saveDevicesToCache).flatMap{ _ in  return linkPub }.eraseToEffect()
+        return Just(DevicesAtion.saveDevicesToCache).merge(with: linkPub).eraseToEffect()
     case .saveDevicesToCache:
         return  environment.devicesCache.save(
             state.devices.map(Device.init)
