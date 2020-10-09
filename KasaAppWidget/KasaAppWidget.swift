@@ -221,7 +221,7 @@ struct KasaAppWidget: Widget {
             KasaAppWidgetEntryView(entry: entry)
         }
         .configurationDisplayName("Kasa")
-        .description("This is an example widget.")
+        .description(.description_widget)
         
     }
 }

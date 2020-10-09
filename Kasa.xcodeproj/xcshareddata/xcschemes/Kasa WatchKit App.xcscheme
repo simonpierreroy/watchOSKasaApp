@@ -54,8 +54,10 @@
       debugDocumentVersioning = "YES"
       debugServiceExtension = "internal"
       allowLocationSimulation = "YES">
-      <BuildableProductRunnable
-         runnableDebuggingMode = "0">
+      <RemoteRunnable
+         runnableDebuggingMode = "2"
+         BundleIdentifier = "com.apple.Carousel"
+         RemotePath = "/$(PRODUCT_NAME)">
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "328950DE24821A3800EC3A49"
@@ -63,7 +65,7 @@
             BlueprintName = "Kasa WatchKit App"
             ReferencedContainer = "container:Kasa.xcodeproj">
          </BuildableReference>
-      </BuildableProductRunnable>
+      </RemoteRunnable>
    </LaunchAction>
    <ProfileAction
       buildConfiguration = "Release"
@@ -71,8 +73,10 @@
       savedToolIdentifier = ""
       useCustomWorkingDirectory = "NO"
       debugDocumentVersioning = "YES">
-      <BuildableProductRunnable
-         runnableDebuggingMode = "0">
+      <RemoteRunnable
+         runnableDebuggingMode = "2"
+         BundleIdentifier = "com.apple.Carousel"
+         RemotePath = "/$(PRODUCT_NAME)">
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "328950DE24821A3800EC3A49"
@@ -80,7 +84,16 @@
             BlueprintName = "Kasa WatchKit App"
             ReferencedContainer = "container:Kasa.xcodeproj">
          </BuildableReference>
-      </BuildableProductRunnable>
+      </RemoteRunnable>
+      <MacroExpansion>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "328950DE24821A3800EC3A49"
+            BuildableName = "Kasa.app"
+            BlueprintName = "Kasa WatchKit App"
+            ReferencedContainer = "container:Kasa.xcodeproj">
+         </BuildableReference>
+      </MacroExpansion>
    </ProfileAction>
    <AnalyzeAction
       buildConfiguration = "Debug">

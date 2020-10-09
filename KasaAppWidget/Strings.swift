@@ -12,6 +12,8 @@ import Foundation
 extension LocalizedStringKey {
     static let no_device: LocalizedStringKey = "no_device"
     static let not_logged: LocalizedStringKey = "not_logged"
+    static let description_widget: LocalizedStringKey = "description_widget"
+
 
 }
 
@@ -26,11 +28,13 @@ struct Strings_Previews: PreviewProvider {
             VStack {
                 Text(.not_logged)
                 Text(.no_device)
+                Text(.description_widget)
             }.previewContext(WidgetPreviewContext(family: .systemMedium))
             .previewDisplayName("English")
             VStack {
                 Text(.not_logged)
                 Text(.no_device)
+                Text(.description_widget)
             }.environment(\.locale, .init(identifier: "fr"))
             .previewContext(WidgetPreviewContext(family: .systemMedium))
             .previewDisplayName("Français")
