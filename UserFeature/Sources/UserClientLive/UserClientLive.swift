@@ -3,9 +3,6 @@ import UserClient
 import ComposableArchitecture
 import Combine
 import KasaCore
-#if canImport(WidgetKit)
-import WidgetKit
-#endif
 
 extension User.Credential {
     func networkCredential() -> Networking.App.Credential {
@@ -21,25 +18,17 @@ public extension UserEnvironment {
             .eraseToAnyPublisher()
     }
     
-    static func liveSave(user: User?) -> Effect<Void, Never> {
-        return .run { subscriber in
+    static func liveSave(user: User?) -> AnyPublisher<Void, Never> {
+        return Effect.future { work in
             UserDefaults.kasaAppGroup.setValue(user?.token.rawValue, forKeyPath: "userToken")
-            #if canImport(WidgetKit)
-                WidgetCenter.shared.reloadAllTimelines()
-            #endif
-            subscriber.send(completion: .finished)
-            return AnyCancellable{}
-        }
+            work(.success(()))
+        }.eraseToAnyPublisher()
     }
     
     
-    static let liveLoadUser: Effect<User?, Never> = .run { subscriber in
-        
+    static let liveLoadUser: AnyPublisher<User?, Never> = Effect.future { work in
         let user = UserDefaults.kasaAppGroup.string(forKey: "userToken")
             .map(Token.init(rawValue:) >>> User.init(token:))
-        
-        subscriber.send(user)
-        subscriber.send(completion: .finished)
-        return AnyCancellable{}
-    }
+        work(.success(user))
+    }.eraseToAnyPublisher()
 }

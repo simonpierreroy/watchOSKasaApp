@@ -62,9 +62,11 @@ public struct UserLoginViewiOS: View {
                         viewStore.send(.tappedLogingButton(email: self.email, password: self.password))
                     }) {
                         LoadingView(.constant(viewStore.isLoadingUser)) {
-                            Text(Strings.login_app.key, bundle: .module).foregroundColor(Color.green)
-                        }.padding()
-                    }.frame(maxWidth: .infinity)
+                            Text(Strings.login_app.key, bundle: .module)
+                                .foregroundColor(Color.green)
+                        }.frame(maxWidth: .infinity)
+                        .padding()
+                    }
                     .background(Color.green.opacity(0.2))
                     .cornerRadius(32)
                 }.frame(maxWidth: 500).padding()

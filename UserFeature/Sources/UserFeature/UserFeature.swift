@@ -37,6 +37,7 @@ public let userReducer = Reducer<UserState, UserAction, UserEnvironment>  { stat
         return environment
             .cache
             .save(state.user)
+            .flatMap{ environment.reloadAppExtensions }
             .flatMap(Empty.completeImmediately)
             .subscribe(on: environment.backgroundQueue)
             .receive(on: environment.mainQueue)

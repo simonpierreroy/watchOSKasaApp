@@ -44,33 +44,28 @@ public struct AppEnv {
         mainQueue: AnySchedulerOf<DispatchQueue>,
         backgroundQueue: AnySchedulerOf<DispatchQueue>,
         login: @escaping (User.Credential) -> AnyPublisher<User, Error>,
-        cache: UserCache,
-        loadDevices: @escaping (Token) -> AnyPublisher<[Device], Error>,
-        toggleDevicesState: @escaping DeviceDetailEvironment.ToggleEffect,
-        getDevicesState: @escaping (Token, Device.ID) -> AnyPublisher<RelayIsOn, Error>,
-        changeDevicesState: @escaping (Token, Device.ID, RelayIsOn) -> AnyPublisher<RelayIsOn, Error>,
-        deviceCache: DevicesCache
+        userCache: UserCache,
+        devicesRepo: DevicesRepo,
+        deviceCache: DevicesCache,
+        reloadAppExtensions: AnyPublisher<Void,Never>
     ) {
         self.mainQueue = mainQueue
         self.backgroundQueue = backgroundQueue
         self.login = login
-        self.cache = cache
-        self.loadDevices = loadDevices
-        self.toggleDevicesState = toggleDevicesState
-        self.getDevicesState = getDevicesState
-        self.changeDevicesState = changeDevicesState
+        self.userCache = userCache
+        self.devicesRepo = devicesRepo
         self.deviceCache = deviceCache
+        self.reloadAppExtensions = reloadAppExtensions
     }
     
     let mainQueue: AnySchedulerOf<DispatchQueue>
     let backgroundQueue: AnySchedulerOf<DispatchQueue>
     let login: (User.Credential) -> AnyPublisher<User, Error>
-    let cache: UserCache
-    let loadDevices: (Token) -> AnyPublisher<[Device], Error>
-    let toggleDevicesState: DeviceDetailEvironment.ToggleEffect
-    let getDevicesState: (Token, Device.ID) -> AnyPublisher<RelayIsOn, Error>
-    let changeDevicesState: (Token, Device.ID, RelayIsOn) -> AnyPublisher<RelayIsOn, Error>
+    let userCache: UserCache
+    let devicesRepo: DevicesRepo
     let deviceCache: DevicesCache
+    let reloadAppExtensions: AnyPublisher<Void,Never>
+
 }
 
 public extension UserEnvironment {
@@ -79,7 +74,8 @@ public extension UserEnvironment {
             mainQueue: appEnv.mainQueue,
             backgroundQueue: appEnv.backgroundQueue,
             login: appEnv.login,
-            cache: appEnv.cache
+            cache: appEnv.userCache,
+            reloadAppExtensions: appEnv.reloadAppExtensions
         )
     }
 }
@@ -89,11 +85,9 @@ public extension DevicesEnvironment {
         self.init(
             mainQueue: appEnv.mainQueue,
             backgroundQueue: appEnv.backgroundQueue,
-            loadDevices: appEnv.loadDevices,
-            toggleDevicesState: appEnv.toggleDevicesState,
-            getDevicesState: appEnv.getDevicesState,
-            changeDevicesState: appEnv.changeDevicesState,
-            devicesCache: appEnv.deviceCache
+            repo: appEnv.devicesRepo,
+            devicesCache: appEnv.deviceCache,
+            reloadAppExtensions: appEnv.reloadAppExtensions
         )
     }
 }
@@ -176,14 +170,25 @@ public extension AppEnv {
         mainQueue: DevicesEnvironment.mockDevicesEnv.mainQueue,
         backgroundQueue: DevicesEnvironment.mockDevicesEnv.backgroundQueue,
         login: UserEnvironment.mockUserEnv.login,
-        cache: UserEnvironment.mockUserEnv.cache,
-        loadDevices: DevicesEnvironment.mockDevicesEnv.loadDevices,
-        toggleDevicesState: DevicesEnvironment.mockDevicesEnv.toggleDevicesState,
-        getDevicesState: DevicesEnvironment.mockDevicesEnv.getDevicesState,
-        changeDevicesState: DevicesEnvironment.mockDevicesEnv.changeDevicesState,
-        deviceCache: DevicesEnvironment.mockDevicesEnv.devicesCache
+        userCache: UserEnvironment.mockUserEnv.cache,
+        devicesRepo: DevicesEnvironment.mockDevicesEnv.repo,
+        deviceCache: DevicesEnvironment.mockDevicesEnv.cache,
+        reloadAppExtensions: DevicesEnvironment.mockDevicesEnv.reloadAppExtensions
     )
 }
 #endif
 
 
+#if canImport(WidgetKit)
+import WidgetKit
+public extension AppEnv {
+    static let liveReloadAppExtensions: AnyPublisher<Void, Never> = Effect.future { work in
+            WidgetCenter.shared.reloadAllTimelines()
+            work(.success(()))
+    }.eraseToAnyPublisher()
+}
+#else
+public extension AppEnv {
+    static let liveReloadAppExtensions: AnyPublisher<Void, Never> = Empty(completeImmediately: true).eraseToAnyPublisher()
+}
+#endif

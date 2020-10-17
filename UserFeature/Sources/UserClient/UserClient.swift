@@ -28,32 +28,36 @@ public struct UserEnvironment {
         mainQueue: AnySchedulerOf<DispatchQueue>,
         backgroundQueue: AnySchedulerOf<DispatchQueue>,
         login: @escaping (User.Credential) -> AnyPublisher<User, Error>,
-        cache: UserCache) {
+        cache: UserCache,
+        reloadAppExtensions: AnyPublisher<Void,Never>
+    ) {
         
         self.mainQueue = mainQueue
         self.backgroundQueue = backgroundQueue
         self.login = login
         self.cache = cache
+        self.reloadAppExtensions = reloadAppExtensions
     }
     
     public let mainQueue: AnySchedulerOf<DispatchQueue>
     public let backgroundQueue: AnySchedulerOf<DispatchQueue>
     public let login: (User.Credential) -> AnyPublisher<User, Error>
     public let cache: UserCache
+    public let reloadAppExtensions: AnyPublisher<Void,Never>
 }
 
 
 public struct UserCache {
     public init(
-        save: @escaping (User?) -> Effect<Void, Never>,
-        load: Effect<User?, Never>
+        save: @escaping (User?) -> AnyPublisher<Void, Never>,
+        load: AnyPublisher<User?, Never>
     ) {
         self.save = save
         self.load = load
     }
     
-    public let save: (User?) -> Effect<Void, Never>
-    public let load: Effect<User?, Never>
+    public let save: (User?) -> AnyPublisher<Void, Never>
+    public let load: AnyPublisher<User?, Never>
 }
 
 #if DEBUG
@@ -66,10 +70,11 @@ public extension UserEnvironment {
             .eraseToAnyPublisher()
         },
         cache: UserCache(
-            save: { _ in Effect<Void, Never>.fireAndForget {} } ,
+            save: { _ in Empty(completeImmediately: true).eraseToAnyPublisher() } ,
             load: Just(Optional.some(User.init(token: "1")))
-                .eraseToEffect()
-        )
+                .eraseToAnyPublisher()
+        ),
+        reloadAppExtensions: Empty(completeImmediately: true).eraseToAnyPublisher()
     )
 }
 #endif

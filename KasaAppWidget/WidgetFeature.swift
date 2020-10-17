@@ -21,7 +21,7 @@ struct WidgetState {
 
 struct WidgetEnvironment {
     let loadDevices: AnyPublisher<[Device], Error>
-    let loadUser: Effect<User?, Never>
+    let loadUser: AnyPublisher<User?, Never>
 }
 
 func getCacheState(environment: WidgetEnvironment) -> AnyPublisher<WidgetState, Error> {

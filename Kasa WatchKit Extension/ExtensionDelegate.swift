@@ -38,12 +38,15 @@ class ExtensionDelegate: NSObject, WKExtensionDelegate {
             mainQueue: DispatchQueue.main.eraseToAnyScheduler(),
             backgroundQueue: DispatchQueue.global(qos: .userInteractive).eraseToAnyScheduler(),
             login: UserEnvironment.liveLogginEffect,
-            cache: UserCache(save: UserEnvironment.liveSave, load: UserEnvironment.liveLoadUser),
-            loadDevices: DevicesEnvironment.liveDevicesCall(token:),
-            toggleDevicesState: DeviceDetailEvironment.liveToggleDeviceState,
-            getDevicesState: DevicesEnvironment.liveGetDevicesState(token:id:),
-            changeDevicesState: DevicesEnvironment.liveChangeDevicesState(token:id:newState:),
-            deviceCache: .init(save: DevicesEnvironment.liveSave(devices:), load: DevicesEnvironment.liveLoadCache)
+            userCache: .init(save: UserEnvironment.liveSave, load: UserEnvironment.liveLoadUser),
+            devicesRepo: .init(
+                loadDevices: DevicesEnvironment.liveDevicesCall(token:),
+                toggleDevicesState: DeviceDetailEvironment.liveToggleDeviceState,
+                getDevicesState: DevicesEnvironment.liveGetDevicesState(token:id:),
+                changeDevicesState: DevicesEnvironment.liveChangeDevicesState(token:id:newState:)
+            ),
+            deviceCache: .init(save: DevicesEnvironment.liveSave(devices:), load: DevicesEnvironment.liveLoadCache),
+            reloadAppExtensions: AppEnv.liveReloadAppExtensions
         )
     )
     

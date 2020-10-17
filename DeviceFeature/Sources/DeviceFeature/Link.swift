@@ -11,10 +11,9 @@ import Foundation
 
 public extension Link {
     
-    private static let validDeviceID: Parser<[Character]> = .oneOrMore(
-        .oneOf([.number, .letter]),
-        separatedBy: .always(())
-    )
+    private static let validDeviceID =  Parser<Character>
+        .oneOf(.number, .letter)
+        .oneOrMore()
 
     private static let validDeviceLink: Parser<Link> = zip(
         .prefix(Link.baseURL.absoluteString),
@@ -24,9 +23,11 @@ public extension Link {
     .map(Device.ID.init(rawValue:))
     .map(Link.device)
 
-    private static let invalidLink: Parser<Link> = Parser<Void>.prefix(Link.invalidURL.absoluteString).map{ Link.invalid }
+    private static let invalidLink: Parser<Link> = Parser<Void>
+        .prefix(Link.invalidURL.absoluteString)
+        .map{ Link.invalid }
 
-    private static let deviceLink: Parser<Link> = .oneOf([invalidLink, validDeviceLink])
+    private static let deviceLink: Parser<Link> = .oneOf(invalidLink, validDeviceLink)
 
     static func parserDeepLink(string: String) -> Link {
         let result = deviceLink.run(string)

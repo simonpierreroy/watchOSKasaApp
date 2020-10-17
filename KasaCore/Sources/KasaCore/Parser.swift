@@ -7,100 +7,122 @@
 
 import Foundation
 
-public struct Parser<A> {
-    public let run: (inout Substring) -> A?
+public struct Parser<Output> {
+    public let run: (inout Substring) -> Output?
 }
 
 public extension Parser {
-    func run(_ str: String) -> (match: A?, rest: Substring) {
-        var str = str[...]
-        let match = self.run(&str)
-        return (match, str)
-    }
+  func run(_ input: String) -> (match: Output?, rest: Substring) {
+    var input = input[...]
+    let match = self.run(&input)
+    return (match, input)
+  }
 }
 
 
 public extension Parser {
-    func map<B>(_ f: @escaping (A) -> B) -> Parser<B> {
-        return Parser<B> { str -> B? in
-            self.run(&str).map(f)
-        }
+    func map<NewOutput>(_ f: @escaping (Output) -> NewOutput) -> Parser<NewOutput> {
+      .init { input in
+        self.run(&input).map(f)
+      }
     }
     
-    func flatMap<B>(_ f: @escaping (A) -> Parser<B>) -> Parser<B> {
-        return Parser<B> { str -> B? in
-            let original = str
-            let matchA = self.run(&str)
-            let parserB = matchA.map(f)
-            guard let matchB = parserB?.run(&str) else {
-                str = original
-                return nil
-            }
-            return matchB
+    func flatMap<NewOutput>(
+      _ f: @escaping (Output) -> Parser<NewOutput>
+    ) -> Parser<NewOutput> {
+      .init { input in
+        let original = input
+        let output = self.run(&input)
+        let newParser = output.map(f)
+        guard let newOutput = newParser?.run(&input) else {
+          input = original
+          return nil
         }
+        return newOutput
+      }
     }
 }
 
 public extension Parser {
-    static func always<A>(_ a: A) -> Parser<A> {
-        return Parser<A> { _ in a }
+    static func always(_ output: Output) -> Self {
+      Self { _ in output }
     }
+
+    static var never: Self {
+      Self { _ in nil }
+    }
+}
+
+public extension Parser where Output == Void {
+  static func prefix(_ p: String) -> Self {
+    Self { input in
+      guard input.hasPrefix(p) else { return nil }
+      input.removeFirst(p.count)
+      return ()
+    }
+  }
+}
+
+extension Parser: ExpressibleByUnicodeScalarLiteral where Output == Void {
+    public typealias UnicodeScalarLiteralType = StringLiteralType
+}
+
+extension Parser: ExpressibleByExtendedGraphemeClusterLiteral where Output == Void {
+    public typealias ExtendedGraphemeClusterLiteralType = StringLiteralType
+}
+
+extension Parser: ExpressibleByStringLiteral where Output == Void {
+    public typealias StringLiteralType = String
     
-    static var never: Parser {
-        return Parser { _ in nil }
+    public init(stringLiteral value: String) {
+        self = .prefix(value)
     }
 }
 
 public extension Parser {
-    static func oneOf<A>(
-        _ ps: [Parser<A>]
-    ) -> Parser<A> {
-        return Parser<A> { str -> A? in
-            for p in ps {
-                if let match = p.run(&str) {
-                    return match
-                }
-            }
-            return nil
+  static func oneOf(_ ps: [Self]) -> Self {
+    .init { input in
+      for p in ps {
+        if let match = p.run(&input) {
+          return match
         }
+      }
+      return nil
     }
-    
-    static func zeroOrMore<A>(
-        _ p: Parser<A>,
-        separatedBy s: Parser<Void>
-    ) -> Parser<[A]> {
-        return Parser<[A]> { str in
-            var rest = str
-            var matches: [A] = []
-            while let match = p.run(&str) {
-                rest = str
-                matches.append(match)
-                if s.run(&str) == nil {
-                    return matches
-                }
-            }
-            str = rest
+  }
+  
+  static func oneOf(_ ps: Self...) -> Self {
+    self.oneOf(ps)
+  }
+}
+
+public extension Parser {
+
+    func zeroOrMore(
+      separatedBy separator: Parser<Void> = ""
+    ) -> Parser<[Output]> {
+      Parser<[Output]> { input in
+        var rest = input
+        var matches: [Output] = []
+        while let match = self.run(&input) {
+          rest = input
+          matches.append(match)
+          if separator.run(&input) == nil {
             return matches
+          }
         }
+        input = rest
+        return matches
+      }
     }
     
-    static func oneOrMore<A>(
-        _ p: Parser<A>,
-        separatedBy s: Parser<Void>
-    ) -> Parser<[A]> {
-        return zeroOrMore(p, separatedBy: s).flatMap{ $0.isEmpty ? .never : .always($0)}
+    func oneOrMore(
+        separatedBy separator: Parser<Void> = ""
+    ) -> Parser<[Output]> {
+        return zeroOrMore(separatedBy: separator).flatMap{ $0.isEmpty ? .never : .always($0)}
     }
 }
 
-public extension Parser {
-    static func prefix(while p: @escaping (Character) -> Bool) -> Parser<Substring> {
-        return Parser<Substring> { str in
-            let prefix = str.prefix(while: p)
-            str.removeFirst(prefix.count)
-            return prefix
-        }
-    }
-}
 
 
 
@@ -136,11 +158,11 @@ public func zip<A, B, C, D>(
         .map { a, bcd in (a, bcd.0, bcd.1, bcd.2) }
 }
 
-
-public extension Parser where A == Character {
-    static let char = Parser<Character> { str in
-        guard !str.isEmpty else { return nil }
-        return str.removeFirst()
+public extension Parser where Output == Character {
+    
+    static let char = Self { input in
+        guard !input.isEmpty else { return nil }
+        return input.removeFirst()
     }
     
     static let number = char
@@ -148,17 +170,4 @@ public extension Parser where A == Character {
     
     static let letter = char
         .flatMap { $0.isLetter ? .always($0) : .never }
-}
-
-
-
-
-public extension Parser where A == Void {
-    static func prefix(_ p: String) -> Parser<Void> {
-        return Parser<Void> { str in
-            guard str.hasPrefix(p) else { return nil }
-            str.removeFirst(p.count)
-            return ()
-        }
-    }
 }

@@ -3,9 +3,6 @@ import DeviceClient
 import ComposableArchitecture
 import Combine
 import KasaCore
-#if canImport(WidgetKit)
-import WidgetKit
-#endif
 
 extension Device.ID {
     func networkDeviceID() -> Networking.App.DeviceID {
@@ -60,9 +57,6 @@ public extension DevicesEnvironment {
             let data = try encoder.encode(devices)
             let string = String(data: data, encoding: .utf8)
             UserDefaults.kasaAppGroup.setValue(string, forKeyPath: "cacheDevices")
-            #if canImport(WidgetKit)
-                WidgetCenter.shared.reloadAllTimelines()
-            #endif
         }.eraseToAnyPublisher()
     }
     

@@ -131,9 +131,10 @@ public let devicesReducer = Reducer<DevicesState, DevicesAtion, DevicesEnvironme
         
         return Just(DevicesAtion.saveDevicesToCache).merge(with: linkPub).eraseToEffect()
     case .saveDevicesToCache:
-        return  environment.devicesCache.save(
+        return  environment.cache.save(
             state.devices.map(Device.init)
-        ).flatMap(Empty.completeImmediately)
+        ).flatMap{ environment.reloadAppExtensions }
+        .flatMap(Empty.completeImmediately)
         .catch(DevicesAtion.send >>> Just.init)
         .subscribe(on: environment.backgroundQueue)
         .receive(on: environment.mainQueue)
@@ -141,7 +142,7 @@ public let devicesReducer = Reducer<DevicesState, DevicesAtion, DevicesEnvironme
     case .fetchFromRemote:
         guard let token = state.token else { return .none }
         state.isLoading = .loadingDevices
-        return environment.loadDevices(token)
+        return environment.repo.loadDevices(token)
             .map(map(DeviceSate.init(device:)))
             .map(IdentifiedArrayOf<DeviceSate>.init)
             .map(DevicesAtion.set)
@@ -161,7 +162,7 @@ public let devicesReducer = Reducer<DevicesState, DevicesAtion, DevicesEnvironme
         state.isLoading = .closingAll
         
         func stateInfo(device: DeviceSate) ->  AnyPublisher<(Device.ID, RelayIsOn), Error> {
-            return environment.getDevicesState(token , device.id)
+            return environment.repo.getDevicesState(token , device.id)
                 .map { isOn in return (device.id, isOn) }
                 .eraseToAnyPublisher()
         }
@@ -170,7 +171,7 @@ public let devicesReducer = Reducer<DevicesState, DevicesAtion, DevicesEnvironme
             state.devices.map(stateInfo)
         ).filter(\.1.rawValue)
         .map { (token, $0.0, false) }
-        .flatMap(environment.changeDevicesState)
+        .flatMap(environment.repo.changeDevicesState)
         .map(always)
         .map(DevicesAtion.doneClosingAll)
         .last()

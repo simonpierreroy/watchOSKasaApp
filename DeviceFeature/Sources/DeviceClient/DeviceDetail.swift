@@ -12,7 +12,7 @@ public struct DeviceDetailEvironment {
 
 extension DeviceDetailEvironment {
     public init(devicesEnv: DevicesEnvironment) {
-        self.toggle = devicesEnv.toggleDevicesState
+        self.toggle = devicesEnv.repo.toggleDevicesState
         self.mainQueue = devicesEnv.mainQueue
     }
 }

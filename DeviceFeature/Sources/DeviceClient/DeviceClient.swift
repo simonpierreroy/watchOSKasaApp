@@ -45,28 +45,45 @@ public struct DevicesEnvironment {
     public init(
         mainQueue: AnySchedulerOf<DispatchQueue>,
         backgroundQueue: AnySchedulerOf<DispatchQueue>,
-        loadDevices: @escaping (Token) -> AnyPublisher<[Device], Error>,
-        toggleDevicesState: @escaping DeviceDetailEvironment.ToggleEffect,
-        getDevicesState: @escaping (Token, Device.ID) -> AnyPublisher<RelayIsOn, Error>,
-        changeDevicesState: @escaping (Token, Device.ID, RelayIsOn) -> AnyPublisher<RelayIsOn, Error>,
-        devicesCache: DevicesCache
+        repo: DevicesRepo,
+        devicesCache: DevicesCache,
+        reloadAppExtensions: AnyPublisher<Void,Never>
     ) {
         self.mainQueue = mainQueue
         self.backgroundQueue = backgroundQueue
-        self.loadDevices = loadDevices
-        self.toggleDevicesState = toggleDevicesState
-        self.getDevicesState = getDevicesState
-        self.changeDevicesState = changeDevicesState
-        self.devicesCache = devicesCache
+        self.repo = repo
+        self.cache = devicesCache
+        self.reloadAppExtensions = reloadAppExtensions
     }
     
     public let mainQueue: AnySchedulerOf<DispatchQueue>
     public let backgroundQueue: AnySchedulerOf<DispatchQueue>
+    public let repo: DevicesRepo
+    public let cache: DevicesCache
+    public let reloadAppExtensions: AnyPublisher<Void,Never>
+}
+
+public struct DevicesRepo {
+    
+    public init(
+        loadDevices: @escaping (Token) -> AnyPublisher<[Device], Error>,
+        toggleDevicesState: @escaping DeviceDetailEvironment.ToggleEffect,
+        getDevicesState: @escaping (Token, Device.ID) -> AnyPublisher<RelayIsOn, Error>,
+        changeDevicesState: @escaping (Token, Device.ID, RelayIsOn) -> AnyPublisher<RelayIsOn, Error>
+    ) {
+        
+        
+        self.loadDevices = loadDevices
+        self.toggleDevicesState = toggleDevicesState
+        self.getDevicesState = getDevicesState
+        self.changeDevicesState = changeDevicesState
+        
+    }
+    
     public let loadDevices: (Token) -> AnyPublisher<[Device], Error>
     public let toggleDevicesState: DeviceDetailEvironment.ToggleEffect
     public let getDevicesState: (Token, Device.ID) -> AnyPublisher<RelayIsOn, Error>
     public let changeDevicesState: (Token, Device.ID, RelayIsOn) -> AnyPublisher<RelayIsOn, Error>
-    public let devicesCache: DevicesCache
 }
 
 public struct DevicesCache {
@@ -87,33 +104,35 @@ public extension DevicesEnvironment {
     
     static let debugDevice1 = Device.init(id: "1", name: "Test device 1")
     static let debugDevice2 = Device.init(id: "2", name: "Test device 2")
-
+    
     static let mockDevicesEnv = DevicesEnvironment (
         mainQueue: DispatchQueue.main.eraseToAnyScheduler(),
         backgroundQueue: DispatchQueue.main.eraseToAnyScheduler(),
-        loadDevices: { token in
-            return Effect.future{ (work) in
-                work(.success([
-                    DevicesEnvironment.debugDevice1,
-                    DevicesEnvironment.debugDevice2
-                ]))
-            }.delay(for: 2, scheduler: DispatchQueue.main)
-            .eraseToAnyPublisher()
-        }, toggleDevicesState: { (_,_) in
-            Just(RelayIsOn.init(rawValue: true))
-                .mapError(absurd)
-                .delay(for: 2, scheduler: DispatchQueue.main)
-                .eraseToAnyPublisher() },
-        getDevicesState: { (_,_) in
-            Just(RelayIsOn.init(rawValue: true))
-                .mapError(absurd)
-                .delay(for: 2, scheduler: DispatchQueue.main)
-                .eraseToAnyPublisher() },
-        changeDevicesState: { (_,_, state) in
-            Just(state.toggle())
-                .mapError(absurd)
-                .delay(for: 2, scheduler: DispatchQueue.main)
-                .eraseToAnyPublisher() },
+        repo: DevicesRepo.init(
+            loadDevices: { token in
+                return Effect.future{ (work) in
+                    work(.success([
+                        DevicesEnvironment.debugDevice1,
+                        DevicesEnvironment.debugDevice2
+                    ]))
+                }.delay(for: 2, scheduler: DispatchQueue.main)
+                .eraseToAnyPublisher()
+            }, toggleDevicesState: { (_,_) in
+                Just(RelayIsOn.init(rawValue: true))
+                    .mapError(absurd)
+                    .delay(for: 2, scheduler: DispatchQueue.main)
+                    .eraseToAnyPublisher() },
+            getDevicesState: { (_,_) in
+                Just(RelayIsOn.init(rawValue: true))
+                    .mapError(absurd)
+                    .delay(for: 2, scheduler: DispatchQueue.main)
+                    .eraseToAnyPublisher() },
+            changeDevicesState: { (_,_, state) in
+                Just(state.toggle())
+                    .mapError(absurd)
+                    .delay(for: 2, scheduler: DispatchQueue.main)
+                    .eraseToAnyPublisher() }
+        ),
         devicesCache:  DevicesCache(
             save: { _ in Empty(completeImmediately: true).eraseToAnyPublisher() } ,
             load: Just([
@@ -121,7 +140,8 @@ public extension DevicesEnvironment {
                 DevicesEnvironment.debugDevice2
             ]).mapError(absurd)
             .eraseToAnyPublisher()
-        )
+        ),
+        reloadAppExtensions: Empty(completeImmediately: true).eraseToAnyPublisher()
     )
 }
 
@@ -130,26 +150,29 @@ public extension DevicesEnvironment {
         return DevicesEnvironment.init(
             mainQueue: mockDevicesEnv.mainQueue,
             backgroundQueue: mockDevicesEnv.backgroundQueue,
-            loadDevices:{ _ in
-                return Just([])
-                    .tryMap{ _ in throw NSError(domain: loadError, code: 1, userInfo: nil) }
-                    .eraseToAnyPublisher()
-            },
-            toggleDevicesState: { _, _ in
-                return Just(RelayIsOn.init(rawValue: true))
-                    .tryMap{ _ in throw NSError(domain: toggleError, code: 2, userInfo: nil) }
-                    .eraseToAnyPublisher()
-            },
-            getDevicesState:{ token, id in
-                return Just(RelayIsOn.init(rawValue: true))
-                    .tryMap{ _ in throw NSError(domain: getDevicesError, code: 3, userInfo: nil) }
-                    .eraseToAnyPublisher()
-            },
-            changeDevicesState: { token, id, state in
-                return  Just(RelayIsOn.init(rawValue: true))
-                    .tryMap{ _ in throw NSError(domain: changeDevicesError, code: 4, userInfo: nil) }
-                    .eraseToAnyPublisher()
-            }, devicesCache: mockDevicesEnv.devicesCache
+            repo: DevicesRepo.init(
+                loadDevices:{ _ in
+                    return Just([])
+                        .tryMap{ _ in throw NSError(domain: loadError, code: 1, userInfo: nil) }
+                        .eraseToAnyPublisher()
+                },
+                toggleDevicesState: { _, _ in
+                    return Just(RelayIsOn.init(rawValue: true))
+                        .tryMap{ _ in throw NSError(domain: toggleError, code: 2, userInfo: nil) }
+                        .eraseToAnyPublisher()
+                },
+                getDevicesState:{ token, id in
+                    return Just(RelayIsOn.init(rawValue: true))
+                        .tryMap{ _ in throw NSError(domain: getDevicesError, code: 3, userInfo: nil) }
+                        .eraseToAnyPublisher()
+                },
+                changeDevicesState: { token, id, state in
+                    return  Just(RelayIsOn.init(rawValue: true))
+                        .tryMap{ _ in throw NSError(domain: changeDevicesError, code: 4, userInfo: nil) }
+                        .eraseToAnyPublisher()
+                }),
+            devicesCache: mockDevicesEnv.cache,
+            reloadAppExtensions: mockDevicesEnv.reloadAppExtensions
         )
     }
 }
