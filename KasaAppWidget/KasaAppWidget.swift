@@ -8,9 +8,7 @@
 
 import WidgetKit
 import SwiftUI
-import UserClientLive
 import UserClient
-import DeviceClientLive
 import DeviceClient
 import KasaCore
 import Combine
@@ -20,14 +18,9 @@ struct Provider: TimelineProvider {
     
     static var cancels: Set<AnyCancellable> = Set()
     
-    static let prodEnv = WidgetEnvironment.init(
-        loadDevices: DevicesEnvironment.liveLoadCache,
-        loadUser: UserEnvironment.liveLoadUser)
-    
-    
     func newEntry(for context: Context,  completion: @escaping (DataDeviceEntry) -> ()) {
         var cancel: AnyCancellable? = nil
-        cancel = getCacheState(environment: Provider.prodEnv)
+        cancel = getCacheState(environment: .liveEnv)
             .sink { _ in Provider.cancels.remove(cancel!) }
                 receiveValue:  { state in
                     let entry: DataDeviceEntry
@@ -117,34 +110,14 @@ struct KasaAppWidgetEntryView : View {
                     }.padding()
                     
                 } else {
-                    VStack {
-                        Image(systemName: "lightbulb.slash.fill")
-                            .padding()
-                            .font(.largeTitle)
-                        Text(.no_device)
-                    }
+                    NoDevicesView()
                 }
                 
             } else {
-                VStack {
-                    Image(systemName: "keyboard")
-                        .font(.largeTitle)
-                        .padding()
-                    Text(.not_logged)
-                }
+                LogoutView()
             }
         }.frame(maxWidth: /*@START_MENU_TOKEN@*/.infinity/*@END_MENU_TOKEN@*/, maxHeight: .infinity)
-        .background(ContainerRelativeShape().fill(
-            LinearGradient(
-                gradient: Gradient(
-                    colors:
-                        [
-                            Color.blue.opacity(0.8),
-                            Color.blue
-                        ]),
-                startPoint: .top,
-                endPoint: .bottom)
-        ))
+        .background(BackgroundWidget())
     }
 }
 
@@ -210,6 +183,45 @@ struct DeviceView : View {
         }
     }
 }
+
+struct NoDevicesView: View {
+    var body: some View {
+        VStack {
+            Image(systemName: "lightbulb.slash.fill")
+                .padding()
+                .font(.largeTitle)
+            Text(.no_device)
+        }
+    }
+}
+
+struct LogoutView: View {
+    var body: some View {
+        VStack {
+            Image(systemName: "keyboard")
+                .font(.largeTitle)
+                .padding()
+            Text(.not_logged)
+        }
+    }
+}
+
+struct BackgroundWidget: View {
+    var body: some View {
+        ContainerRelativeShape().fill(
+            LinearGradient(
+                gradient: Gradient(
+                    colors:
+                        [
+                            Color.blue.opacity(0.8),
+                            Color.blue
+                        ]),
+                startPoint: .top,
+                endPoint: .bottom)
+        )
+    }
+}
+
 
 
 @main
