@@ -16,7 +16,7 @@ public enum UserAction {
 }
 
 public struct UserState {
-    public static let empty = UserState(user: nil, isLoading: false, error: nil)
+    public static let empty = Self(user: nil, isLoading: false, error: nil)
     
     public var user: User?
     public var isLoading: Bool

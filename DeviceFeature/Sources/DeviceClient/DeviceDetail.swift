@@ -20,7 +20,7 @@ extension DeviceDetailEvironment {
 
 #if DEBUG
 extension DeviceDetailEvironment {
-    static let mockDetailEnv = DeviceDetailEvironment (
+    static let mockDetailEnv = Self(
         toggle: { (_,_) in
             Just(RelayIsOn.init(rawValue: true))
                 .mapError(absurd)

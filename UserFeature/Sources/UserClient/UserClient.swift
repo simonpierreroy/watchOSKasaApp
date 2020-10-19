@@ -62,7 +62,7 @@ public struct UserCache {
 
 #if DEBUG
 public extension UserEnvironment {
-    static let mockUserEnv: UserEnvironment = .init(
+    static let mockUserEnv = Self(
         mainQueue: DispatchQueue.main.eraseToAnyScheduler(),
         backgroundQueue: DispatchQueue.main.eraseToAnyScheduler(),
         login:  { _ in Effect.future { $0(.success(User.init(token: "1"))) }

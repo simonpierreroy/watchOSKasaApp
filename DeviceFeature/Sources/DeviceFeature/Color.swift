@@ -8,10 +8,10 @@
 import SwiftUI
 
 extension Color {
-    static let logout = Color.init("logout", bundle: .module)
-    static let valid = Color.init("valid", bundle: .module)
-    static let tile = Color.init("tile", bundle: .module)
-    static let moon = Color.init("moon", bundle: .module)
+    static let logout = Self("logout", bundle: .module)
+    static let valid = Self("valid", bundle: .module)
+    static let tile = Self("tile", bundle: .module)
+    static let moon = Self("moon", bundle: .module)
     
 }
 

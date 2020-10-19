@@ -105,7 +105,7 @@ public extension DevicesEnvironment {
     static let debugDevice1 = Device.init(id: "1", name: "Test device 1")
     static let debugDevice2 = Device.init(id: "2", name: "Test device 2")
     
-    static let mockDevicesEnv = DevicesEnvironment (
+    static let mockDevicesEnv = Self(
         mainQueue: DispatchQueue.main.eraseToAnyScheduler(),
         backgroundQueue: DispatchQueue.main.eraseToAnyScheduler(),
         repo: DevicesRepo.init(
@@ -146,11 +146,11 @@ public extension DevicesEnvironment {
 }
 
 public extension DevicesEnvironment {
-    static func devicesEnvError(loadError: String, toggleError: String, getDevicesError: String, changeDevicesError: String) -> DevicesEnvironment {
-        return DevicesEnvironment.init(
+    static func devicesEnvError(loadError: String, toggleError: String, getDevicesError: String, changeDevicesError: String) -> Self {
+        return Self(
             mainQueue: mockDevicesEnv.mainQueue,
             backgroundQueue: mockDevicesEnv.backgroundQueue,
-            repo: DevicesRepo.init(
+            repo: .init(
                 loadDevices:{ _ in
                     return Just([])
                         .tryMap{ _ in throw NSError(domain: loadError, code: 1, userInfo: nil) }

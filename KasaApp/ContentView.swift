@@ -54,11 +54,9 @@ struct ContentView: View {
 
 
 extension ContentView {
-    
     struct StateView: Equatable {
         let isUserLogged: Bool
     }
-    
 }
 
 extension ContentView.StateView {
@@ -71,10 +69,12 @@ extension ContentView.StateView {
 #if DEBUG
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-        ContentView(store: Store<AppState, AppAction>.init(
-                        initialState: .empty,
-                        reducer: appReducer,
-                        environment: AppEnv.mockAppEnv)
+        ContentView(
+            store: Store<AppState, AppAction>.init(
+                initialState: .empty,
+                reducer: appReducer,
+                environment: AppEnv.mockAppEnv
+            )
         )
     }
 }

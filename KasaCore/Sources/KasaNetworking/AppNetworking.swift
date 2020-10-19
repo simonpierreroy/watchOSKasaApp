@@ -17,8 +17,8 @@ extension Networking {
         
         // Shared Info
         static let baseUrl = URL(string: "https://use1-wap.tplinkcloud.com")!
-        static let decoder: JSONDecoder = JSONDecoder()
-        static let encoder: JSONEncoder = JSONEncoder()
+        static let decoder = JSONDecoder()
+        static let encoder = JSONEncoder()
         static let session = URLSession(configuration: .default)
         
         struct Response<Model: Decodable>: Decodable {

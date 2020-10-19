@@ -26,7 +26,7 @@ public enum DevicesAtion {
 }
 
 public struct DevicesState {
-    public static let empty = DevicesState(devices: [], isLoading: .nerverLoaded, error: nil, token: nil)
+    public static let empty = Self(devices: [], isLoading: .nerverLoaded, error: nil, token: nil)
     
     init(devices: [DeviceSate], isLoading: Loading, error: Error?, token: Token?, link: Link? = nil) {
         self._devices = .init(devices)
@@ -71,13 +71,13 @@ public struct DevicesState {
 
 #if DEBUG
 extension DevicesState {
-    static let emptyLogged = DevicesState(devices: [], isLoading: .nerverLoaded, error: nil, token: "logged")
-    static let emptyLoggedLink = DevicesState(devices: [], isLoading: .nerverLoaded, error: nil, token: "logged", link: DevicesEnvironment.debugDevice1.deepLink())
-    static let emptyLoading = DevicesState(devices: [], isLoading: .loadingDevices, error: nil, token: "logged")
-    static let emptyNeverLoaded = DevicesState(devices: [], isLoading: .nerverLoaded, error: nil, token: "logged")
-    static let oneDeviceLoaded = DevicesState(devices: [.init(device: DevicesEnvironment.debugDevice1)], isLoading: .loaded, error: nil, token: "logged")
-    static func nDeviceLoaded(n: Int) -> DevicesState {
-        DevicesState(
+    static let emptyLogged = Self(devices: [], isLoading: .nerverLoaded, error: nil, token: "logged")
+    static let emptyLoggedLink = Self(devices: [], isLoading: .nerverLoaded, error: nil, token: "logged", link: DevicesEnvironment.debugDevice1.deepLink())
+    static let emptyLoading = Self(devices: [], isLoading: .loadingDevices, error: nil, token: "logged")
+    static let emptyNeverLoaded = Self(devices: [], isLoading: .nerverLoaded, error: nil, token: "logged")
+    static let oneDeviceLoaded = Self(devices: [.init(device: DevicesEnvironment.debugDevice1)], isLoading: .loaded, error: nil, token: "logged")
+    static func nDeviceLoaded(n: Int) -> Self {
+        Self(
             devices: (1...n).map{ DeviceSate.init(id: "\($0)", name: "Test device number \($0)") },
             isLoading: .loaded,
             error: nil,

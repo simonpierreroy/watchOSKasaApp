@@ -15,7 +15,7 @@ public extension Link {
         .oneOf(.number, .letter)
         .oneOrMore()
 
-    private static let validDeviceLink: Parser<Link> = zip(
+    private static let validDeviceLink: Parser<Self> = zip(
         .prefix(Link.baseURL.absoluteString),
         validDeviceID
     ).map(\.1)
@@ -23,13 +23,13 @@ public extension Link {
     .map(Device.ID.init(rawValue:))
     .map(Link.device)
 
-    private static let invalidLink: Parser<Link> = Parser<Void>
+    private static let invalidLink: Parser<Self> = Parser<Void>
         .prefix(Link.invalidURL.absoluteString)
         .map{ Link.invalid }
 
-    private static let deviceLink: Parser<Link> = .oneOf(invalidLink, validDeviceLink)
+    private static let deviceLink: Parser<Self> = .oneOf(invalidLink, validDeviceLink)
 
-    static func parserDeepLink(string: String) -> Link {
+    static func parserDeepLink(string: String) -> Self {
         let result = deviceLink.run(string)
         guard result.rest.isEmpty, let match = result.match  else {
             return .error
@@ -37,7 +37,7 @@ public extension Link {
         return match
     }
     
-    static func parserDeepLink(url: URL) -> Link {
+    static func parserDeepLink(url: URL) -> Self {
         parserDeepLink(string: url.absoluteString)
     }
 }

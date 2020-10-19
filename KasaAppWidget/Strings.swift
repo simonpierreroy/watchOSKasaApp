@@ -10,9 +10,9 @@ import Foundation
 
 
 extension LocalizedStringKey {
-    static let no_device: LocalizedStringKey = "no_device"
-    static let not_logged: LocalizedStringKey = "not_logged"
-    static let description_widget: LocalizedStringKey = "description_widget"
+    static let no_device: Self = "no_device"
+    static let not_logged: Self = "not_logged"
+    static let description_widget: Self = "description_widget"
 
 
 }

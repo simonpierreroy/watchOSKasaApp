@@ -16,7 +16,7 @@ import ComposableArchitecture
 import KasaCore
 
 public struct AppState {
-    public static let empty = AppState(userState: .empty, _devicesState: .empty)
+    public static let empty = Self(userState: .empty, _devicesState: .empty)
     
     public var userState: UserState
     private var _devicesState: DevicesState
@@ -166,7 +166,7 @@ public extension DeviceListViewiOS.StateView {
 
 #if DEBUG
 public extension AppEnv {
-    static let mockAppEnv = AppEnv(
+    static let mockAppEnv = Self(
         mainQueue: DevicesEnvironment.mockDevicesEnv.mainQueue,
         backgroundQueue: DevicesEnvironment.mockDevicesEnv.backgroundQueue,
         login: UserEnvironment.mockUserEnv.login,
