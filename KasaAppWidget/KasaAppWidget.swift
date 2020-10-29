@@ -81,45 +81,52 @@ struct DataDeviceEntry: TimelineEntry {
 
 struct KasaAppWidgetEntryView : View {
     var entry: Provider.Entry
-    @Environment(\.widgetFamily) var widgetFamily
-    
     
     var body: some View {
         VStack {
             if entry.userIsLogged {
-                if  entry.devices.count > 0 {
-                    VStack {
-                        switch widgetFamily {
-                        case .systemSmall:
-                            DeviceViewMaybe(device: entry.devices[safeIndex: 0])
-                                .widgetURL(entry.devices[safeIndex: 0]?.deepLink().getURL())
-                        case .systemMedium :
-                            VStack{
-                                DeviceRowMaybe(devices: (entry.devices[safeIndex: 0], entry.devices[safeIndex: 1]))
-                                DeviceRowMaybe(devices: (entry.devices[safeIndex: 2], entry.devices[safeIndex: 3]))
-                            }
-                        case .systemLarge:
-                            VStack{
-                                DeviceRowMaybe(devices: (entry.devices[safeIndex: 0], entry.devices[safeIndex: 1]))
-                                DeviceRowMaybe(devices: (entry.devices[safeIndex: 2], entry.devices[safeIndex: 3]))
-                                DeviceRowMaybe(devices: (entry.devices[safeIndex: 4], entry.devices[safeIndex: 5]))
-                            }
-                        @unknown default:
-                            EmptyView()
-                        }
-                    }.padding()
-                    
-                } else {
-                    NoDevicesView()
-                }
-                
+                StackList(devices: entry.devices)
             } else {
                 LogoutView()
             }
-        }.frame(maxWidth: /*@START_MENU_TOKEN@*/.infinity/*@END_MENU_TOKEN@*/, maxHeight: .infinity)
+        }.frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(BackgroundWidget())
     }
 }
+
+struct StackList : View {
+    @Environment(\.widgetFamily) var widgetFamily
+    let devices: [Device]
+    
+    var body: some View {
+        if  devices.count > 0 {
+            VStack {
+                switch widgetFamily {
+                case .systemSmall:
+                    DeviceViewMaybe(device: devices[safeIndex: 0])
+                        .widgetURL(devices[safeIndex: 0]?.deepLink().getURL())
+                case .systemMedium :
+                    VStack{
+                        DeviceRowMaybe(devices: (devices[safeIndex: 0], devices[safeIndex: 1]))
+                        DeviceRowMaybe(devices: (devices[safeIndex: 2], devices[safeIndex: 3]))
+                    }
+                case .systemLarge:
+                    VStack{
+                        DeviceRowMaybe(devices: (devices[safeIndex: 0], devices[safeIndex: 1]))
+                        DeviceRowMaybe(devices: (devices[safeIndex: 2], devices[safeIndex: 3]))
+                        DeviceRowMaybe(devices: (devices[safeIndex: 4], devices[safeIndex: 5]))
+                    }
+                @unknown default:
+                    EmptyView()
+                }
+            }.padding()
+            
+        } else {
+            NoDevicesView()
+        }
+    }
+}
+
 
 struct DeviceRowMaybe : View {
     
@@ -177,7 +184,7 @@ struct DeviceView : View {
             }.padding()
             .frame(maxWidth: .infinity,maxHeight: .infinity, alignment: .center)
             .frame(maxWidth: .infinity)
-            .background(Color.white.opacity(0.2))
+            .background(Color.button.opacity(0.2))
             .cornerRadius(16)
             
         }
@@ -197,27 +204,31 @@ struct NoDevicesView: View {
 
 struct LogoutView: View {
     var body: some View {
-        VStack {
-            Image(systemName: "keyboard")
-                .font(.largeTitle)
-                .padding()
-            Text(.not_logged)
+        ZStack {
+            StackList(devices: DataDeviceEntry.preview(10).devices)
+                .blur(radius: 4.0)
+            VStack {
+                Image(systemName: "keyboard")
+                    .font(.largeTitle)
+                    .padding()
+                Text(.not_logged)
+            }
         }
     }
 }
 
 struct BackgroundWidget: View {
+    @Environment(\.colorScheme) var colorScheme
+    
     var body: some View {
         ContainerRelativeShape().fill(
             LinearGradient(
                 gradient: Gradient(
-                    colors:
-                        [
-                            Color.blue.opacity(0.8),
-                            Color.blue
-                        ]),
+                    colors: [.backgroudStart, .backgroudEnd]
+                ),
                 startPoint: .top,
-                endPoint: .bottom)
+                endPoint: .bottom
+            )
         )
     }
 }
@@ -249,6 +260,7 @@ struct KasaAppWidget_Previews: PreviewProvider {
             .previewContext(WidgetPreviewContext(family: .systemMedium))
         KasaAppWidgetEntryView(entry: DataDeviceEntry.preview(3))
             .previewContext(WidgetPreviewContext(family: .systemMedium))
+            .environment(\.colorScheme, .dark)
         KasaAppWidgetEntryView(entry: DataDeviceEntry.preview(1))
             .previewContext(WidgetPreviewContext(family: .systemMedium))
         KasaAppWidgetEntryView(entry: DataDeviceEntry.preview(0))
