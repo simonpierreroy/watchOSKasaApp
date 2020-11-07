@@ -63,6 +63,42 @@ public extension Parser where Output == Void {
   }
 }
 
+public extension Parser where Output == Substring {
+  static func prefix(while p: @escaping (Character) -> Bool) -> Self {
+    Self { input in
+      let output = input.prefix(while: p)
+      input.removeFirst(output.count)
+      return output
+    }
+  }
+
+  static func prefix(upTo substring: Substring) -> Self {
+    Self { input in
+      guard let endIndex = input.range(of: substring)?.lowerBound
+      else { return nil }
+
+      let match = input[..<endIndex]
+
+      input = input[endIndex...]
+
+      return match
+    }
+  }
+
+  static func prefix(through substring: Substring) -> Self {
+    Self { input in
+      guard let endIndex = input.range(of: substring)?.upperBound
+      else { return nil }
+
+      let match = input[..<endIndex]
+
+      input = input[endIndex...]
+
+      return match
+    }
+  }
+}
+
 extension Parser: ExpressibleByUnicodeScalarLiteral where Output == Void {
     public typealias UnicodeScalarLiteralType = StringLiteralType
 }
@@ -170,4 +206,34 @@ public extension Parser where Output == Character {
     
     static let letter = char
         .flatMap { $0.isLetter ? .always($0) : .never }
+}
+
+public extension Parser {
+  func skip<B>(_ p: Parser<B>) -> Self {
+    zip(self, p).map { a, _ in a }
+  }
+}
+
+public extension Parser {
+    func take<NewOutput>(_ p: Parser<NewOutput>) -> Parser<(Output, NewOutput)> {
+        zip(self, p)
+    }
+    
+    func take<A, B, C>(_ p: Parser<C>) -> Parser<(A, B, C)> where Output == (A, B) {
+        zip(self, p).map { ab, c in
+            (ab.0, ab.1, c)
+        }
+    }
+}
+
+public extension Parser {
+  static func skip(_ p: Self) -> Parser<Void> {
+    p.map { _ in () }
+  }
+}
+
+public extension Parser where Output == Void {
+  func take<A>(_ p: Parser<A>) -> Parser<A> {
+    zip(self, p).map { _, a in a }
+  }
 }

@@ -9,26 +9,31 @@ import DeviceClient
 import KasaCore
 import Foundation
 
+extension String {
+    init<S>(characters: S) where S : Sequence, S.Element == Character {
+        self.init(characters)
+    }
+}
+
 public extension Link {
     
     private static let validDeviceID =  Parser<Character>
         .oneOf(.number, .letter)
         .oneOrMore()
-
-    private static let validDeviceLink: Parser<Self> = zip(
-        .prefix(Link.baseURL.absoluteString),
-        validDeviceID
-    ).map(\.1)
-    .map{ String.init($0) }
-    .map(Device.ID.init(rawValue:))
-    .map(Link.device)
-
+    
+    private static let validDeviceLink: Parser<Self> = Parser
+        .prefix(Link.baseURL.absoluteString)
+        .take(validDeviceID)
+        .map(String.init(characters:))
+        .map(Device.ID.init(rawValue:))
+        .map(Link.device)
+    
     private static let invalidLink: Parser<Self> = Parser<Void>
         .prefix(Link.invalidURL.absoluteString)
         .map{ Link.invalid }
-
+    
     private static let deviceLink: Parser<Self> = .oneOf(invalidLink, validDeviceLink)
-
+    
     static func parserDeepLink(string: String) -> Self {
         let result = deviceLink.run(string)
         guard result.rest.isEmpty, let match = result.match  else {
