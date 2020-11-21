@@ -24,22 +24,23 @@ public extension Link {
     private static let validDeviceLink: Parser<Self> = Parser
         .prefix(Link.baseURL.absoluteString)
         .take(validDeviceID)
+        .skip(.end)
         .map(String.init(characters:))
         .map(Device.ID.init(rawValue:))
         .map(Link.device)
     
     private static let invalidLink: Parser<Self> = Parser<Void>
         .prefix(Link.invalidURL.absoluteString)
+        .skip(.end)
         .map{ Link.invalid }
     
     private static let deviceLink: Parser<Self> = .oneOf(invalidLink, validDeviceLink)
     
     static func parserDeepLink(string: String) -> Self {
-        let result = deviceLink.run(string)
-        guard result.rest.isEmpty, let match = result.match  else {
+        guard let link = deviceLink.run(string).match  else {
             return .error
         }
-        return match
+        return link
     }
     
     static func parserDeepLink(url: URL) -> Self {

@@ -237,3 +237,10 @@ public extension Parser where Output == Void {
     zip(self, p).map { _, a in a }
   }
 }
+
+public extension Parser where Output == Void {
+    static let end = Self { input in
+        guard input.isEmpty else { return nil }
+        return ()
+    }
+}
