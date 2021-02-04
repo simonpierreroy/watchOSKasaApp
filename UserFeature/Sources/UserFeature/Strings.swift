@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import SwiftUI
 
 enum Strings: String {
     case login_app
@@ -24,9 +25,7 @@ extension Strings {
     }
 }
 
-#if DEBUG 
-import SwiftUI
-
+#if DEBUG
 struct Strings_Previews: PreviewProvider {
     static var previews: some View {
         Group{

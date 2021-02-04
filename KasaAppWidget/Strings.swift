@@ -7,18 +7,15 @@
 //
 
 import Foundation
-
+import SwiftUI
 
 extension LocalizedStringKey {
     static let no_device: Self = "no_device"
     static let not_logged: Self = "not_logged"
     static let description_widget: Self = "description_widget"
-
-
 }
 
 #if DEBUG
-import SwiftUI
 import WidgetKit
 
 
