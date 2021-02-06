@@ -4,21 +4,15 @@
 //
 //  Created by Simon-Pierre Roy on 10/29/20.
 //  Copyright © 2020 Simon. All rights reserved.
-//
 
-//
-//  File.swift
-//
-//
-//  Created by Simon-Pierre Roy on 9/19/20.
-//
 
+import Foundation
 import SwiftUI
 
 extension Color {
-    static let backgroudEnd = Self("backgroud_end")
-    static let backgroudStart = Self("backgroud_start")
-    static let button = Self("button")
+    static let backgroudEnd = Self("backgroud_end",bundle: .module)
+    static let backgroudStart = Self("backgroud_start", bundle: .module)
+    static let button = Self("button", bundle: .module)
 
 }
 
@@ -33,7 +27,6 @@ struct Color_Previews: PreviewProvider {
                 Text("button").foregroundColor(.button)
             }.preferredColorScheme(.light)
             .previewDisplayName("light")
-            .previewContext(WidgetPreviewContext(family: .systemMedium))
             
             VStack {
                 Text("backgroud_end").foregroundColor(.backgroudEnd)
@@ -42,7 +35,6 @@ struct Color_Previews: PreviewProvider {
             }
             .preferredColorScheme(.dark)
             .previewDisplayName("dark")
-            .previewContext(WidgetPreviewContext(family: .systemMedium))
             
         }
     }

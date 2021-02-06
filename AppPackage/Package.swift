@@ -13,7 +13,8 @@ let package = Package(
     ],
     dependencies: [
         .package(path: "DeviceFeature"),
-        .package(path: "UserFeature")
+        .package(path: "UserFeature"),
+        .package(path: "WidgetFeature")
     ],
     targets: [
         .target(
@@ -21,6 +22,8 @@ let package = Package(
             dependencies: [
                 "DeviceFeature",
                 "UserFeature",
+                .product(name:"WidgetFeature", package: "WidgetFeature", condition: .when(platforms: [.iOS])),
+                .product(name: "WidgetClientLive", package: "WidgetFeature", condition: .when(platforms: [.iOS])),
                 .product(name: "UserClientLive", package: "UserFeature"),
                 .product(name: "DeviceClientLive", package: "DeviceFeature")
             ]),

@@ -13,7 +13,6 @@
 		32213C8225283032009F42FD /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 32213C8125283032009F42FD /* Assets.xcassets */; };
 		32213C8625283032009F42FD /* KasaAppWidgetExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 32213C7925283032009F42FD /* KasaAppWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		3279E27B252838FA0067FE28 /* AppPackage in Frameworks */ = {isa = PBXBuildFile; productRef = 3279E27A252838FA0067FE28 /* AppPackage */; };
-		3281E55D254B77AC00DDB1E9 /* Color.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3281E55C254B77AC00DDB1E9 /* Color.swift */; };
 		32821CEF2526DB50005E9623 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32821CEE2526DB50005E9623 /* AppDelegate.swift */; };
 		32821CF12526DB50005E9623 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32821CF02526DB50005E9623 /* SceneDelegate.swift */; };
 		32821CF32526DB50005E9623 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32821CF22526DB50005E9623 /* ContentView.swift */; };
@@ -32,9 +31,6 @@
 		328950F824821A3900EC3A49 /* ExtensionDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 328950F724821A3900EC3A49 /* ExtensionDelegate.swift */; };
 		328950FA24821A3A00EC3A49 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 328950F924821A3A00EC3A49 /* Assets.xcassets */; };
 		328950FD24821A3A00EC3A49 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 328950FC24821A3A00EC3A49 /* Preview Assets.xcassets */; };
-		329621AA2528D39A009A7761 /* Strings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3296219C2528D2C4009A7761 /* Strings.swift */; };
-		329621B92528D4E8009A7761 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 329621BB2528D4E8009A7761 /* Localizable.strings */; };
-		32C47827252A43A200E0BE65 /* WidgetFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32C47826252A43A200E0BE65 /* WidgetFeature.swift */; };
 		32D3F93525156CC300A8446C /* AppPackage in Frameworks */ = {isa = PBXBuildFile; productRef = 32D3F93425156CC300A8446C /* AppPackage */; };
 /* End PBXBuildFile section */
 
@@ -131,7 +127,6 @@
 		32213C7F25283032009F42FD /* KasaAppWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KasaAppWidget.swift; sourceTree = "<group>"; };
 		32213C8125283032009F42FD /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		32213C8325283032009F42FD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		3281E55C254B77AC00DDB1E9 /* Color.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Color.swift; sourceTree = "<group>"; };
 		32821CEC2526DB50005E9623 /* KasaApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = KasaApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		32821CEE2526DB50005E9623 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		32821CF02526DB50005E9623 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -158,12 +153,9 @@
 		328950F924821A3A00EC3A49 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		328950FC24821A3A00EC3A49 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		328950FE24821A3A00EC3A49 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		3296219C2528D2C4009A7761 /* Strings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Strings.swift; sourceTree = "<group>"; };
-		329621BA2528D4E8009A7761 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
-		329621C22528D50D009A7761 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/Localizable.strings; sourceTree = "<group>"; };
 		32A8D00C2528EA9C003FD623 /* KasaApp.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = KasaApp.entitlements; sourceTree = "<group>"; };
 		32A8D00D2528EACC003FD623 /* KasaAppWidgetExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = KasaAppWidgetExtension.entitlements; sourceTree = "<group>"; };
-		32C47826252A43A200E0BE65 /* WidgetFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetFeature.swift; sourceTree = "<group>"; };
+		32CC942225CF14D8009E2176 /* WidgetFeature */ = {isa = PBXFileReference; lastKnownFileType = folder; path = WidgetFeature; sourceTree = "<group>"; };
 		32D3F920251566C200A8446C /* UserFeature */ = {isa = PBXFileReference; lastKnownFileType = folder; path = UserFeature; sourceTree = "<group>"; };
 		32D3F9232515679100A8446C /* KasaCore */ = {isa = PBXFileReference; lastKnownFileType = folder; path = KasaCore; sourceTree = "<group>"; };
 		32D3F926251568BC00A8446C /* DeviceFeature */ = {isa = PBXFileReference; lastKnownFileType = folder; path = DeviceFeature; sourceTree = "<group>"; };
@@ -217,13 +209,9 @@
 		32213C7E25283032009F42FD /* KasaAppWidget */ = {
 			isa = PBXGroup;
 			children = (
-				329621BB2528D4E8009A7761 /* Localizable.strings */,
 				32213C7F25283032009F42FD /* KasaAppWidget.swift */,
-				32C47826252A43A200E0BE65 /* WidgetFeature.swift */,
 				32213C8125283032009F42FD /* Assets.xcassets */,
 				32213C8325283032009F42FD /* Info.plist */,
-				3296219C2528D2C4009A7761 /* Strings.swift */,
-				3281E55C254B77AC00DDB1E9 /* Color.swift */,
 			);
 			path = KasaAppWidget;
 			sourceTree = "<group>";
@@ -277,6 +265,7 @@
 				32D3F9232515679100A8446C /* KasaCore */,
 				32D3F926251568BC00A8446C /* DeviceFeature */,
 				32D3F920251566C200A8446C /* UserFeature */,
+				32CC942225CF14D8009E2176 /* WidgetFeature */,
 				328950E324821A3800EC3A49 /* Kasa WatchKit App */,
 				328950F224821A3900EC3A49 /* Kasa WatchKit Extension */,
 				32821CED2526DB50005E9623 /* KasaApp */,
@@ -556,7 +545,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				32213C8225283032009F42FD /* Assets.xcassets in Resources */,
-				329621B92528D4E8009A7761 /* Localizable.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -616,10 +604,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				329621AA2528D39A009A7761 /* Strings.swift in Sources */,
-				3281E55D254B77AC00DDB1E9 /* Color.swift in Sources */,
 				32213C8025283032009F42FD /* KasaAppWidget.swift in Sources */,
-				32C47827252A43A200E0BE65 /* WidgetFeature.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -704,15 +689,6 @@
 				328950E524821A3800EC3A49 /* Base */,
 			);
 			name = Interface.storyboard;
-			sourceTree = "<group>";
-		};
-		329621BB2528D4E8009A7761 /* Localizable.strings */ = {
-			isa = PBXVariantGroup;
-			children = (
-				329621BA2528D4E8009A7761 /* en */,
-				329621C22528D50D009A7761 /* fr */,
-			);
-			name = Localizable.strings;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */
