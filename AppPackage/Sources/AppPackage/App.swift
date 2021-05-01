@@ -14,6 +14,8 @@ import DeviceClient
 import UserClient
 import ComposableArchitecture
 import KasaCore
+import UserClientLive
+import DeviceClientLive
 
 public struct AppState {
     public static let empty = Self(userState: .empty, _devicesState: .empty)
@@ -33,31 +35,14 @@ public struct AppState {
 }
 
 public enum AppAction {
+    case delegate(AppDelegateAction)
     case userAction(UserAction)
     case devicesAction(DevicesAtion)
 }
 
 
 public struct AppEnv {
-    
-    public init(
-        mainQueue: AnySchedulerOf<DispatchQueue>,
-        backgroundQueue: AnySchedulerOf<DispatchQueue>,
-        login: @escaping (User.Credential) -> AnyPublisher<User, Error>,
-        userCache: UserCache,
-        devicesRepo: DevicesRepo,
-        deviceCache: DevicesCache,
-        reloadAppExtensions: AnyPublisher<Void,Never>
-    ) {
-        self.mainQueue = mainQueue
-        self.backgroundQueue = backgroundQueue
-        self.login = login
-        self.userCache = userCache
-        self.devicesRepo = devicesRepo
-        self.deviceCache = deviceCache
-        self.reloadAppExtensions = reloadAppExtensions
-    }
-    
+        
     let mainQueue: AnySchedulerOf<DispatchQueue>
     let backgroundQueue: AnySchedulerOf<DispatchQueue>
     let login: (User.Credential) -> AnyPublisher<User, Error>
@@ -65,7 +50,21 @@ public struct AppEnv {
     let devicesRepo: DevicesRepo
     let deviceCache: DevicesCache
     let reloadAppExtensions: AnyPublisher<Void,Never>
+    let linkURLParser: Link.URLParser
+    
+}
 
+public extension AppEnv {
+    static let live = Self(
+        mainQueue: DispatchQueue.main.eraseToAnyScheduler(),
+        backgroundQueue: DispatchQueue.global(qos: .userInteractive).eraseToAnyScheduler(),
+        login: UserEnvironment.liveLogginEffect,
+        userCache: .live,
+        devicesRepo: .live,
+        deviceCache: .live,
+        reloadAppExtensions: AppEnv.liveReloadAppExtensions,
+        linkURLParser: .live
+    )
 }
 
 public extension UserEnvironment {
@@ -92,19 +91,22 @@ public extension DevicesEnvironment {
     }
 }
 
-
-public let appReducer: Reducer<AppState, AppAction, AppEnv> = userReducer
-    .pullback(
+public let appReducer = Reducer<AppState, AppAction, AppEnv>.combine(
+    
+    delegateReducer,
+    
+    userReducer.pullback(
         state: \.userState,
         action: /AppAction.userAction,
         environment: UserEnvironment.init(appEnv:)
-    ).combined(with:
-                devicesReducer.pullback(
-                    state: \.devicesState,
-                    action: /AppAction.devicesAction,
-                    environment:DevicesEnvironment.init(appEnv:)
-                )
-    )//.debug()
+    ),
+    
+    devicesReducer.pullback(
+        state: \.devicesState,
+        action: /AppAction.devicesAction,
+        environment:DevicesEnvironment.init(appEnv:)
+    )
+).debug()
 
 #if os(watchOS)
 public extension AppAction {
@@ -166,14 +168,15 @@ public extension DeviceListViewiOS.StateView {
 
 #if DEBUG
 public extension AppEnv {
-    static let mockAppEnv = Self(
-        mainQueue: DevicesEnvironment.mockDevicesEnv.mainQueue,
-        backgroundQueue: DevicesEnvironment.mockDevicesEnv.backgroundQueue,
-        login: UserEnvironment.mockUserEnv.login,
-        userCache: UserEnvironment.mockUserEnv.cache,
-        devicesRepo: DevicesEnvironment.mockDevicesEnv.repo,
-        deviceCache: DevicesEnvironment.mockDevicesEnv.cache,
-        reloadAppExtensions: DevicesEnvironment.mockDevicesEnv.reloadAppExtensions
+    static let mock = Self(
+        mainQueue: DevicesEnvironment.mock.mainQueue,
+        backgroundQueue: DevicesEnvironment.mock.backgroundQueue,
+        login: UserEnvironment.mock.login,
+        userCache: .mock,
+        devicesRepo: .mock,
+        deviceCache: .mock,
+        reloadAppExtensions: DevicesEnvironment.mock.reloadAppExtensions,
+        linkURLParser: .mockDeviceIdOne
     )
 }
 #endif
@@ -183,8 +186,8 @@ public extension AppEnv {
 import WidgetKit
 public extension AppEnv {
     static let liveReloadAppExtensions: AnyPublisher<Void, Never> = Effect.future { work in
-            WidgetCenter.shared.reloadAllTimelines()
-            work(.success(()))
+        WidgetCenter.shared.reloadAllTimelines()
+        work(.success(()))
     }.eraseToAnyPublisher()
 }
 #else

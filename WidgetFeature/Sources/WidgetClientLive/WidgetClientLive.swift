@@ -5,7 +5,7 @@ import UserClient
 import WidgetClient
 
 public extension WidgetEnvironment {
-    static let liveEnv = Self(
+    static let live = Self(
         loadDevices: DevicesEnvironment.liveLoadCache,
         loadUser: UserEnvironment.liveLoadUser
     )

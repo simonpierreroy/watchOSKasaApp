@@ -20,6 +20,7 @@ public struct Device: Equatable, Identifiable, Codable {
 }
 
 public enum Link: Equatable {
+    
     case device(Device.ID)
     case invalid
     case error
@@ -37,6 +38,15 @@ public enum Link: Equatable {
         case .error:
             return Link.errorURL
         }
+    }
+}
+
+public extension Link {
+    struct URLParser {
+        public init(parse: @escaping (URL) -> Link) {
+            self.parse = parse
+        }
+        public let parse: (URL) -> Link
     }
 }
 
@@ -100,47 +110,55 @@ public struct DevicesCache {
 }
 
 #if DEBUG
+public extension DevicesRepo {
+    static let mock = Self(
+        loadDevices: { token in
+            return Effect.future{ (work) in
+                work(.success([
+                    DevicesEnvironment.debugDevice1,
+                    DevicesEnvironment.debugDevice2
+                ]))
+            }.delay(for: 2, scheduler: DispatchQueue.main)
+            .eraseToAnyPublisher()
+        }, toggleDevicesState: { (_,_) in
+            Just(RelayIsOn.init(rawValue: true))
+                .mapError(absurd)
+                .delay(for: 2, scheduler: DispatchQueue.main)
+                .eraseToAnyPublisher() },
+        getDevicesState: { (_,_) in
+            Just(RelayIsOn.init(rawValue: true))
+                .mapError(absurd)
+                .delay(for: 2, scheduler: DispatchQueue.main)
+                .eraseToAnyPublisher() },
+        changeDevicesState: { (_,_, state) in
+            Just(state.toggle())
+                .mapError(absurd)
+                .delay(for: 2, scheduler: DispatchQueue.main)
+                .eraseToAnyPublisher() }
+    )
+}
+
+public extension DevicesCache {
+    static let mock = Self(
+        save: { _ in Empty(completeImmediately: true).eraseToAnyPublisher() } ,
+        load: Just([
+            DevicesEnvironment.debugDevice1,
+            DevicesEnvironment.debugDevice2
+        ]).mapError(absurd)
+        .eraseToAnyPublisher()
+    )
+}
+
 public extension DevicesEnvironment {
     
     static let debugDevice1 = Device.init(id: "1", name: "Test device 1")
     static let debugDevice2 = Device.init(id: "2", name: "Test device 2")
     
-    static let mockDevicesEnv = Self(
+    static let mock = Self(
         mainQueue: DispatchQueue.main.eraseToAnyScheduler(),
         backgroundQueue: DispatchQueue.main.eraseToAnyScheduler(),
-        repo: DevicesRepo.init(
-            loadDevices: { token in
-                return Effect.future{ (work) in
-                    work(.success([
-                        DevicesEnvironment.debugDevice1,
-                        DevicesEnvironment.debugDevice2
-                    ]))
-                }.delay(for: 2, scheduler: DispatchQueue.main)
-                .eraseToAnyPublisher()
-            }, toggleDevicesState: { (_,_) in
-                Just(RelayIsOn.init(rawValue: true))
-                    .mapError(absurd)
-                    .delay(for: 2, scheduler: DispatchQueue.main)
-                    .eraseToAnyPublisher() },
-            getDevicesState: { (_,_) in
-                Just(RelayIsOn.init(rawValue: true))
-                    .mapError(absurd)
-                    .delay(for: 2, scheduler: DispatchQueue.main)
-                    .eraseToAnyPublisher() },
-            changeDevicesState: { (_,_, state) in
-                Just(state.toggle())
-                    .mapError(absurd)
-                    .delay(for: 2, scheduler: DispatchQueue.main)
-                    .eraseToAnyPublisher() }
-        ),
-        devicesCache:  DevicesCache(
-            save: { _ in Empty(completeImmediately: true).eraseToAnyPublisher() } ,
-            load: Just([
-                DevicesEnvironment.debugDevice1,
-                DevicesEnvironment.debugDevice2
-            ]).mapError(absurd)
-            .eraseToAnyPublisher()
-        ),
+        repo: .mock,
+        devicesCache: .mock,
         reloadAppExtensions: Empty(completeImmediately: true).eraseToAnyPublisher()
     )
 }
@@ -148,8 +166,8 @@ public extension DevicesEnvironment {
 public extension DevicesEnvironment {
     static func devicesEnvError(loadError: String, toggleError: String, getDevicesError: String, changeDevicesError: String) -> Self {
         return Self(
-            mainQueue: mockDevicesEnv.mainQueue,
-            backgroundQueue: mockDevicesEnv.backgroundQueue,
+            mainQueue: mock.mainQueue,
+            backgroundQueue: mock.backgroundQueue,
             repo: .init(
                 loadDevices:{ _ in
                     return Just([])
@@ -171,8 +189,8 @@ public extension DevicesEnvironment {
                         .tryMap{ _ in throw NSError(domain: changeDevicesError, code: 4, userInfo: nil) }
                         .eraseToAnyPublisher()
                 }),
-            devicesCache: mockDevicesEnv.cache,
-            reloadAppExtensions: mockDevicesEnv.reloadAppExtensions
+            devicesCache: .mock,
+            reloadAppExtensions: mock.reloadAppExtensions
         )
     }
 }

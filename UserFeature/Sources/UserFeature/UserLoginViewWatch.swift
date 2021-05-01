@@ -106,9 +106,9 @@ struct UserLoginView_Previews: PreviewProvider {
             UserLoginViewWatch(store:
                                 Store<UserState, UserAction>.init(
                                     initialState:
-                                        UserState.init(user: nil, isLoading: false),
+                                        UserState.empty,
                                     reducer: userReducer,
-                                    environment: UserEnvironment.mockUserEnv
+                                    environment: .mock
                                 ).scope(
                                     state: UserLoginViewWatch.StateView.init(userState:),
                                     action: UserAction.init(userViewAction:)
@@ -118,9 +118,9 @@ struct UserLoginView_Previews: PreviewProvider {
             UserLoginViewWatch(store:
                                 Store<UserState, UserAction>.init(
                                     initialState:
-                                        UserState.init(user: nil, isLoading: false),
+                                        UserState.empty,
                                     reducer: userReducer,
-                                    environment: UserEnvironment.mockUserEnv
+                                    environment: .mock
                                 ).scope(
                                     state: UserLoginViewWatch.StateView.init(userState:),
                                     action: UserAction.init(userViewAction:)
@@ -132,9 +132,9 @@ struct UserLoginView_Previews: PreviewProvider {
             UserLoginViewWatch(store:
                                 Store<UserState, UserAction>.init(
                                     initialState:
-                                        UserState.init(user: nil, isLoading: true),
+                                        .init(user: nil, isLoading: true),
                                     reducer: userReducer,
-                                    environment: UserEnvironment.mockUserEnv
+                                    environment: .mock
                                 ).scope(
                                     state: UserLoginViewWatch.StateView.init(userState:),
                                     action: UserAction.init(userViewAction:)

@@ -61,19 +61,23 @@ public struct UserCache {
 }
 
 #if DEBUG
+public extension UserCache {
+    static let mock = Self(
+        save: { _ in Empty(completeImmediately: true).eraseToAnyPublisher() } ,
+        load: Just(Optional.some(User.init(token: "1")))
+            .eraseToAnyPublisher()
+    )
+}
+
 public extension UserEnvironment {
-    static let mockUserEnv = Self(
+    static let mock = Self(
         mainQueue: DispatchQueue.main.eraseToAnyScheduler(),
         backgroundQueue: DispatchQueue.main.eraseToAnyScheduler(),
         login:  { _ in Effect.future { $0(.success(User.init(token: "1"))) }
             .delay(for: 2, scheduler: DispatchQueue.main)
             .eraseToAnyPublisher()
         },
-        cache: UserCache(
-            save: { _ in Empty(completeImmediately: true).eraseToAnyPublisher() } ,
-            load: Just(Optional.some(User.init(token: "1")))
-                .eraseToAnyPublisher()
-        ),
+        cache: .mock,
         reloadAppExtensions: Empty(completeImmediately: true).eraseToAnyPublisher()
     )
 }

@@ -199,9 +199,9 @@ struct DeviceListView_Previews: PreviewProvider {
         Group {
             DeviceListViewWatch(
                 store: Store<DevicesState, DevicesAtion>.init(
-                    initialState: DevicesState.emptyLogged,
+                    initialState: .emptyLogged,
                     reducer: devicesReducer,
-                    environment: DevicesEnvironment.mockDevicesEnv
+                    environment: .mock
                 ).scope(
                     state: DeviceListViewWatch.StateView.init(devices:),
                     action: DevicesAtion.init(deviceAction:)
@@ -210,9 +210,9 @@ struct DeviceListView_Previews: PreviewProvider {
             
             DeviceListViewWatch(
                 store: Store<DevicesState, DevicesAtion>.init(
-                    initialState: DevicesState.emptyLoading,
+                    initialState: .emptyLoading,
                     reducer: devicesReducer,
-                    environment: DevicesEnvironment.mockDevicesEnv
+                    environment: .mock
                 ).scope(
                     state: DeviceListViewWatch.StateView.init(devices:),
                     action: DevicesAtion.init(deviceAction:)
@@ -221,9 +221,9 @@ struct DeviceListView_Previews: PreviewProvider {
             
             DeviceListViewWatch(
                 store: Store<DevicesState, DevicesAtion>.init(
-                    initialState: DevicesState.emptyNeverLoaded,
+                    initialState: .emptyNeverLoaded,
                     reducer: devicesReducer,
-                    environment: DevicesEnvironment.mockDevicesEnv
+                    environment: .mock
                 ).scope(
                     state: DeviceListViewWatch.StateView.init(devices:),
                     action: DevicesAtion.init(deviceAction:)
@@ -232,9 +232,9 @@ struct DeviceListView_Previews: PreviewProvider {
             
             DeviceListViewWatch(
                 store: Store<DevicesState, DevicesAtion>.init(
-                    initialState: DevicesState.oneDeviceLoaded,
+                    initialState: .oneDeviceLoaded,
                     reducer: devicesReducer,
-                    environment: DevicesEnvironment.mockDevicesEnv
+                    environment: .mock
                 ).scope(
                     state: DeviceListViewWatch.StateView.init(devices:),
                     action: DevicesAtion.init(deviceAction:)
@@ -244,9 +244,9 @@ struct DeviceListView_Previews: PreviewProvider {
             
             DeviceListViewWatch(
                 store: Store<DevicesState, DevicesAtion>.init(
-                    initialState: DevicesState.oneDeviceLoaded,
+                    initialState: .oneDeviceLoaded,
                     reducer: devicesReducer,
-                    environment: DevicesEnvironment.mockDevicesEnv
+                    environment: .mock
                 ).scope(
                     state: DeviceListViewWatch.StateView.init(devices:),
                     action: DevicesAtion.init(deviceAction:)

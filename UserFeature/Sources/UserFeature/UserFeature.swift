@@ -24,7 +24,7 @@ public struct UserState {
 }
 
 
-public let userReducer = Reducer<UserState, UserAction, UserEnvironment>  { state, action, environment in
+public let userReducer = Reducer<UserState, UserAction, UserEnvironment> { state, action, environment in
     
     switch action {
     case .logout:

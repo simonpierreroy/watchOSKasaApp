@@ -35,8 +35,8 @@ public struct WidgetEnvironment {
 #if DEBUG
 public extension WidgetEnvironment {
     static let mockEnv = Self(
-        loadDevices: DevicesEnvironment.mockDevicesEnv.cache.load,
-        loadUser:  UserEnvironment.mockUserEnv.cache.load
+        loadDevices: DevicesEnvironment.mock.cache.load,
+        loadUser:  UserEnvironment.mock.cache.load
     )
 }
 #endif

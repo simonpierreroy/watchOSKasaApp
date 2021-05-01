@@ -16,57 +16,25 @@ import DeviceClientLive
 import KasaCore
 import AppPackage
 
-extension AppAction {
-    init(delegateAction: AppDelegate.Action) {
-        switch delegateAction {
-        case .applicationDidFinishLaunching:
-            self = .userAction(.loadSavedUser)
-        case .applicationWillTerminate:
-            self = .userAction(.save)
-        }
-    }
-}
-
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
     
     static let store: Store<AppState, AppAction> = .init(
         initialState: AppState.empty,
         reducer: appReducer,
-        environment: AppEnv.init(
-            mainQueue: DispatchQueue.main.eraseToAnyScheduler(),
-            backgroundQueue: DispatchQueue.global(qos: .userInteractive).eraseToAnyScheduler(),
-            login: UserEnvironment.liveLogginEffect,
-            userCache: .init(save: UserEnvironment.liveSave, load: UserEnvironment.liveLoadUser),
-            devicesRepo: .init(
-                loadDevices: DevicesEnvironment.liveDevicesCall(token:),
-                toggleDevicesState: DeviceDetailEvironment.liveToggleDeviceState,
-                getDevicesState: DevicesEnvironment.liveGetDevicesState(token:id:),
-                changeDevicesState: DevicesEnvironment.liveChangeDevicesState(token:id:newState:)
-            ),
-            deviceCache: .init(save: DevicesEnvironment.liveSave(devices:), load: DevicesEnvironment.liveLoadCache),
-            reloadAppExtensions: AppEnv.liveReloadAppExtensions
-        )
+        environment: .live
     )
     
-    private static let viewStore: ViewStore<Void, Action> = {
+    private static let viewStore: ViewStore<Void, AppAction> = {
         ViewStore(
             AppDelegate.store
-                .scope(
-                    state: always,
-                    action: AppAction.init(delegateAction:)
-                ),
+                .scope(state: always, action: { $0 }),
             removeDuplicates: { _,_ in true }
         )
     }()
-    
-    enum Action {
-        case applicationDidFinishLaunching
-        case applicationWillTerminate
-    }
-    
+        
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        AppDelegate.viewStore.send(.applicationDidFinishLaunching)
+        AppDelegate.viewStore.send(.delegate(.applicationDidFinishLaunching))
         return true
     }
     
@@ -79,14 +47,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     
     func application(_ application: UIApplication, didDiscardSceneSessions sceneSessions: Set<UISceneSession>) {
-        // Called when the user discards a scene session.
-        // If any sessions were discarded while the application was not running, this will be called shortly after application:didFinishLaunchingWithOptions.
-        // Use this method to release any resources that were specific to the discarded scenes, as they will not return.
+ 
     }
     
     func applicationWillTerminate(_ application: UIApplication) {
-        AppDelegate.viewStore.send(.applicationWillTerminate)
+        AppDelegate.viewStore.send(.delegate(.applicationWillTerminate))
     }
-    
 }
 

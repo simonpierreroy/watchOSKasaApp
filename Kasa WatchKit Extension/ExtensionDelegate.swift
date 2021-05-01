@@ -15,64 +15,27 @@ import DeviceClientLive
 import KasaCore
 import AppPackage
 
-
-extension AppAction {
-    init(delegateAction: ExtensionDelegate.Action) {
-        switch delegateAction {
-        case .applicationDidFinishLaunching:
-            self = .userAction(.loadSavedUser)
-        case .applicationWillResignActive:
-            self = .userAction(.save)
-        }
-    }
-}
-
-
 class ExtensionDelegate: NSObject, WKExtensionDelegate {
-    
     
     static let store: Store<AppState, AppAction> = .init(
         initialState: AppState.empty,
         reducer: appReducer,
-        environment: AppEnv.init(
-            mainQueue: DispatchQueue.main.eraseToAnyScheduler(),
-            backgroundQueue: DispatchQueue.global(qos: .userInteractive).eraseToAnyScheduler(),
-            login: UserEnvironment.liveLogginEffect,
-            userCache: .init(save: UserEnvironment.liveSave, load: UserEnvironment.liveLoadUser),
-            devicesRepo: .init(
-                loadDevices: DevicesEnvironment.liveDevicesCall(token:),
-                toggleDevicesState: DeviceDetailEvironment.liveToggleDeviceState,
-                getDevicesState: DevicesEnvironment.liveGetDevicesState(token:id:),
-                changeDevicesState: DevicesEnvironment.liveChangeDevicesState(token:id:newState:)
-            ),
-            deviceCache: .init(save: DevicesEnvironment.liveSave(devices:), load: DevicesEnvironment.liveLoadCache),
-            reloadAppExtensions: AppEnv.liveReloadAppExtensions
-        )
+        environment: .live
     )
     
-    private static let viewStore: ViewStore<Void, Action> = {
+    private static let viewStore: ViewStore<Void, AppAction> = {
         ViewStore(
-            ExtensionDelegate.store
-                .scope(
-                    state: always,
-                    action: AppAction.init(delegateAction:)
-                ),
+            ExtensionDelegate.store.scope(state: always, action: { $0 }),
             removeDuplicates: { _,_ in true }
         )
     }()
     
-    enum Action {
-        case applicationDidFinishLaunching
-        case applicationWillResignActive
-    }
-    
-    
     func applicationDidFinishLaunching() {
-        ExtensionDelegate.viewStore.send(.applicationDidFinishLaunching)
+        ExtensionDelegate.viewStore.send(.delegate(.applicationDidFinishLaunching))
     }
     
     func applicationWillResignActive() {
-        ExtensionDelegate.viewStore.send(.applicationWillResignActive)
+        ExtensionDelegate.viewStore.send(.delegate(.applicationWillResignActive))
     }
     
     func handle(_ backgroundTasks: Set<WKRefreshBackgroundTask>) {

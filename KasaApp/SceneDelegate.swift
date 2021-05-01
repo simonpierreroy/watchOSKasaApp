@@ -14,28 +14,11 @@ import AppPackage
 import KasaCore
 import DeviceClient
 
-extension AppAction {
-    init(delegateAction: SceneDelegate.Action) {
-        switch delegateAction {
-        case .deepLink(let link):
-            self = AppAction.devicesAction(.attempDeepLink(link))
-        }
-    }
-}
-
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     
-    enum Action {
-        case deepLink(DeviceClient.Link)
-    }
-    
-    private static let viewStore: ViewStore<Void, Action> = {
+    private static let viewStore: ViewStore<Void, AppAction> = {
         ViewStore(
-            AppDelegate.store
-                .scope(
-                    state: always,
-                    action: AppAction.init(delegateAction:)
-                ),
+            AppDelegate.store.scope(state: always, action: { $0 }),
             removeDuplicates: { _,_ in true }
         )
     }()
@@ -44,12 +27,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     
     
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
-        // Use this method to optionally configure and attach the UIWindow `window` to the provided UIWindowScene `scene`.
-        // If using a storyboard, the `window` property will automatically be initialized and attached to the scene.
-        // This delegate does not imply the connecting scene or session are new (see `application:configurationForConnectingSceneSession` instead).
-        
-        // Create the SwiftUI view that provides the window contents.
-        let contentView = ContentView()
+  
+        let contentView = ContentView(store: AppDelegate.store)
         
         // Use a UIHostingController as window root view controller.
         if let windowScene = scene as? UIWindowScene {
@@ -66,13 +45,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     }
     
     static func parse(context URLContexts: Set<UIOpenURLContext>) {
-        for context in URLContexts{
-            let link = DeviceClient.Link.parserDeepLink(url: context.url)
-            if case .device = link {
-                SceneDelegate.viewStore.send(.deepLink(link))
-                break
-            }
-        }
+        SceneDelegate.viewStore.send(.delegate(.openURLContexts(
+            URLContexts.map(\.url)
+        )))
     }
 }
 

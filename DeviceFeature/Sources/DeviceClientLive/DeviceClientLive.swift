@@ -71,3 +71,20 @@ public extension DevicesEnvironment {
     }.eraseToAnyPublisher()
 }
 
+public extension DevicesCache {
+    static let live = Self(save: DevicesEnvironment.liveSave(devices:), load: DevicesEnvironment.liveLoadCache)
+}
+
+public extension DevicesRepo {
+    static let live = Self(
+        loadDevices: DevicesEnvironment.liveDevicesCall(token:),
+        toggleDevicesState: DeviceDetailEvironment.liveToggleDeviceState,
+        getDevicesState: DevicesEnvironment.liveGetDevicesState(token:id:),
+        changeDevicesState: DevicesEnvironment.liveChangeDevicesState(token:id:newState:)
+    )
+}
+
+public extension Link.URLParser {
+    static let live = Self(parse: Link.parserDeepLink(url:))
+}
+

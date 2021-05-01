@@ -15,7 +15,7 @@ extension String {
     }
 }
 
-public extension Link {
+extension Link {
     
     private static let validDeviceID =  Parser<Character>
         .oneOf(.number, .letter)
@@ -36,7 +36,7 @@ public extension Link {
     
     private static let deviceLink: Parser<Self> = .oneOf(invalidLink, validDeviceLink)
     
-    static func parserDeepLink(string: String) -> Self {
+    private static func parserDeepLink(string: String) -> Self {
         guard let link = deviceLink.run(string).match  else {
             return .error
         }

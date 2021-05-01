@@ -21,7 +21,7 @@ struct Provider: TimelineProvider {
     
     func newEntry(for context: Context,  completion: @escaping (DataDeviceEntry) -> ()) {
         var cancel: AnyCancellable? = nil
-        cancel = getCacheState(environment: .liveEnv)
+        cancel = getCacheState(environment: .live)
             .sink { _ in Provider.cancels.remove(cancel!) }
                 receiveValue:  { state in
                     let entry: DataDeviceEntry

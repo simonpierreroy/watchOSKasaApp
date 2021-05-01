@@ -32,3 +32,7 @@ public extension UserEnvironment {
         work(.success(user))
     }.eraseToAnyPublisher()
 }
+
+public extension UserCache {
+    static let live = Self(save: UserEnvironment.liveSave, load: UserEnvironment.liveLoadUser)
+}

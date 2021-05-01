@@ -18,7 +18,7 @@ struct ContentView: View {
     let store: Store<StateView, Never>
     let globalStore: Store<AppState, AppAction>
     
-    init(store: Store<AppState, AppAction> = AppDelegate.store) {
+    init(store: Store<AppState, AppAction>) {
         self.globalStore = store
         self.store = store
             .scope(
@@ -73,7 +73,7 @@ struct ContentView_Previews: PreviewProvider {
             store: Store<AppState, AppAction>.init(
                 initialState: .empty,
                 reducer: appReducer,
-                environment: AppEnv.mockAppEnv
+                environment: AppEnv.mock
             )
         )
     }

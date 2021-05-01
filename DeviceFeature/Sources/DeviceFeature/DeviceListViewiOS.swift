@@ -312,9 +312,9 @@ struct DeviceListViewiOS_Previews: PreviewProvider {
             
             DeviceListViewiOS(
                 store: Store<DevicesState, DevicesAtion>.init(
-                    initialState: DevicesState.emptyNeverLoaded,
+                    initialState: .emptyNeverLoaded,
                     reducer: devicesReducer,
-                    environment: DevicesEnvironment.mockDevicesEnv
+                    environment: .mock
                 ).scope(
                     state: DeviceListViewiOS.StateView.init(devices:),
                     action: DevicesAtion.init(deviceAction:)
@@ -323,9 +323,9 @@ struct DeviceListViewiOS_Previews: PreviewProvider {
             
             DeviceListViewiOS(
                 store: Store<DevicesState, DevicesAtion>.init(
-                    initialState: DevicesState.emptyLoggedLink,
+                    initialState: .emptyLoggedLink,
                     reducer: devicesReducer,
-                    environment: DevicesEnvironment.mockDevicesEnv
+                    environment: .mock
                 ).scope(
                     state: DeviceListViewiOS.StateView.init(devices:),
                     action: DevicesAtion.init(deviceAction:)
@@ -334,9 +334,9 @@ struct DeviceListViewiOS_Previews: PreviewProvider {
             
             DeviceListViewiOS(
                 store: Store<DevicesState, DevicesAtion>.init(
-                    initialState: DevicesState.nDeviceLoaded(n: 5),
+                    initialState: .nDeviceLoaded(n: 5),
                     reducer: devicesReducer,
-                    environment: DevicesEnvironment.mockDevicesEnv
+                    environment: .mock
                 ).scope(
                     state: DeviceListViewiOS.StateView.init(devices:),
                     action: DevicesAtion.init(deviceAction:)
@@ -345,9 +345,9 @@ struct DeviceListViewiOS_Previews: PreviewProvider {
             
             DeviceListViewiOS(
                 store: Store<DevicesState, DevicesAtion>.init(
-                    initialState: DevicesState.nDeviceLoaded(n: 4),
+                    initialState: .nDeviceLoaded(n: 4),
                     reducer: devicesReducer,
-                    environment: DevicesEnvironment.devicesEnvError(
+                    environment: .devicesEnvError(
                         loadError: "Load",
                         toggleError: "Toggle",
                         getDevicesError: "Get",
