@@ -55,7 +55,7 @@ public struct DevicesState {
     private var _devices: IdentifiedArrayOf<DeviceSate>
     public var devices: IdentifiedArrayOf<DeviceSate> {
         get {
-            return .init (_devices.elements.map {
+            return .init (uniqueElements: _devices.map {
                 var copy = $0
                 copy.token = self.token
                 return copy
@@ -144,7 +144,7 @@ public let devicesReducer = Reducer<DevicesState, DevicesAtion, DevicesEnvironme
         state.isLoading = .loadingDevices
         return environment.repo.loadDevices(token)
             .map(map(DeviceSate.init(device:)))
-            .map(IdentifiedArrayOf<DeviceSate>.init)
+            .map(IdentifiedArrayOf<DeviceSate>.init(uniqueElements:))
             .map(DevicesAtion.set)
             .catch(DevicesAtion.send >>> Just.init)
             .merge(with: Effect.cancel(id: CancelInFlightToggle()))
