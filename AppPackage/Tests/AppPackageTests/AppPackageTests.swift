@@ -8,8 +8,4 @@ final class AppPackageTests: XCTestCase {
         // results.
         XCTAssertEqual(AppPackage().text, "Hello, World!")
     }
-
-    static var allTests = [
-        ("testExample", testExample),
-    ]
 }

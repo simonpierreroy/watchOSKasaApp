@@ -8,8 +8,4 @@ final class UserFeatureTests: XCTestCase {
         // results.
         XCTAssertEqual(UserFeature().text, "Hello, World!")
     }
-
-    static var allTests = [
-        ("testExample", testExample),
-    ]
 }

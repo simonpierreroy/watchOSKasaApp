@@ -8,8 +8,4 @@ final class KasaCoreTests: XCTestCase {
         // results.
         XCTAssertEqual(KasaCore().text, "Hello, World!")
     }
-
-    static var allTests = [
-        ("testExample", testExample),
-    ]
 }

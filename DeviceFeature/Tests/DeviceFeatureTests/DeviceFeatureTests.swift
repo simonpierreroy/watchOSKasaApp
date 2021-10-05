@@ -8,8 +8,4 @@ final class DeviceFeatureTests: XCTestCase {
         // results.
         XCTAssertEqual(DeviceFeature().text, "Hello, World!")
     }
-
-    static var allTests = [
-        ("testExample", testExample),
-    ]
 }
