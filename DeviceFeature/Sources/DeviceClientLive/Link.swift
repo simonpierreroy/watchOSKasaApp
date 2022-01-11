@@ -8,44 +8,37 @@
 import DeviceClient
 import KasaCore
 import Foundation
-
-extension String {
-    init<S>(characters: S) where S : Sequence, S.Element == Character {
-        self.init(characters)
-    }
-}
+import Parsing
 
 extension Link {
     
-    private static let validDeviceID =  Parser<Character>
-        .oneOf(.number, .letter)
-        .oneOrMore()
+    private static let validDeviceID =  Prefix(1...) { $0.isNumber || $0.isLetter }
     
-    private static let validDeviceLink: Parser<Self> = Parser
-        .prefix(Link.baseURL.absoluteString)
+    private static let validDeviceLink = StartsWith(Link.baseURL.absoluteString)
         .take(validDeviceID)
-        .skip(.end)
-        .map(String.init(characters:))
+        .skip(End())
+        .map(String.init)
         .map(Device.ID.init(rawValue:))
         .map(Link.device)
+
     
-    private static let invalidLink: Parser<Self> = Parser<Void>
-        .prefix(Link.invalidURL.absoluteString)
-        .skip(.end)
+    private static let invalidLink = StartsWith(Link.invalidURL.absoluteString)
+        .skip(End())
         .map{ Link.invalid }
-    
-    private static let deviceLink: Parser<Self> = .oneOf(invalidLink, validDeviceLink)
-    
-    private static func parserDeepLink(string: String) -> Self {
-        guard let link = deviceLink.run(string).match  else {
-            return .error
-        }
-        return link
-    }
+
+    private static let deviceLink = validDeviceLink
+        .orElse(invalidLink)
     
     static func parserDeepLink(url: URL) -> Self {
         parserDeepLink(string: url.absoluteString)
     }
+    
+    private static func parserDeepLink(string: String) -> Self {
+        guard let link = deviceLink.parse(string[...]) else {
+              return .error
+          }
+          return link
+      }
 }
 
 

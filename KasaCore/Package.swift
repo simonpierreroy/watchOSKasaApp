@@ -26,13 +26,19 @@ let package = Package(
             url: "https://github.com/pointfreeco/swift-tagged.git",
             .exact("0.6.0")
         ),
+        .package(
+            url: "https://github.com/pointfreeco/swift-parsing.git",
+            .exact("0.4.1")
+        ),
     ],
     targets: [
         .target(
             name: "KasaCore",
             dependencies: [
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
-                .product(name: "Tagged", package: "swift-tagged")
+                .product(name: "Tagged", package: "swift-tagged"),
+                .product(name: "Parsing", package: "swift-parsing")
+
             ]),
         .target(
             name: "KasaNetworking",
