@@ -36,21 +36,13 @@ extension Networking.App {
         
         let params = Request<LoginParam>(
             method: .login,
-            params: .init(cloudUserName: cred.email, cloudPassword: cred.password, terminalUUID: .init())
-        )
-        let data = try Networking.App.encoder.encode(params)
-        
-        let request =  URLRequest(url: baseUrl)
-        |> mut(^\.httpMethod, Networking.HTTP.post.rawValue)
-        <> baseRequest
-        <> mut(^\.httpBody, data)
-        
-        let response: Response<LoggedUserInfo> = try await Networking.modelFetcher(
-            decoder: decoder,
-            urlSession: session,
-            urlResquest: request
+            params: .init(
+                cloudUserName: cred.email,
+                cloudPassword: cred.password,
+                terminalUUID: .init()
+            )
         )
         
-        return try responseToModel(response)
+        return try await performResquest(request: params, queryItems: [:])
     }
 }

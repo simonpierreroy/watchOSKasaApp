@@ -29,6 +29,13 @@ extension Networking {
             case passthrough
             case getDeviceList
             case login
+            
+            func httpMethod() -> Networking.HTTP {
+                switch self {
+                case .login, .passthrough, .getDeviceList:
+                    return .post
+                }
+            }
         }
         
         struct Request<Param: Encodable>: Encodable {
@@ -45,6 +52,32 @@ extension Networking {
         
         static let baseRequest = guaranteeHeaders
             <> setHeader("Content-Type", "application/json")
+        
+        static func performResquest<ModelRequest: Encodable, ModelForResponse: Decodable>(
+            request: Request<ModelRequest>,
+            queryItems: [String: String]
+        ) async throws -> ModelForResponse  {
+            
+            let data = try Networking.App.encoder.encode(request)
+            let endpointQuerry = baseUrl |> Networking.setQuery(items: queryItems)
+            
+            guard let endpoint = endpointQuerry else {
+                throw Networking.ResquestError(errorDescription: "Invalid endpoint query items")
+            }
+            
+            let request = URLRequest(url: endpoint)
+            |> mut(^\.httpMethod, request.method.httpMethod().rawValue)
+            <> baseRequest
+            <> mut(^\.httpBody, data)
+            
+            let response: Response<ModelForResponse> = try await Networking.modelFetcher(
+                decoder: decoder,
+                urlSession: session,
+                urlResquest: request
+            )
+            
+            return try responseToModel(response)
+        }
     }
 }
 

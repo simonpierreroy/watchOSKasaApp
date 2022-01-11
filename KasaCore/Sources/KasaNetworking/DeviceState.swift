@@ -59,30 +59,15 @@ extension Networking.App {
         id: DeviceID
     ) async throws -> RelayIsOn {
         
-        let data = try encoder.encode(
-            Request<DeviceStateParam>.init(
-                method: .passthrough,
-                params: .init(deviceId: id.rawValue)
-            )
+        let request = Request<DeviceStateParam>.init(
+            method: .passthrough,
+            params: .init(deviceId: id.rawValue)
         )
         
-        let endpointQuerry = baseUrl |> Networking.setQuery(items: ["token": token.rawValue])
-        
-        guard let endpoint = endpointQuerry else {
-            throw Networking.ResquestError(errorDescription: "Invalid token")
-        }
-        
-        let request = URLRequest(url: endpoint)
-        |> mut(^\.httpMethod, Networking.HTTP.post.rawValue)
-        <> baseRequest
-        <> mut(^\.httpBody, data)
-        
-        let response: Response<DeviceStateResponse> = try await Networking.modelFetcher(
-            decoder: decoder,
-            urlSession: session,
-            urlResquest: request
+        let deviceStateResponse: DeviceStateResponse = try await performResquest(
+            request: request,
+            queryItems:  ["token": token.rawValue]
         )
-        let deviceStateResponse = try responseToModel(response)
         
         guard let state = deviceStateResponse.getRelayState() else {
             throw Networking.ResquestError(errorDescription: "Invalid JSON for relay_state")
@@ -109,34 +94,17 @@ extension Networking.App {
         state: RelayIsOn
     ) async throws -> RelayIsOn {
         
-        let data = try encoder.encode(
-            Request<ChangeDeviceStateParam>(
-                method: .passthrough,
-                params: .init(deviceId: id.rawValue, state: state)
-            )
+        let request = Request<ChangeDeviceStateParam>(
+            method: .passthrough,
+            params: .init(deviceId: id.rawValue, state: state)
         )
         
-        let endpointQuerry = baseUrl |> Networking.setQuery(items: ["token": token.rawValue])
-        
-        guard let endpoint = endpointQuerry else {
-            throw Networking.ResquestError(errorDescription: "Invalid token querry items")
-        }
-        
-        let request = URLRequest(url: endpoint)
-        |> mut(^\.httpMethod, Networking.HTTP.post.rawValue)
-        <> baseRequest
-        <> mut(^\.httpBody, data)
-        
-        let response: Response<DeviceStateResponse> = try await Networking.modelFetcher(
-            decoder: decoder,
-            urlSession: session,
-            urlResquest: request
+        let deviceStateResponse: DeviceStateResponse = try await performResquest(
+            request: request,
+            queryItems:  ["token": token.rawValue]
         )
         
-        let deviceStateResponse = try responseToModel(response)
-        
-        guard let errorCode = deviceStateResponse.getErrorCodeForSetRelayState(),
-              errorCode == 0 else {
+        guard let errorCode = deviceStateResponse.getErrorCodeForSetRelayState(), errorCode == 0 else {
             throw Networking.ResquestError(errorDescription: "Invalid JSON for set_relay_state")
         }
         
