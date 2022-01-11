@@ -1,11 +1,11 @@
-// swift-tools-version:5.3
+// swift-tools-version:5.5
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
 
 let package = Package(
     name: "KasaCore",
-    platforms: [.iOS(.v14), .watchOS(.v7)],
+    platforms: [.iOS(.v15), .watchOS(.v8)],
     products: [
         .library(
             name: "KasaCore",
@@ -20,11 +20,11 @@ let package = Package(
     dependencies: [
         .package(
             url: "https://github.com/pointfreeco/swift-composable-architecture.git",
-            from: "0.21.0"
+            .exact("0.33.0")
         ),
         .package(
             url: "https://github.com/pointfreeco/swift-tagged.git",
-            .revision("6c36cf66f58553d0481a2628e3e27177f698a897")
+            .exact("0.6.0")
         ),
     ],
     targets: [

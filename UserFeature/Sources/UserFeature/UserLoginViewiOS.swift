@@ -106,8 +106,19 @@ public extension UserLoginViewiOS {
 
 public extension UserLoginViewiOS.StateView {
     init(userState: UserState) {
-        self.errorMessageToDisplayText = userState.error?.localizedDescription
-        self.isLoadingUser = userState.isLoading
+        switch userState.status {
+        case .loading:
+            self.isLoadingUser = true
+        case .logout, .logged:
+            self.isLoadingUser = false
+        }
+        
+        switch userState.route {
+            case nil:
+                self.errorMessageToDisplayText = nil
+        case .some(.error(let error)):
+            self.errorMessageToDisplayText = error.localizedDescription
+        }
     }
 }
 
@@ -156,7 +167,7 @@ struct UserLoginView_Previews: PreviewProvider {
             UserLoginViewiOS(store:
                                 Store<UserState, UserAction>.init(
                                     initialState:
-                                        .init(user: nil, isLoading: true),
+                                            .init(status: .loading, route: nil),
                                     reducer: userReducer,
                                     environment: .mock
                                 ).scope(

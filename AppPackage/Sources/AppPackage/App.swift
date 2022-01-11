@@ -19,14 +19,19 @@ import DeviceClientLive
 
 public struct AppState {
     public static let empty = Self(userState: .empty, _devicesState: .empty)
-    
+        
     public var userState: UserState
     private var _devicesState: DevicesState
     
     var devicesState: DevicesState {
         get {
             var copy = self._devicesState
-            copy.token = self.userState.user?.token
+            switch userState.status {
+            case .logout, .loading:
+                copy.token = nil
+            case .logged(let userState):
+                copy.token  = userState.user.token
+            }
             return copy
         }
         set { self._devicesState = newValue }
@@ -129,8 +134,17 @@ public extension AppAction {
 
 public extension DeviceListViewWatch.StateView {
     init(appState: AppState) {
+        let errorMessageToDisplayText: String?
+        
+        switch appState.devicesState.route {
+        case nil:
+            errorMessageToDisplayText = nil
+        case .some(.error(let error)):
+            errorMessageToDisplayText = error.localizedDescription
+        }
+        
         self.init(
-            errorMessageToDisplayText: appState.devicesState.error?.localizedDescription,
+            errorMessageToDisplayText: errorMessageToDisplayText,
             isRefreshingDevices: appState.devicesState.isLoading,
             devicesToDisplay: appState.devicesState.devices
         )
@@ -157,8 +171,17 @@ public extension AppAction {
 
 public extension DeviceListViewiOS.StateView {
     init(appState: AppState) {
+        let errorMessageToDisplayText: String?
+        
+        switch appState.devicesState.route {
+        case nil:
+            errorMessageToDisplayText = nil
+        case .some(.error(let error)):
+            errorMessageToDisplayText = error.localizedDescription
+        }
+        
         self.init(
-            errorMessageToDisplayText: appState.devicesState.error?.localizedDescription,
+            errorMessageToDisplayText: errorMessageToDisplayText,
             isRefreshingDevices: appState.devicesState.isLoading,
             devicesToDisplay: appState.devicesState.devices
         )

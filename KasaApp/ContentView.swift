@@ -61,7 +61,12 @@ extension ContentView {
 
 extension ContentView.StateView {
     init(appState: AppState) {
-        self.isUserLogged = appState.userState.user != nil
+        switch appState.userState.status {
+        case  .loading , .logout:
+            self.isUserLogged = false
+        case .logged:
+            self.isUserLogged = true
+        }
     }
 }
 

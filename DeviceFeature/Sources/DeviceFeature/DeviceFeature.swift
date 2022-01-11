@@ -26,12 +26,12 @@ public enum DevicesAtion {
 }
 
 public struct DevicesState {
-    public static let empty = Self(devices: [], isLoading: .nerverLoaded, error: nil, token: nil)
+    public static let empty = Self(devices: [], isLoading: .nerverLoaded, route: nil, token: nil)
     
-    init(devices: [DeviceSate], isLoading: Loading, error: Error?, token: Token?, link: Link? = nil) {
-        self._devices = .init(devices)
+    init(devices: [DeviceSate], isLoading: Loading, route: Route?, token: Token?, link: Link? = nil) {
+        self._devices = .init(uniqueElements: devices)
         self.isLoading = isLoading
-        self.error = error
+        self.route = route
         self.token = token
         self.linkToComplete = link
     }
@@ -63,25 +63,31 @@ public struct DevicesState {
         }
         set { self._devices = newValue }
     }
-    public var isLoading: Loading
-    public var error: Error?
+    
+    public enum Route {
+        case error(Error)
+    }
+    
     public var token: Token?
+    public var isLoading: Loading
+    public var route: Route?
     public var linkToComplete: Link?
 }
 
 #if DEBUG
 extension DevicesState {
-    static let emptyLogged = Self(devices: [], isLoading: .nerverLoaded, error: nil, token: "logged")
-    static let emptyLoggedLink = Self(devices: [], isLoading: .nerverLoaded, error: nil, token: "logged", link: DevicesEnvironment.debugDevice1.deepLink())
-    static let emptyLoading = Self(devices: [], isLoading: .loadingDevices, error: nil, token: "logged")
-    static let emptyNeverLoaded = Self(devices: [], isLoading: .nerverLoaded, error: nil, token: "logged")
-    static let oneDeviceLoaded = Self(devices: [.init(device: DevicesEnvironment.debugDevice1)], isLoading: .loaded, error: nil, token: "logged")
+    static let emptyLogged = Self(devices: [], isLoading: .nerverLoaded, route: nil, token: "logged")
+    static let emptyLoggedLink = Self(devices: [], isLoading: .nerverLoaded, route: nil, token: "logged", link: DevicesEnvironment.debugDevice1.deepLink())
+    static let emptyLoading = Self(devices: [], isLoading: .loadingDevices, route: nil, token: "logged")
+    static let emptyNeverLoaded = Self(devices: [], isLoading: .nerverLoaded, route: nil, token: "logged")
+    static let oneDeviceLoaded = Self(devices: [.init(device: DevicesEnvironment.debugDevice1)], isLoading: .loaded, route: nil, token: "logged")
     static func nDeviceLoaded(n: Int) -> Self {
         Self(
             devices: (1...n).map{ DeviceSate.init(id: "\($0)", name: "Test device number \($0)") },
             isLoading: .loaded,
-            error: nil,
-            token: "logged")
+            route: nil,
+            token: "logged"
+        )
     }
 }
 #endif
@@ -152,10 +158,10 @@ public let devicesReducer = Reducer<DevicesState, DevicesAtion, DevicesEnvironme
             .eraseToEffect()
     case .send(let error):
         state.isLoading = .loaded
-        state.error = error
+        state.route = .error(error)
         return .none
     case .errorHandled:
-        state.error = nil
+        state.route = nil
         return .none
     case .closeAll:
         guard let token = state.token, state.isLoading != .nerverLoaded else { return .none }

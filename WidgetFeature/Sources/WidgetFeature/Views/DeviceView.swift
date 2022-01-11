@@ -35,6 +35,8 @@ struct DeviceView : View {
             return (.caption, .caption)
         case .systemSmall:
             return (.title, .body)
+        case .systemExtraLarge:
+            return (.title, .body)
         @unknown default:
             return (.title, .body)
         }
@@ -102,6 +104,13 @@ struct StackList : View {
                         DeviceRowMaybe(devices: (devices[safeIndex: 0], devices[safeIndex: 1]))
                         DeviceRowMaybe(devices: (devices[safeIndex: 2], devices[safeIndex: 3]))
                         DeviceRowMaybe(devices: (devices[safeIndex: 4], devices[safeIndex: 5]))
+                    }
+                case .systemExtraLarge:
+                    VStack{
+                        DeviceRowMaybe(devices: (devices[safeIndex: 0], devices[safeIndex: 1]))
+                        DeviceRowMaybe(devices: (devices[safeIndex: 2], devices[safeIndex: 3]))
+                        DeviceRowMaybe(devices: (devices[safeIndex: 4], devices[safeIndex: 5]))
+                        DeviceRowMaybe(devices: (devices[safeIndex: 6], devices[safeIndex: 7]))
                     }
                 @unknown default:
                     EmptyView()

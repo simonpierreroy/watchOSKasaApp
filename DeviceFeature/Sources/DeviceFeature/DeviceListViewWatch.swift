@@ -169,7 +169,13 @@ public extension DeviceDetailAction {
 #if DEBUG
 extension DeviceListViewWatch.StateView {
     init(devices: DevicesState) {
-        self.errorMessageToDisplayText = devices.error?.localizedDescription
+        switch devices.route {
+        case nil:
+            self.errorMessageToDisplayText = nil
+        case .some(.error(let error)):
+            self.errorMessageToDisplayText = error.localizedDescription
+        }
+        
         self.devicesToDisplay = devices.devices
         self.isRefreshingDevices = devices.isLoading
     }
