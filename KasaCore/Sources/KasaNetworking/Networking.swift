@@ -7,7 +7,6 @@
 //
 
 import Foundation
-import Combine
 import KasaCore
 
 public enum Networking {
@@ -17,44 +16,34 @@ public enum Networking {
         case get = "GET"
     }
     
-    public typealias DataFetcher = AnyPublisher<Data, Error>
-    public typealias ModelFetcher<Model: Decodable> = AnyPublisher<Model, Error>
-    static let defaultWorkQueue = DispatchQueue(label: "Networking.defaultWorkQueue", qos: .userInitiated, attributes: .concurrent)
+    static let defaultWorkQueue = DispatchQueue(
+        label: "Networking.defaultWorkQueue",
+        qos: .userInitiated,
+        attributes: .concurrent
+    )
     
-    static func fetcher(urlSession: URLSession, urlResquest: URLRequest, workQueue: DispatchQueue = defaultWorkQueue) -> DataFetcher {
-        return urlSession.dataTaskPublisher(for: urlResquest)
-            .receive(on: workQueue)
-            .tryMap { data, reponse in
-                if let httpResponse = reponse as? HTTPURLResponse,
-                   !(200...299).contains(httpResponse.statusCode) {
-                    throw CodeError(statusCode: httpResponse.statusCode)
-                }
-                return data
-            }
-            .eraseToAnyPublisher()
-    }
-    
-    static func modelFetcher<Model: Decodable>(decoder: JSONDecoder, fetcher: DataFetcher) -> ModelFetcher<Model> {
-        return fetcher.tryMap {
-            do {
-                return try decoder.decode(Model.self, from: $0)
-            } catch  {
-                throw ModelError(decodeError: error)
-            }
+    static func fetcher(
+        urlSession: URLSession,
+        urlResquest: URLRequest,
+        workQueue: DispatchQueue = defaultWorkQueue
+    ) async throws -> Data {
+        let (data, response) = try await urlSession.data(for: urlResquest, delegate: nil)
+        if let httpResponse = response as? HTTPURLResponse, !(200...299).contains(httpResponse.statusCode) {
+            throw CodeError(statusCode: httpResponse.statusCode)
+        } else {
+            return data
         }
-        .eraseToAnyPublisher()
     }
     
     static func modelFetcher<Model: Decodable>(
+        decoder: JSONDecoder,
         urlSession: URLSession,
         urlResquest: URLRequest,
-        decoder: JSONDecoder,
         workQueue: DispatchQueue = defaultWorkQueue
-    ) -> ModelFetcher<Model> {
-        let dataFetcher = fetcher(urlSession: urlSession, urlResquest: urlResquest, workQueue: workQueue)
-        return modelFetcher(decoder: decoder, fetcher: dataFetcher)
+    ) async throws -> Model {
+        let data = try await fetcher(urlSession: urlSession, urlResquest: urlResquest,workQueue: workQueue)
+        return try decoder.decode(Model.self, from: data)
     }
-    
     
     static let guaranteeHeaders = mver(^\URLRequest.allHTTPHeaderFields) { $0 = $0 ?? [:] }
     
@@ -91,13 +80,5 @@ extension Networking {
         var errorDescription: String? {
             return "Request was not completed successfully (status code: \(self.statusCode))."
         }
-    }
-}
-
-struct ModelError: LocalizedError {
-    let decodeError: Error
-    
-    var errorDescription: String? {
-        return "Invalid data from the request."
     }
 }

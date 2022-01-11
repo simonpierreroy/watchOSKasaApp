@@ -12,9 +12,9 @@ extension Device.ID {
 
 public extension DeviceDetailEvironment {
     static func liveToggleDeviceState(token : Token, id: Device.ID) -> AnyPublisher<RelayIsOn, Error> {
-        return Networking.App
-            .toggleDevicesState(token: token, id: id.networkDeviceID())
-            .eraseToAnyPublisher()
+        return Effect.task {
+            return try await Networking.App.toggleDevicesState(token: token, id: id.networkDeviceID())
+        }.eraseToAnyPublisher()
     }
 }
 
@@ -26,29 +26,31 @@ extension Device {
 
 public extension DevicesEnvironment {
     static func liveDevicesCall(token: Token) -> AnyPublisher<[Device], Error> {
-        return Networking.App
-            .getDevices(token: token)
-            .map(\.deviceList)
-            .map(map(Device.init(kasa:)))
-            .eraseToAnyPublisher()
+        return Effect.task {
+            let devicesData = try await Networking.App.getDevices(token: token)
+            return devicesData.deviceList.map(Device.init(kasa:))
+        }.eraseToAnyPublisher()
     }
 }
 
 public extension DevicesEnvironment {
     static func liveChangeDevicesState(token:Token, id: Device.ID, newState: RelayIsOn) -> AnyPublisher<RelayIsOn, Error> {
-        Networking.App
-            .changeDevicesState(token: token, id: id.networkDeviceID(), state: newState)
+        return Effect.task {
+            return try await Networking.App.changeDevicesState(token: token, id: id.networkDeviceID(), state: newState)
+        }.eraseToAnyPublisher()
     }
 }
 
 public extension DevicesEnvironment {
     static func liveGetDevicesState(token:Token, id: Device.ID) -> AnyPublisher<RelayIsOn, Error> {
-        Networking.App
-            .getDevicesState(token: token, id: id.networkDeviceID())
+        return Effect.task {
+            return try await Networking.App.getDevicesState(token: token, id: id.networkDeviceID())
+        }.eraseToAnyPublisher()
     }
 }
 
 public extension DevicesEnvironment {
+    
     static let encoder = JSONEncoder()
     static let decoder = JSONDecoder()
     
@@ -62,11 +64,10 @@ public extension DevicesEnvironment {
     
     
     static let liveLoadCache: AnyPublisher<[Device], Error> = Effect.catching {
-        
-        let data = try
-            UserDefaults.kasaAppGroup.string(forKey: "cacheDevices")?.data(using: .utf8)
+        let data = try UserDefaults.kasaAppGroup
+            .string(forKey: "cacheDevices")?
+            .data(using: .utf8)
             .map { try decoder.decode([Device].self, from: $0) }
-        
         return data ?? []
     }.eraseToAnyPublisher()
 }

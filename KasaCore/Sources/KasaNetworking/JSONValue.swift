@@ -141,20 +141,25 @@ struct RawStringJSONContainer: Codable {
     static let rawEncoder = JSONEncoder()
     static let rawDecoder = JSONDecoder()
     
+    init(wrapping: JSONValue) {
+        self.wrapping = wrapping
+    }
+    
+    let wrapping: JSONValue
+
+    
     func encode(to encoder: Encoder) throws {
         var container = encoder.singleValueContainer()
         let data = try RawStringJSONContainer.rawEncoder.encode(self.wrapping)
         guard let rawString = String(bytes: data, encoding: .utf8) else {
-            throw EncodingError.invalidValue("", .init(
-                                                codingPath: container.codingPath,
-                                                debugDescription: "RawStringJSONContainer: Impossible to convert the encoded JSONValue data to a string.")
+            throw EncodingError.invalidValue(
+                "", .init(
+                    codingPath: container.codingPath,
+                    debugDescription: "RawStringJSONContainer: Impossible to convert the encoded JSONValue data to a string."
+                )
             )
         }
         try container.encode(rawString)
-    }
-    
-    init(wrapping: JSONValue) {
-        self.wrapping = wrapping
     }
     
     init(from decoder: Decoder) throws {
@@ -168,6 +173,4 @@ struct RawStringJSONContainer: Codable {
         }
         self.wrapping = try RawStringJSONContainer.rawDecoder.decode(JSONValue.self, from: data)
     }
-    
-    let wrapping: JSONValue
 }

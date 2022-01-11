@@ -7,7 +7,6 @@
 //
 
 import Foundation
-import Combine
 import ComposableArchitecture
 import KasaCore
 
@@ -15,7 +14,6 @@ extension Networking {
     
     public enum App {
         
-        // Shared Info
         static let baseUrl = URL(string: "https://use1-wap.tplinkcloud.com")!
         static let decoder = JSONDecoder()
         static let encoder = JSONEncoder()
@@ -25,7 +23,6 @@ extension Networking {
             let error_code: Int
             let msg: String?
             let result: Model?
-            
         }
         
         enum EndPoint: String, Encodable {
@@ -39,18 +36,11 @@ extension Networking {
             let params: Param
         }
         
-        
-        typealias FetcherResponse<Model: Decodable> = Networking.ModelFetcher<Response<Model>>
-        
-        static func responseToModel<Model: Decodable>(_ response: FetcherResponse<Model>) -> Networking.ModelFetcher<Model> {
-            return response
-                .tryMap { data in
-                    guard let result = data.result else {
-                        throw Networking.CodeError(statusCode: data.error_code)
-                    }
-                    return result
-                    
-                }.eraseToAnyPublisher()
+        static func responseToModel<Model: Decodable>(_ response: Response<Model>) throws -> Model {
+            guard let result = response.result else {
+                throw Networking.CodeError(statusCode: response.error_code)
+            }
+            return result
         }
         
         static let baseRequest = guaranteeHeaders

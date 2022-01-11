@@ -12,10 +12,10 @@ extension User.Credential {
 
 public extension UserEnvironment {
     static func liveLogginEffect(credential: User.Credential) -> AnyPublisher<User, Error> {
-        return  Networking.App
-            .login(cred: credential.networkCredential())
-            .map(\.token >>> Token.init(rawValue:) >>> User.init(token:))
-            .eraseToAnyPublisher()
+        return Effect.task {
+            let info = try await Networking.App.login(cred: credential.networkCredential())
+            return User(token: .init(rawValue: info.token))
+        }.eraseToAnyPublisher()
     }
     
     static func liveSave(user: User?) -> AnyPublisher<Void, Never> {
