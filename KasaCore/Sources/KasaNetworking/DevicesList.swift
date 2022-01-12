@@ -21,7 +21,7 @@ extension Networking.App {
     }
     
     public static func getDevices(token: Token) async throws -> KasaDeviceList {
-        let request = Request<JSONValue>(method: .getDeviceList,params: [:])
+        let request = Request<JSONValue>(method: .getDeviceList, params: [:])
         return try await performResquest(request: request, queryItems: ["token": token.rawValue])
     }
 }

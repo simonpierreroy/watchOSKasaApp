@@ -168,7 +168,7 @@ public let devicesReducer = Reducer<DevicesState, DevicesAtion, DevicesEnvironme
         state.isLoading = .closingAll
         
         func stateInfo(device: DeviceSate) ->  AnyPublisher<(Device.ID, RelayIsOn), Error> {
-            return environment.repo.getDevicesState(token , device.id)
+            return environment.repo.getDeviceRelayState(token , device.id)
                 .map { isOn in return (device.id, isOn) }
                 .eraseToAnyPublisher()
         }
@@ -177,7 +177,7 @@ public let devicesReducer = Reducer<DevicesState, DevicesAtion, DevicesEnvironme
             state.devices.map(stateInfo)
         ).filter(\.1.rawValue)
         .map { (token, $0.0, false) }
-        .flatMap(environment.repo.changeDevicesState)
+        .flatMap(environment.repo.changeDeviceRelayState)
         .map(always)
         .map(DevicesAtion.doneClosingAll)
         .last()

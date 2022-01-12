@@ -77,23 +77,23 @@ public struct DevicesRepo {
     
     public init(
         loadDevices: @escaping (Token) -> AnyPublisher<[Device], Error>,
-        toggleDevicesState: @escaping DeviceDetailEvironment.ToggleEffect,
-        getDevicesState: @escaping (Token, Device.ID) -> AnyPublisher<RelayIsOn, Error>,
-        changeDevicesState: @escaping (Token, Device.ID, RelayIsOn) -> AnyPublisher<RelayIsOn, Error>
+        toggleDeviceRelayState: @escaping DeviceDetailEvironment.ToggleEffect,
+        getDeviceRelayState: @escaping (Token, Device.ID) -> AnyPublisher<RelayIsOn, Error>,
+        changeDeviceRelayState: @escaping (Token, Device.ID, RelayIsOn) -> AnyPublisher<RelayIsOn, Error>
     ) {
         
         
         self.loadDevices = loadDevices
-        self.toggleDevicesState = toggleDevicesState
-        self.getDevicesState = getDevicesState
-        self.changeDevicesState = changeDevicesState
+        self.toggleDeviceRelayState = toggleDeviceRelayState
+        self.getDeviceRelayState = getDeviceRelayState
+        self.changeDeviceRelayState = changeDeviceRelayState
         
     }
     
     public let loadDevices: (Token) -> AnyPublisher<[Device], Error>
-    public let toggleDevicesState: DeviceDetailEvironment.ToggleEffect
-    public let getDevicesState: (Token, Device.ID) -> AnyPublisher<RelayIsOn, Error>
-    public let changeDevicesState: (Token, Device.ID, RelayIsOn) -> AnyPublisher<RelayIsOn, Error>
+    public let toggleDeviceRelayState: DeviceDetailEvironment.ToggleEffect
+    public let getDeviceRelayState: (Token, Device.ID) -> AnyPublisher<RelayIsOn, Error>
+    public let changeDeviceRelayState: (Token, Device.ID, RelayIsOn) -> AnyPublisher<RelayIsOn, Error>
 }
 
 public struct DevicesCache {
@@ -120,17 +120,17 @@ public extension DevicesRepo {
                 ]))
             }.delay(for: 2, scheduler: DispatchQueue.main)
             .eraseToAnyPublisher()
-        }, toggleDevicesState: { (_,_) in
+        }, toggleDeviceRelayState: { (_,_) in
             Just(RelayIsOn.init(rawValue: true))
                 .mapError(absurd)
                 .delay(for: 2, scheduler: DispatchQueue.main)
                 .eraseToAnyPublisher() },
-        getDevicesState: { (_,_) in
+        getDeviceRelayState: { (_,_) in
             Just(RelayIsOn.init(rawValue: true))
                 .mapError(absurd)
                 .delay(for: 2, scheduler: DispatchQueue.main)
                 .eraseToAnyPublisher() },
-        changeDevicesState: { (_,_, state) in
+        changeDeviceRelayState: { (_,_, state) in
             Just(state.toggle())
                 .mapError(absurd)
                 .delay(for: 2, scheduler: DispatchQueue.main)
@@ -174,17 +174,17 @@ public extension DevicesEnvironment {
                         .tryMap{ _ in throw NSError(domain: loadError, code: 1, userInfo: nil) }
                         .eraseToAnyPublisher()
                 },
-                toggleDevicesState: { _, _ in
+                toggleDeviceRelayState: { _, _ in
                     return Just(RelayIsOn.init(rawValue: true))
                         .tryMap{ _ in throw NSError(domain: toggleError, code: 2, userInfo: nil) }
                         .eraseToAnyPublisher()
                 },
-                getDevicesState:{ token, id in
+                getDeviceRelayState:{ token, id in
                     return Just(RelayIsOn.init(rawValue: true))
                         .tryMap{ _ in throw NSError(domain: getDevicesError, code: 3, userInfo: nil) }
                         .eraseToAnyPublisher()
                 },
-                changeDevicesState: { token, id, state in
+                changeDeviceRelayState: { token, id, state in
                     return  Just(RelayIsOn.init(rawValue: true))
                         .tryMap{ _ in throw NSError(domain: changeDevicesError, code: 4, userInfo: nil) }
                         .eraseToAnyPublisher()

@@ -11,9 +11,9 @@ extension Device.ID {
 }
 
 public extension DeviceDetailEvironment {
-    static func liveToggleDeviceState(token : Token, id: Device.ID) -> AnyPublisher<RelayIsOn, Error> {
+    static func liveToggleDeviceRelayState(token : Token, id: Device.ID) -> AnyPublisher<RelayIsOn, Error> {
         return Effect.task {
-            return try await Networking.App.toggleDevicesState(token: token, id: id.networkDeviceID())
+            return try await Networking.App.toggleDeviceRelayState(token: token, id: id.networkDeviceID())
         }.eraseToAnyPublisher()
     }
 }
@@ -34,17 +34,19 @@ public extension DevicesEnvironment {
 }
 
 public extension DevicesEnvironment {
-    static func liveChangeDevicesState(token:Token, id: Device.ID, newState: RelayIsOn) -> AnyPublisher<RelayIsOn, Error> {
+    static func liveChangeDeviceRelayState(token:Token, id: Device.ID, newState: RelayIsOn) -> AnyPublisher<RelayIsOn, Error> {
         return Effect.task {
-            return try await Networking.App.changeDevicesState(token: token, id: id.networkDeviceID(), state: newState)
+            return try await Networking.App.changeDeviceRelayState(token: token, id: id.networkDeviceID(), state: newState)
         }.eraseToAnyPublisher()
     }
 }
 
 public extension DevicesEnvironment {
-    static func liveGetDevicesState(token:Token, id: Device.ID) -> AnyPublisher<RelayIsOn, Error> {
+    static func liveGetDeviceRelayState(token:Token, id: Device.ID) -> AnyPublisher<RelayIsOn, Error> {
         return Effect.task {
-            return try await Networking.App.getDevicesState(token: token, id: id.networkDeviceID())
+            return try await Networking.App
+                .getDeviceState(token: token, id: id.networkDeviceID())
+                .getRelayState()
         }.eraseToAnyPublisher()
     }
 }
@@ -79,9 +81,9 @@ public extension DevicesCache {
 public extension DevicesRepo {
     static let live = Self(
         loadDevices: DevicesEnvironment.liveDevicesCall(token:),
-        toggleDevicesState: DeviceDetailEvironment.liveToggleDeviceState,
-        getDevicesState: DevicesEnvironment.liveGetDevicesState(token:id:),
-        changeDevicesState: DevicesEnvironment.liveChangeDevicesState(token:id:newState:)
+        toggleDeviceRelayState: DeviceDetailEvironment.liveToggleDeviceRelayState,
+        getDeviceRelayState: DevicesEnvironment.liveGetDeviceRelayState(token:id:),
+        changeDeviceRelayState: DevicesEnvironment.liveChangeDeviceRelayState(token:id:newState:)
     )
 }
 

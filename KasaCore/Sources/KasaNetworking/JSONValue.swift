@@ -135,22 +135,21 @@ extension JSONValue: ExpressibleByDictionaryLiteral {
     }
 }
 
+let rawEncoder = JSONEncoder()
+let rawDecoder = JSONDecoder()
 
-struct RawStringJSONContainer: Codable {
+struct RawStringJSONContainer<Model: Codable>: Codable {
     
-    static let rawEncoder = JSONEncoder()
-    static let rawDecoder = JSONDecoder()
-    
-    init(wrapping: JSONValue) {
+    init(wrapping: Model) {
         self.wrapping = wrapping
     }
     
-    let wrapping: JSONValue
+    let wrapping: Model
 
     
     func encode(to encoder: Encoder) throws {
         var container = encoder.singleValueContainer()
-        let data = try RawStringJSONContainer.rawEncoder.encode(self.wrapping)
+        let data = try rawEncoder.encode(self.wrapping)
         guard let rawString = String(bytes: data, encoding: .utf8) else {
             throw EncodingError.invalidValue(
                 "", .init(
@@ -171,6 +170,6 @@ struct RawStringJSONContainer: Codable {
                 debugDescription: "RawStringJSONContainer: Impossible to convert the JSON string to data."
             )
         }
-        self.wrapping = try RawStringJSONContainer.rawDecoder.decode(JSONValue.self, from: data)
+        self.wrapping = try rawDecoder.decode(Model.self, from: data)
     }
 }
