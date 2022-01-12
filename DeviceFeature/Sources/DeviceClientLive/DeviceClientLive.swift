@@ -20,7 +20,7 @@ public extension DeviceDetailEvironment {
 
 extension Device {
     init(kasa: Networking.App.KasaDevice) {
-        self.init(id: .init(rawValue: kasa.deviceId), name: kasa.alias)
+        self.init(id: .init(rawValue: kasa.deviceId.rawValue), name: kasa.alias.rawValue)
     }
 }
 
@@ -44,9 +44,7 @@ public extension DevicesEnvironment {
 public extension DevicesEnvironment {
     static func liveGetDeviceRelayState(token:Token, id: Device.ID) -> AnyPublisher<RelayIsOn, Error> {
         return Effect.task {
-            return try await Networking.App
-                .getDeviceState(token: token, id: id.networkDeviceID())
-                .getRelayState()
+            return try await Networking.App.tryToGetDeviceRelayState(token: token, id: id.networkDeviceID())
         }.eraseToAnyPublisher()
     }
 }
