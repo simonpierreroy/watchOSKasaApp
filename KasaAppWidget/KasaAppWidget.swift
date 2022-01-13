@@ -64,7 +64,7 @@ struct DataDeviceEntry: TimelineEntry {
         return DataDeviceEntry(
             date: Date(),
             userIsLogged: true,
-            devices: (1...n).map{ Device.init(id: .init(rawValue: "\($0)"), name: "Lampe du salaon \($0)") }
+            devices: (1...n).map{ Device.init(id: .init(rawValue: "\($0)"), name: "Lampe du salaon \($0)", state: false) }
         )
     }
     

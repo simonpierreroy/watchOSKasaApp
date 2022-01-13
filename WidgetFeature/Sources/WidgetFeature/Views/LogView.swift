@@ -10,7 +10,7 @@ import DeviceClient
 
 struct LogoutView: View {
     static let logoutDevicesPreview = (1...10)
-        .map { i in Device.init(id: "\(i)", name: "Here is device no \(i)") }
+        .map { i in Device.init(id: "\(i)", name: "Here is device no \(i)", state: false) }
         
     var body: some View {
         ZStack {

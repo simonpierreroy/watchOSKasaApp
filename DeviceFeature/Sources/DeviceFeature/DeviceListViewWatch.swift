@@ -94,14 +94,23 @@ struct DeviceDetailViewWatch: View {
     
     var body: some View {
         WithViewStore(self.store) { viewStore in
-            Button(action: { viewStore.send(.tapped) }) {
-                LoadingView(.constant(viewStore.isLoading)){
-                    HStack {
-                        Image(systemName: "lightbulb.fill")
-                        Text(viewStore.name)
-                    }
+            VStack {
+                switch viewStore.relay?.rawValue {
+                case .some(true), .some(false):
+                    DeviceDetailNoChildViewWatch(store: self.store)
+                case .none:
+                    VStack(alignment: .center) {
+                        ForEachStore(
+                            self.store.scope(
+                                state: \DeviceSate.children,
+                                action: DeviceListViewWatch.Action.DeviceAction.tappedDeviceChild(index:action:)
+                            ) , content: { store in
+                                DeviceChildViewWatch(store: store)
+                            })
+                    }.padding()
                 }
-            }.disabled(viewStore.isLoading)
+            }
+            .disabled(viewStore.isLoading)
             .alert(
                 item: viewStore.binding(
                     get: { $0.error.map(AlertInfo.init(title:))},
@@ -109,6 +118,53 @@ struct DeviceDetailViewWatch: View {
                 ),
                 content: { Alert(title: Text($0.title)) }
             )
+        }
+    }
+}
+public struct DeviceChildViewWatch: View {
+    
+    let store: Store<DeviceSate.DeviceChildrenSate, DeviceChildAction>
+    
+    public var body: some View {
+        WithViewStore(self.store) { viewStore in
+            Button(action: { viewStore.send(.toggle) }) {
+                HStack {
+                    Image(
+                        systemName:
+                            viewStore.relay == true ? "lightbulb.fill" :  "lightbulb.slash.fill"
+                    ).font(.title3)
+                        .foregroundColor(viewStore.relay == true ? Color.yellow :  Color.blue)
+                    Text("\(viewStore.name)")
+                }
+            }
+        }
+    }
+}
+
+
+struct DeviceDetailNoChildViewWatch: View {
+    
+    let store: Store<DeviceSate, DeviceListViewWatch.Action.DeviceAction>
+    
+    var body: some View {
+        WithViewStore(self.store) { viewStore in
+            Button(action: { viewStore.send(.tapped) }) {
+                LoadingView(.constant(viewStore.isLoading)){
+                    HStack {
+                        switch viewStore.relay?.rawValue {
+                        case .some(true):
+                            Image(systemName: "lightbulb.fill").font(.title3).foregroundColor(Color.yellow)
+                            Text(viewStore.name).multilineTextAlignment(.center)
+                        case .some(false):
+                            Image(systemName: "lightbulb.slash.fill").font(.title3).foregroundColor(Color.blue)
+                            Text(viewStore.name).multilineTextAlignment(.center)
+                        case .none:
+                            EmptyView()
+                        }
+                        
+                    }
+                }
+            }
         }
     }
 }
@@ -143,6 +199,7 @@ public extension DeviceListViewWatch {
         public enum DeviceAction {
             case tapped
             case tappedErrorAlert
+            case tappedDeviceChild(index: DeviceSate.ID, action: DeviceChildAction)
         }
         
         case tappedCloseAll
@@ -162,6 +219,8 @@ public extension DeviceDetailAction {
             self = .toggle
         case .tappedErrorAlert:
             self = .errorHandled
+        case .tappedDeviceChild(index: let id, action: let action):
+            self = .deviceChild(index: id, action: action)
         }
     }
 }
@@ -246,7 +305,7 @@ struct DeviceListView_Previews: PreviewProvider {
                     action: DevicesAtion.init(deviceAction:)
                 )
             ).preferredColorScheme(.dark)
-            .previewDisplayName("1 item")
+                .previewDisplayName("1 item")
             
             DeviceListViewWatch(
                 store: Store<DevicesState, DevicesAtion>.init(
@@ -258,8 +317,8 @@ struct DeviceListView_Previews: PreviewProvider {
                     action: DevicesAtion.init(deviceAction:)
                 )
             )
-            .environment(\.locale, .init(identifier: "fr"))
-            .previewDisplayName("1 item french")
+                .environment(\.locale, .init(identifier: "fr"))
+                .previewDisplayName("1 item french")
         }
     }
 }

@@ -203,6 +203,7 @@ public extension DeviceListViewiOS {
         public enum DeviceAction {
             case tapped
             case tappedErrorAlert
+            case tappedDeviceChild(index: DeviceSate.ID, action: DeviceChildAction)
         }
         
         case tappedCloseAll
@@ -228,16 +229,24 @@ public struct DeviceDetailViewiOS: View {
     
     public var body: some View {
         WithViewStore(self.store) { viewStore in
-            Button(action: { viewStore.send(.tapped) }) {
-                LoadingView(.constant(viewStore.isLoading)){
-                    VStack {
-                        Image(systemName: "lightbulb.fill").font(.title3)
-                        Text(viewStore.name).multilineTextAlignment(.center)
+            VStack {
+                switch viewStore.relay?.rawValue {
+                case .some(true), .some(false):
+                    DeviceNoChildViewiOS(store: self.store)
+                case .none:
+                    VStack(alignment: .center) {
+                        ForEachStore(
+                            self.store.scope(
+                                state: \DeviceSate.children,
+                                action: DeviceListViewiOS.Action.DeviceAction.tappedDeviceChild(index:action:)
+                            ) , content: { store in
+                                DeviceChildViewiOS(store: store)
+                            })
                     }.padding()
                 }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                
-            }.disabled(viewStore.isLoading)
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .disabled(viewStore.isLoading)
             .alert(
                 item: viewStore.binding(
                     get: { $0.error.map(AlertInfo.init(title:))},
@@ -245,6 +254,52 @@ public struct DeviceDetailViewiOS: View {
                 ),
                 content: { Alert(title: Text($0.title)) }
             )
+        }
+    }
+}
+
+public struct DeviceNoChildViewiOS: View {
+    
+    let store: Store<DeviceSate, DeviceListViewiOS.Action.DeviceAction>
+
+    public var body: some View {
+        WithViewStore(self.store) { viewStore in
+            Button(action: { viewStore.send(.tapped) }) {
+                LoadingView(.constant(viewStore.isLoading)){
+                    VStack {
+                        switch viewStore.relay?.rawValue {
+                        case .some(true):
+                            Image(systemName: "lightbulb.fill").font(.title3).tint(Color.yellow)
+                            Text(viewStore.name).multilineTextAlignment(.center)
+                        case .some(false):
+                            Image(systemName: "lightbulb.slash.fill").font(.title3).tint(Color.blue)
+                            Text(viewStore.name).multilineTextAlignment(.center)
+                        case .none:
+                            EmptyView()
+                        }
+                    }.padding()
+                }
+            }
+        }
+    }
+}
+
+public struct DeviceChildViewiOS: View {
+    
+    let store: Store<DeviceSate.DeviceChildrenSate, DeviceChildAction>
+    
+    public var body: some View {
+        WithViewStore(self.store) { viewStore in
+            Button(action: { viewStore.send(.toggle) }) {
+                HStack {
+                    Image(
+                        systemName:
+                            viewStore.relay == true ? "lightbulb.fill" :  "lightbulb.slash.fill"
+                    ).font(.title3)
+                        .tint(viewStore.relay == true ? Color.yellow :  Color.blue)
+                    Text("\(viewStore.name)")
+                }
+            }
         }
     }
 }
@@ -274,6 +329,8 @@ public extension DeviceDetailAction {
             self = .toggle
         case .tappedErrorAlert:
             self = .errorHandled
+        case .tappedDeviceChild(index: let id, action: let action):
+            self = .deviceChild(index: id, action: action)
         }
     }
 }
@@ -315,7 +372,6 @@ extension DevicesAtion {
 struct DeviceListViewiOS_Previews: PreviewProvider {
     static var previews: some View {
         Group {
-            
             DeviceListViewiOS(
                 store: Store<DevicesState, DevicesAtion>.init(
                     initialState: .emptyNeverLoaded,
@@ -364,7 +420,7 @@ struct DeviceListViewiOS_Previews: PreviewProvider {
                     action: DevicesAtion.init(deviceAction:)
                 )
             ).preferredColorScheme(.dark)
-            .previewDisplayName("Error on item")
+                .previewDisplayName("Error on item")
         }
     }
 }

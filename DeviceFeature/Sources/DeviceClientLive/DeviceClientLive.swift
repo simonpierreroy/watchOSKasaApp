@@ -19,16 +19,28 @@ public extension DeviceDetailEvironment {
 }
 
 extension Device {
-    init(kasa: Networking.App.KasaDevice) {
-        self.init(id: .init(rawValue: kasa.deviceId.rawValue), name: kasa.alias.rawValue)
+    init(kasa: Networking.App.KasaDeviceAndSystemInfo) {
+        self.init(
+            id: .init(rawValue: kasa.device.deviceId.rawValue),
+            name: kasa.device.alias.rawValue,
+            children: (kasa.info.children ?? [])
+                .map{
+                    Device.DeviceChild(
+                        id: .init(rawValue: $0.id.rawValue),
+                        name: $0.alias.rawValue,
+                        state: Networking.App.getRelayState(from: $0.state)! //FIX ME
+                    )
+                },
+            state: Networking.App.getRelayState(from: kasa.info.relay_state)
+        )
     }
 }
 
 public extension DevicesEnvironment {
     static func liveDevicesCall(token: Token) -> AnyPublisher<[Device], Error> {
         return Effect.task {
-            let devicesData = try await Networking.App.getDevices(token: token)
-            return devicesData.deviceList.map(Device.init(kasa:))
+            let devicesData = try await Networking.App.getDevicesAndSysInfo(token: token)
+            return devicesData.map(Device.init(kasa:))
         }.eraseToAnyPublisher()
     }
 }

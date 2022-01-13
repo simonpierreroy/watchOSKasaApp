@@ -83,7 +83,7 @@ extension DevicesState {
     static let oneDeviceLoaded = Self(devices: [.init(device: DevicesEnvironment.debugDevice1)], isLoading: .loaded, route: nil, token: "logged")
     static func nDeviceLoaded(n: Int) -> Self {
         Self(
-            devices: (1...n).map{ DeviceSate.init(id: "\($0)", name: "Test device number \($0)") },
+            devices: (1...n).map{ DeviceSate(device: .init(id: "\($0)", name: "Test device number \($0)", children: [], state: false))},
             isLoading: .loaded,
             route: nil,
             token: "logged"
@@ -95,13 +95,26 @@ extension DevicesState {
 
 extension DeviceSate {
     init(device: Device) {
-        self.init(id: device.id, name: device.name)
+        self.id  = device.id
+        self.name = device.name
+        self.relay = device.state
+        let tmpChildren = device.children
+            .map {
+                DeviceSate.DeviceChildrenSate.init(relay: $0.state, id: $0.id, name: $0.name)
+            }
+        self.children = .init(uniqueElements: tmpChildren)
     }
 }
 
 extension Device {
-    init(deviceSate: DeviceSate) {
-        self.init(id: deviceSate.id, name: deviceSate.name)
+    init(deviceState: DeviceSate) {
+        self.init(
+            id: deviceState.id,
+            name: deviceState.name,
+            children: deviceState.children
+                .map { Device.DeviceChild.init(id: $0.id, name: $0.name, state: $0.relay) },
+            state:  deviceState.relay
+        )
     }
 }
 
@@ -138,7 +151,7 @@ public let devicesReducer = Reducer<DevicesState, DevicesAtion, DevicesEnvironme
         return Just(DevicesAtion.saveDevicesToCache).merge(with: linkPub).eraseToEffect()
     case .saveDevicesToCache:
         return  environment.cache.save(
-            state.devices.map(Device.init)
+            state.devices.map(Device.init(deviceState:))
         ).flatMap{ environment.reloadAppExtensions }
         .flatMap(Empty.completeImmediately)
         .catch(DevicesAtion.send >>> Just.init)
@@ -166,18 +179,11 @@ public let devicesReducer = Reducer<DevicesState, DevicesAtion, DevicesEnvironme
     case .closeAll:
         guard let token = state.token, state.isLoading != .nerverLoaded else { return .none }
         state.isLoading = .closingAll
-        
-        func stateInfo(device: DeviceSate) ->  AnyPublisher<(Device.ID, RelayIsOn), Error> {
-            return environment.repo.getDeviceRelayState(token , device.id)
-                .map { isOn in return (device.id, isOn) }
-                .eraseToAnyPublisher()
-        }
-        
         return Publishers.MergeMany.init(
-            state.devices.map(stateInfo)
-        ).filter(\.1.rawValue)
-        .map { (token, $0.0, false) }
-        .flatMap(environment.repo.changeDeviceRelayState)
+            state.devices
+                .filter { $0.relay != nil }
+                .map { environment.repo.changeDeviceRelayState(token, $0.id, false) }
+            )
         .map(always)
         .map(DevicesAtion.doneClosingAll)
         .last()
@@ -187,7 +193,7 @@ public let devicesReducer = Reducer<DevicesState, DevicesAtion, DevicesEnvironme
         .eraseToEffect()
     case .doneClosingAll:
         state.isLoading = .loaded
-        return .none
+        return Just(DevicesAtion.fetchFromRemote).eraseToEffect()
     case .deviceDetail: return .none
     case .empty: return .none
     }

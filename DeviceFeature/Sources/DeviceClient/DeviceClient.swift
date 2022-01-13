@@ -5,14 +5,33 @@ import Tagged
 import KasaCore
 
 public struct Device: Equatable, Identifiable, Codable {
-    public init(id: Id, name: String) {
+    
+    public struct DeviceChild: Equatable, Identifiable, Codable {
+        public init(id: Id, name: String, state: RelayIsOn) {
+            self.id = id
+            self.name = name
+            self.state = state
+        }
+        
+        public let id: Id
+        public let name: String
+        public var state: RelayIsOn
+    }
+    
+    
+    public init(id: Id, name: String, children: [DeviceChild] = [], state: RelayIsOn?) {
         self.id = id
         self.name = name
+        self.children = children
+        self.state = state
     }
+    
     public typealias Id = Tagged<Device, String>
     
     public let id: Id
     public let name: String
+    public let children: [DeviceChild]
+    public var state: RelayIsOn?
     
     public func deepLink() -> Link {
         return Link.device(self.id)
@@ -119,22 +138,22 @@ public extension DevicesRepo {
                     DevicesEnvironment.debugDevice2
                 ]))
             }.delay(for: 2, scheduler: DispatchQueue.main)
-            .eraseToAnyPublisher()
+                .eraseToAnyPublisher()
         }, toggleDeviceRelayState: { (_,_) in
             Just(RelayIsOn.init(rawValue: true))
                 .mapError(absurd)
                 .delay(for: 2, scheduler: DispatchQueue.main)
-                .eraseToAnyPublisher() },
+            .eraseToAnyPublisher() },
         getDeviceRelayState: { (_,_) in
             Just(RelayIsOn.init(rawValue: true))
                 .mapError(absurd)
                 .delay(for: 2, scheduler: DispatchQueue.main)
-                .eraseToAnyPublisher() },
+            .eraseToAnyPublisher() },
         changeDeviceRelayState: { (_,_, state) in
             Just(state.toggle())
                 .mapError(absurd)
                 .delay(for: 2, scheduler: DispatchQueue.main)
-                .eraseToAnyPublisher() }
+            .eraseToAnyPublisher() }
     )
 }
 
@@ -145,14 +164,14 @@ public extension DevicesCache {
             DevicesEnvironment.debugDevice1,
             DevicesEnvironment.debugDevice2
         ]).mapError(absurd)
-        .eraseToAnyPublisher()
+            .eraseToAnyPublisher()
     )
 }
 
 public extension DevicesEnvironment {
     
-    static let debugDevice1 = Device.init(id: "1", name: "Test device 1")
-    static let debugDevice2 = Device.init(id: "2", name: "Test device 2")
+    static let debugDevice1 = Device.init(id: "1", name: "Test device 1", state: false)
+    static let debugDevice2 = Device.init(id: "2", name: "Test device 2", state: true)
     
     static let mock = Self(
         mainQueue: DispatchQueue.main.eraseToAnyScheduler(),
