@@ -46,9 +46,11 @@ struct DeviceView : View {
         Link(destination: device.deepLink().getURL()) {
             VStack {
                 if device.children.count > 0 {
-                    Image(systemName: "rectangle.3.group.fill").font(.title)
-                    Text(Strings.device_group.key, bundle: .module)
-                    Text("(\(device.children.count))")
+                    Image(systemName: "rectangle.3.group.fill").font(DeviceView.font(widgetFamily).0)
+                    (Text(Strings.device_group.key, bundle: .module).font(DeviceView.font(widgetFamily).1)
+                    +
+                    Text(" (\(device.children.count))").font(DeviceView.font(widgetFamily).1))
+                        .multilineTextAlignment(.center)
                 } else {
                     Image(systemName: "light.max")
                         .font(DeviceView.font(widgetFamily).0)
