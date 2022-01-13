@@ -41,11 +41,13 @@ public struct Device: Equatable, Identifiable, Codable {
 public enum Link: Equatable {
     
     case device(Device.ID)
+    case closeAll
     case invalid
     case error
     
     public static let errorURL = URL(string: "link/error")!
     public static let baseURL = URL(string: "link/device/")!
+    public static let cloaseAllURL = URL(string: "link/closeAll")!
     public static let invalidURL = Link.baseURL.appendingPathComponent("invalid")
     
     public func getURL() -> URL {
@@ -56,6 +58,8 @@ public enum Link: Equatable {
             return Link.invalidURL
         case .error:
             return Link.errorURL
+        case .closeAll:
+            return Link.cloaseAllURL
         }
     }
 }

@@ -41,7 +41,13 @@ public enum DeviceDetailAction {
 let deviceDetailStateReducer = Reducer<DeviceSate, DeviceDetailAction, DeviceDetailEvironment> { state, action, env in
     switch action {
     case .toggle:
-        guard let token = state.token, state.relay != nil, state.isLoading == false else { return .none }
+        guard let token = state.token, state.isLoading == false else { return .none }
+        
+        // No state, but has child.
+        if state.relay == nil, let firstChild = state.children.first {
+            return Just(DeviceDetailAction.deviceChild(index: firstChild.id, action: .toggleChild)).eraseToEffect()
+        }
+        
         state.isLoading = true
         return env
             .toggle(token, state.id, nil)

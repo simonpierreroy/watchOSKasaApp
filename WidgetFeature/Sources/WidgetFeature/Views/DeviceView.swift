@@ -45,16 +45,23 @@ struct DeviceView : View {
     var body: some View {
         Link(destination: device.deepLink().getURL()) {
             VStack {
-                Image(systemName: "light.max")
-                    .font(DeviceView.font(widgetFamily).0)
-                Text("\(device.name)")
-                    .multilineTextAlignment(.center)
-                    .font(DeviceView.font(widgetFamily).1)
+                if device.children.count > 0 {
+                    Image(systemName: "rectangle.3.group.fill").font(.title)
+                    Text(Strings.device_group.key, bundle: .module)
+                    Text("(\(device.children.count))")
+                } else {
+                    Image(systemName: "light.max")
+                        .font(DeviceView.font(widgetFamily).0)
+                    Text("\(device.name)")
+                        .multilineTextAlignment(.center)
+                        .font(DeviceView.font(widgetFamily).1)
+                }
+                
             }.padding()
-            .frame(maxWidth: .infinity,maxHeight: .infinity, alignment: .center)
-            .frame(maxWidth: .infinity)
-            .background(Color.button.opacity(0.2))
-            .cornerRadius(16)
+                .frame(maxWidth: .infinity,maxHeight: .infinity, alignment: .center)
+                .frame(maxWidth: .infinity)
+                .background(Color.button.opacity(0.2))
+                .cornerRadius(16)
             
         }
     }
@@ -83,6 +90,17 @@ struct DeviceViewMaybe : View {
     }
 }
 
+struct CloseAll : View {
+    var body: some View {
+        Link(destination: Link.closeAll.getURL()) {
+            VStack {
+                Image(systemName: "moon.fill").font(.largeTitle).padding()
+                Text(Strings.close_all.key, bundle: .module).font(.body)
+            }
+        }
+    }
+}
+
 struct StackList : View {
     @Environment(\.widgetFamily) var widgetFamily
     let devices: [Device]
@@ -92,8 +110,8 @@ struct StackList : View {
             VStack {
                 switch widgetFamily {
                 case .systemSmall:
-                    DeviceViewMaybe(device: devices[safeIndex: 0])
-                        .widgetURL(devices[safeIndex: 0]?.deepLink().getURL())
+                    CloseAll()
+                        .widgetURL(Link.closeAll.getURL())
                 case .systemMedium :
                     VStack{
                         DeviceRowMaybe(devices: (devices[safeIndex: 0], devices[safeIndex: 1]))

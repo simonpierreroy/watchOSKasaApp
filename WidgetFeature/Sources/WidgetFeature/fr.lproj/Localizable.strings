@@ -1,3 +1,5 @@
 "no_device" = "Aucun appareil";
 "not_logged" = "Connecter vous";
 "description_widget" = "Ouvrir les lumières rapidement";
+"close_all" = "Fermer";
+"device_group" = "Groupe";

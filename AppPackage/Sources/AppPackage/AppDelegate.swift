@@ -27,9 +27,7 @@ let delegateReducer = Reducer<AppState, AppAction, AppEnv> { state, action, envi
     case .delegate(.openURLContexts(let urls)):
         for url in urls {
             let link = environment.linkURLParser.parse(url)
-            if case .device = link {
-                return  Effect(value: .devicesAction(.attempDeepLink(link)))
-            }
+            return  Effect(value: .devicesAction(.attempDeepLink(link)))
         }
         return .none
     default: return .none

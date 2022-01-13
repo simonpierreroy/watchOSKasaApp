@@ -1,3 +1,5 @@
 "no_device" = "No devices";
 "not_logged" = "Please login";
 "description_widget" = "Toggle lights superfast";
+"close_all" = "Close all";
+"device_group" = "Device group";

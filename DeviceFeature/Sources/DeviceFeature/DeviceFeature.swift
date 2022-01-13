@@ -136,22 +136,22 @@ extension Device {
 public let devicesReducer = Reducer<DevicesState, DevicesAtion, DevicesEnvironment> { state, action, environment in
     switch action {
     case .attempDeepLink(let link):
-        guard case let .device(id) = link else {
-            state.linkToComplete = nil
-            return .none
-        }
-        
-        if state.devices[id: id] != nil { // Link is in list
-            state.linkToComplete = nil
-            return Just(DevicesAtion.deviceDetail(index: id, action: .toggle)).eraseToEffect()
-        } else if state.linkToComplete == link  { // Link is not in list and already tried
-            state.linkToComplete = nil
-            return .none
-        } else { // not in list, not tried
+        guard state.isLoading == .loaded else {
             state.linkToComplete = link
             return .none
         }
         
+        defer { state.linkToComplete = nil }
+        
+        switch link {
+        case .closeAll:
+            return Just(DevicesAtion.closeAll).eraseToEffect()
+        case .device(let id):
+            guard state.devices[id: id] != nil else { return .none }
+            return Just(DevicesAtion.deviceDetail(index: id, action: .toggle)).eraseToEffect()
+        case .error, .invalid:
+            return .none
+        }
     case .set(let devices):
         state.isLoading = .loaded
         state.devices = devices

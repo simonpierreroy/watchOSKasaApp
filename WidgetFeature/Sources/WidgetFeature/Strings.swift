@@ -13,6 +13,8 @@ public enum Strings: String {
     case no_device
     case not_logged
     case description_widget
+    case close_all
+    case device_group
 }
 
 extension Strings {
@@ -36,12 +38,16 @@ struct Strings_Previews: PreviewProvider {
                 Text(Strings.not_logged.key, bundle: .module)
                 Text(Strings.no_device.key, bundle: .module)
                 Text(Strings.description_widget.key, bundle: .module)
+                Text(Strings.close_all.key, bundle: .module)
+                Text(Strings.device_group.key, bundle: .module)
             }
             .previewDisplayName("English")
             VStack {
                 Text(Strings.not_logged.key,  bundle: .module)
                 Text(Strings.no_device.key,  bundle: .module)
                 Text(Strings.description_widget.key,  bundle: .module)
+                Text(Strings.close_all.key, bundle: .module)
+                Text(Strings.device_group.key, bundle: .module)
             }.environment(\.locale, .init(identifier: "fr"))
             .previewDisplayName("Français")
         }

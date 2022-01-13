@@ -25,9 +25,15 @@ extension Link {
     private static let invalidLink = StartsWith(Link.invalidURL.absoluteString)
         .skip(End())
         .map{ Link.invalid }
+    
+    private static let closeAllLink = StartsWith(Link.cloaseAllURL.absoluteString)
+        .skip(End())
+        .map{ Link.closeAll }
+
 
     private static let deviceLink = validDeviceLink
         .orElse(invalidLink)
+        .orElse(closeAllLink)
     
     static func parserDeepLink(url: URL) -> Self {
         parserDeepLink(string: url.absoluteString)
