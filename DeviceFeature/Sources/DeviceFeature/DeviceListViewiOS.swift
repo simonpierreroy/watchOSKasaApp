@@ -235,6 +235,11 @@ public struct DeviceDetailViewiOS: View {
                     DeviceNoChildViewiOS(store: self.store)
                 case .none:
                     VStack(alignment: .center) {
+                        HStack {
+                            Image(systemName: "rectangle.3.group.fill")
+                            Text(Strings.device_group.key, bundle: .module)
+                        }
+                        Spacer()
                         ForEachStore(
                             self.store.scope(
                                 state: \DeviceSate.children,
@@ -261,7 +266,7 @@ public struct DeviceDetailViewiOS: View {
 public struct DeviceNoChildViewiOS: View {
     
     let store: Store<DeviceSate, DeviceListViewiOS.Action.DeviceAction>
-
+    
     public var body: some View {
         WithViewStore(self.store) { viewStore in
             Button(action: { viewStore.send(.tapped) }) {
@@ -290,7 +295,7 @@ public struct DeviceChildViewiOS: View {
     
     public var body: some View {
         WithViewStore(self.store) { viewStore in
-            Button(action: { viewStore.send(.toggle) }) {
+            Button(action: { viewStore.send(.toggleChild) }) {
                 HStack {
                     Image(
                         systemName:
@@ -405,6 +410,17 @@ struct DeviceListViewiOS_Previews: PreviewProvider {
                 )
             ).previewDisplayName("5 item")
             
+            DeviceListViewiOS(
+                store: Store<DevicesState, DevicesAtion>.init(
+                    initialState: .nDeviceLoaded(n: 5, childrenCount: 4),
+                    reducer: devicesReducer,
+                    environment: .mock
+                ).scope(
+                    state: DeviceListViewiOS.StateView.init(devices:),
+                    action: DevicesAtion.init(deviceAction:)
+                )
+            ).previewDisplayName("Group")
+             
             DeviceListViewiOS(
                 store: Store<DevicesState, DevicesAtion>.init(
                     initialState: .nDeviceLoaded(n: 4),

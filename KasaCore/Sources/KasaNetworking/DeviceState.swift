@@ -15,7 +15,7 @@ extension Networking.App {
     private struct System<SubSystem: Codable>: Codable {
         let system: SubSystem
     }
-        
+    
     private struct SystemInfoDiscover: Codable {}
     
     private struct GetSysInfo<State: Codable>: Codable {
@@ -56,8 +56,14 @@ extension Networking.App {
     
     private struct ChangeDeviceStateParam: Encodable {
         
-        init(deviceId: String, state: RelayIsOn) {
-            self.deviceId = deviceId
+        struct Context: Encodable {
+            let child_ids: [String]
+        }
+        
+        init(deviceId: DeviceID, state: RelayIsOn, children: [DeviceID]) {
+            self.deviceId = deviceId.rawValue
+            self.context = .init(child_ids: children.map(\.rawValue))
+            
             self.requestData = .init(
                 wrapping: .init(
                     system: .init(set_relay_state: .init(state: relayIsOnToRelayState(state)))
@@ -66,6 +72,7 @@ extension Networking.App {
         }
         
         let deviceId: String
+        let context: Context
         //Pass to API: "{\"system\":{\"set_relay_state\":{\"state\":\(boolState)}}}"
         let requestData: RawStringJSONContainer<System<SetRelayState<RelayStatePut>>>
     }
@@ -76,7 +83,7 @@ extension Networking.App {
 }
 
 extension Networking.App {
-        
+    
     public static func getDeviceState(
         token: Token,
         id: DeviceID
@@ -97,24 +104,45 @@ extension Networking.App {
     
     public static func tryToGetDeviceRelayState(
         token: Token,
-        id: DeviceID
+        id: DeviceID,
+        childId: DeviceID?
     ) async throws -> RelayIsOn {
         let info = try await getDeviceState(token: token, id: id)
-        guard let relayState =  getRelayState(from: info.relay_state) else {
+        let rawRelayState: RawState?
+        
+        if let childId = childId  {
+            guard let child = info.children?.first(where: { childId == $0.id }) else {
+                throw  Networking.ResquestError(errorDescription: "No child matching")
+            }
+            rawRelayState = child.state
+        } else {
+            rawRelayState = info.relay_state
+        }
+        
+        guard let relayState =  getRelayState(from: rawRelayState) else {
             throw  Networking.ResquestError(errorDescription: "Device has no relay_state")
         }
+        
         return relayState
     }
     
     public static func changeDeviceRelayState(
         token: Token,
         id: DeviceID,
+        childId: DeviceID?,
         state: RelayIsOn
     ) async throws -> RelayIsOn {
         
+        let children: [DeviceID]
+        if let childId = childId { children = [childId] } else { children = [] }
+        
         let request = Request<ChangeDeviceStateParam>(
             method: .passthrough,
-            params: .init(deviceId: id.rawValue, state: state)
+            params: .init(
+                deviceId: id,
+                state: state,
+                children: children
+            )
         )
         
         let deviceStateResponse: ChangeDeviceStateResponse = try await performResquest(
@@ -129,8 +157,9 @@ extension Networking.App {
         return state
     }
     
-    public static func toggleDeviceRelayState(token: Token, id: DeviceID)  async throws -> RelayIsOn  {
-        let state = try await tryToGetDeviceRelayState(token: token, id: id)
-        return try await changeDeviceRelayState(token: token, id: id, state: state.toggle())
+    public static func toggleDeviceRelayState(token: Token, id: DeviceID,  childId: DeviceID?)  async throws -> RelayIsOn  {
+        let state = try await tryToGetDeviceRelayState(token: token, id: id, childId: childId)
+        try Task.checkCancellation()
+        return try await changeDeviceRelayState(token: token, id: id, childId: childId, state: state.toggle())
     }
 }

@@ -11,9 +11,14 @@ extension Device.ID {
 }
 
 public extension DeviceDetailEvironment {
-    static func liveToggleDeviceRelayState(token : Token, id: Device.ID) -> AnyPublisher<RelayIsOn, Error> {
+    static func liveToggleDeviceRelayState(token : Token, id: Device.ID, childId: Device.ID?) -> AnyPublisher<RelayIsOn, Error> {
         return Effect.task {
-            return try await Networking.App.toggleDeviceRelayState(token: token, id: id.networkDeviceID())
+            return try await Networking.App
+                .toggleDeviceRelayState(
+                    token: token,
+                    id: id.networkDeviceID(),
+                    childId: childId?.networkDeviceID()
+                )
         }.eraseToAnyPublisher()
     }
 }
@@ -46,17 +51,28 @@ public extension DevicesEnvironment {
 }
 
 public extension DevicesEnvironment {
-    static func liveChangeDeviceRelayState(token:Token, id: Device.ID, newState: RelayIsOn) -> AnyPublisher<RelayIsOn, Error> {
+    static func liveChangeDeviceRelayState(token:Token, id: Device.ID, childId: Device.ID?, newState: RelayIsOn) -> AnyPublisher<RelayIsOn, Error> {
         return Effect.task {
-            return try await Networking.App.changeDeviceRelayState(token: token, id: id.networkDeviceID(), state: newState)
+            return try await Networking.App
+                .changeDeviceRelayState(
+                    token: token,
+                    id: id.networkDeviceID(),
+                    childId: childId?.networkDeviceID(),
+                    state: newState
+                )
         }.eraseToAnyPublisher()
     }
 }
 
 public extension DevicesEnvironment {
-    static func liveGetDeviceRelayState(token:Token, id: Device.ID) -> AnyPublisher<RelayIsOn, Error> {
+    static func liveGetDeviceRelayState(token:Token, id: Device.ID, childId: Device.ID?) -> AnyPublisher<RelayIsOn, Error> {
         return Effect.task {
-            return try await Networking.App.tryToGetDeviceRelayState(token: token, id: id.networkDeviceID())
+            return try await Networking.App
+                .tryToGetDeviceRelayState(
+                    token: token,
+                    id: id.networkDeviceID(),
+                    childId: childId?.networkDeviceID()
+                )
         }.eraseToAnyPublisher()
     }
 }
@@ -92,8 +108,8 @@ public extension DevicesRepo {
     static let live = Self(
         loadDevices: DevicesEnvironment.liveDevicesCall(token:),
         toggleDeviceRelayState: DeviceDetailEvironment.liveToggleDeviceRelayState,
-        getDeviceRelayState: DevicesEnvironment.liveGetDeviceRelayState(token:id:),
-        changeDeviceRelayState: DevicesEnvironment.liveChangeDeviceRelayState(token:id:newState:)
+        getDeviceRelayState: DevicesEnvironment.liveGetDeviceRelayState(token:id:childId:),
+        changeDeviceRelayState: DevicesEnvironment.liveChangeDeviceRelayState(token:id:childId:newState:)
     )
 }
 

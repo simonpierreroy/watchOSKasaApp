@@ -81,9 +81,24 @@ extension DevicesState {
     static let emptyLoading = Self(devices: [], isLoading: .loadingDevices, route: nil, token: "logged")
     static let emptyNeverLoaded = Self(devices: [], isLoading: .nerverLoaded, route: nil, token: "logged")
     static let oneDeviceLoaded = Self(devices: [.init(device: DevicesEnvironment.debugDevice1)], isLoading: .loaded, route: nil, token: "logged")
-    static func nDeviceLoaded(n: Int) -> Self {
-        Self(
-            devices: (1...n).map{ DeviceSate(device: .init(id: "\($0)", name: "Test device number \($0)", children: [], state: false))},
+    static func nDeviceLoaded(n: Int, childrenCount: Int = 0) -> Self {
+        var children: [Device.DeviceChild] = []
+        var state: RelayIsOn? = false
+        
+        if childrenCount >= 1 {
+            children = (1...childrenCount).map {  Device.DeviceChild(id: "child \($0)", name:  "child \($0)", state: true) }
+            state = nil
+        }
+        
+        return Self(
+            devices: (1...n).map{ DeviceSate(
+                device: .init(
+                    id: "\($0)",
+                    name: "Test device number \($0)",
+                    children: children,
+                    state: state
+                )
+            )},
             isLoading: .loaded,
             route: nil,
             token: "logged"
@@ -166,7 +181,6 @@ public let devicesReducer = Reducer<DevicesState, DevicesAtion, DevicesEnvironme
             .map(IdentifiedArrayOf<DeviceSate>.init(uniqueElements:))
             .map(DevicesAtion.set)
             .catch(DevicesAtion.send >>> Just.init)
-            .merge(with: Effect.cancel(id: CancelInFlightToggle()))
             .receive(on: environment.mainQueue)
             .eraseToEffect()
     case .send(let error):
@@ -179,11 +193,25 @@ public let devicesReducer = Reducer<DevicesState, DevicesAtion, DevicesEnvironme
     case .closeAll:
         guard let token = state.token, state.isLoading != .nerverLoaded else { return .none }
         state.isLoading = .closingAll
-        return Publishers.MergeMany.init(
-            state.devices
-                .filter { $0.relay != nil }
-                .map { environment.repo.changeDeviceRelayState(token, $0.id, false) }
-            )
+        
+        let effects: [[AnyPublisher<RelayIsOn, Error>]] = state.devices
+            .map { (device: DeviceSate) in
+                var closePubs: [AnyPublisher<RelayIsOn, Error>] = []
+                
+                if let _ = device.relay {
+                    closePubs.append(environment.repo.changeDeviceRelayState(token, device.id, nil, false))
+                }
+                
+                closePubs.append(
+                    contentsOf: device.children.map { environment.repo.changeDeviceRelayState(token, device.id, $0.id, false) }
+                )
+                
+                return closePubs
+            }
+        
+        let effectsFlatten = effects.flatMap { $0 }
+        
+        return Publishers.MergeMany(effectsFlatten)
         .map(always)
         .map(DevicesAtion.doneClosingAll)
         .last()

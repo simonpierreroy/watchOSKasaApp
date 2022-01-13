@@ -19,41 +19,47 @@ public struct DeviceSate: Equatable, Identifiable {
     
     public let id: Device.Id
     public let name: String
-    public let children: IdentifiedArrayOf<DeviceChildrenSate>
+    public var children: IdentifiedArrayOf<DeviceChildrenSate>
     public var relay: RelayIsOn?
 }
 
 
 public enum DeviceChildAction {
-    case toggle
+    case toggleChild
+    case didToggleChild(state: RelayIsOn)
 }
 
 public enum DeviceDetailAction {
     case toggle
+    case didToggleChild(childId: DeviceSate.ID, state: RelayIsOn)
     case send(Error)
     case errorHandled
     case didToggle(state: RelayIsOn)
     case deviceChild(index: DeviceSate.ID, action: DeviceChildAction)
 }
 
-struct CancelInFlightToggle: Hashable {}
-
 let deviceDetailStateReducer = Reducer<DeviceSate, DeviceDetailAction, DeviceDetailEvironment> { state, action, env in
     switch action {
     case .toggle:
-        guard let token = state.token, state.relay != nil else { return .none }
+        guard let token = state.token, state.relay != nil, state.isLoading == false else { return .none }
         state.isLoading = true
         return env
-            .toggle(token, state.id)
+            .toggle(token, state.id, nil)
             .map(DeviceDetailAction.didToggle)
             .catch (DeviceDetailAction.send >>> Just.init)
             .receive(on: env.mainQueue)
             .eraseToEffect()
-            .cancellable(id: CancelInFlightToggle())
     case .didToggle(let status):
         state.isLoading = false
         state.relay = status
         return .none
+    case .didToggleChild(let id, let status):
+        state.isLoading = false
+        let effects = state.children
+            .map {
+                Just(DeviceDetailAction.deviceChild(index: $0.id, action: .didToggleChild(state: status)))
+            }
+        return Publishers.MergeMany(effects).eraseToEffect()
     case .send(let error):
         state.isLoading = false
         state.error = error.localizedDescription
@@ -61,7 +67,34 @@ let deviceDetailStateReducer = Reducer<DeviceSate, DeviceDetailAction, DeviceDet
     case .errorHandled:
         state.error = nil
         return .none
+    case .deviceChild(let childId, .toggleChild):
+        guard let token = state.token, let child = state.children[id: childId], state.isLoading == false else { return .none }
+        state.isLoading = true
+        return env
+            .toggle(token, state.id, child.id)
+            .map { DeviceDetailAction.didToggleChild(childId: child.id, state: $0) }
+            .catch (DeviceDetailAction.send >>> Just.init)
+            .receive(on: env.mainQueue)
+            .eraseToEffect()
     case .deviceChild:
+        return .none
+    }
+}.combined(with:
+            deviceChildStateReducer.forEach(
+                state: \.children,
+                action: /DeviceDetailAction.deviceChild(index:action:),
+                environment: { _ in return }
+            )
+)
+
+
+let deviceChildStateReducer = Reducer<DeviceSate.DeviceChildrenSate, DeviceChildAction, Void> { state, action, env in
+    switch action {
+    case .toggleChild:
+        // parent will take care of it
+        return .none
+    case .didToggleChild(let status):
+        state.relay = status
         return .none
     }
 }

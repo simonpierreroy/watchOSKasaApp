@@ -100,6 +100,11 @@ struct DeviceDetailViewWatch: View {
                     DeviceDetailNoChildViewWatch(store: self.store)
                 case .none:
                     VStack(alignment: .center) {
+                        HStack {
+                            Image(systemName: "rectangle.3.group.fill")
+                            Text(Strings.device_group.key, bundle: .module)
+                        }
+                        Spacer()
                         ForEachStore(
                             self.store.scope(
                                 state: \DeviceSate.children,
@@ -127,7 +132,7 @@ public struct DeviceChildViewWatch: View {
     
     public var body: some View {
         WithViewStore(self.store) { viewStore in
-            Button(action: { viewStore.send(.toggle) }) {
+            Button(action: { viewStore.send(.toggleChild) }) {
                 HStack {
                     Image(
                         systemName:
@@ -306,6 +311,30 @@ struct DeviceListView_Previews: PreviewProvider {
                 )
             ).preferredColorScheme(.dark)
                 .previewDisplayName("1 item")
+            
+            DeviceListViewWatch(
+                store: Store<DevicesState, DevicesAtion>.init(
+                    initialState: .nDeviceLoaded(n: 5),
+                    reducer: devicesReducer,
+                    environment: .mock
+                ).scope(
+                    state: DeviceListViewWatch.StateView.init(devices:),
+                    action: DevicesAtion.init(deviceAction:)
+                )
+            ).preferredColorScheme(.dark)
+                .previewDisplayName("5 items")
+            
+            DeviceListViewWatch(
+                store: Store<DevicesState, DevicesAtion>.init(
+                    initialState: .nDeviceLoaded(n: 5, childrenCount: 3),
+                    reducer: devicesReducer,
+                    environment: .mock
+                ).scope(
+                    state: DeviceListViewWatch.StateView.init(devices:),
+                    action: DevicesAtion.init(deviceAction:)
+                )
+            ).preferredColorScheme(.dark)
+                .previewDisplayName("Group")
             
             DeviceListViewWatch(
                 store: Store<DevicesState, DevicesAtion>.init(

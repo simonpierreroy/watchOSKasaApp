@@ -5,7 +5,7 @@ import KasaCore
 
 
 public struct DeviceDetailEvironment {
-    public typealias ToggleEffect = (Token, Device.ID) -> AnyPublisher<RelayIsOn, Error>
+    public typealias ToggleEffect = (Token, Device.ID, Device.ID?) -> AnyPublisher<RelayIsOn, Error>
     public let toggle: ToggleEffect
     public let mainQueue: AnySchedulerOf<DispatchQueue>
 }
@@ -21,7 +21,7 @@ extension DeviceDetailEvironment {
 #if DEBUG
 extension DeviceDetailEvironment {
     static let mock = Self(
-        toggle: { (_,_) in
+        toggle: { (_,_, _) in
             Just(RelayIsOn.init(rawValue: true))
                 .mapError(absurd)
                 .delay(for: 2, scheduler: DispatchQueue.main)
