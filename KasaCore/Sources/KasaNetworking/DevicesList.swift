@@ -85,6 +85,7 @@ extension Networking.App {
             
             for device in mainDeviceList {
                 group.addTask {
+                    try Task.checkCancellation() // needed?
                     let info =  try await getDeviceState(token: token, id: device.deviceId)
                     return KasaDeviceAndSystemInfo.init(device: device, info: info)
                 }
