@@ -78,16 +78,27 @@ extension Networking.App {
     
     public static func getDevicesAndSysInfo(token: Token) async throws -> [KasaDeviceAndSystemInfo] {
         let mainDeviceList = try await getDevices(token: token).deviceList
-        
         try Task.checkCancellation()
-        var finalList: [KasaDeviceAndSystemInfo] = []
-        finalList.reserveCapacity(mainDeviceList.count)
+
         
-        for device in mainDeviceList {
-            let info = try await getDeviceState(token: token, id: device.deviceId)
-            finalList.append(KasaDeviceAndSystemInfo.init(device: device, info: info))
-            try Task.checkCancellation()
+        return try await withThrowingTaskGroup(of: KasaDeviceAndSystemInfo.self) { group -> [KasaDeviceAndSystemInfo] in
+            
+            for device in mainDeviceList {
+                group.addTask {
+                    let info =  try await getDeviceState(token: token, id: device.deviceId)
+                    return KasaDeviceAndSystemInfo.init(device: device, info: info)
+                }
+            }
+            
+            
+            var finalList: [KasaDeviceAndSystemInfo] = []
+            finalList.reserveCapacity(mainDeviceList.count)
+            
+            for try await infoInGroup in group {
+                finalList.append(infoInGroup)
+            }
+            
+            return finalList.sorted { $0.device.alias < $1.device.alias }
         }
-        return finalList
     }
 }
