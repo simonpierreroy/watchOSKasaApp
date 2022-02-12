@@ -28,7 +28,7 @@ let package = Package(
         ),
         .package(
             url: "https://github.com/pointfreeco/swift-parsing.git",
-            .exact("0.4.1")
+            .exact("0.5.0")
         ),
     ],
     targets: [
