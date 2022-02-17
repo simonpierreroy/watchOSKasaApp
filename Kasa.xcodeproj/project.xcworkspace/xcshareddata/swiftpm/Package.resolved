@@ -60,8 +60,8 @@
         "repositoryURL": "https://github.com/pointfreeco/swift-parsing.git",
         "state": {
           "branch": null,
-          "revision": "69d56291adcaec6bc58553850e13ae7bdfe5c1da",
-          "version": "0.5.0"
+          "revision": "00ded1efa7d78700130a876d6ec925e37cc41ca2",
+          "version": "0.7.0"
         }
       },
       {

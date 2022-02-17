@@ -41,10 +41,11 @@ extension Link {
     }
     
     private static func parserDeepLink(string: String) -> Self {
-        guard let link = deviceLink.parse(string[...]) else {
-              return .error
-          }
-          return link
+        do {
+            return try deviceLink.parse(string[...])
+        } catch {
+            return .error
+        }
       }
 }
 
