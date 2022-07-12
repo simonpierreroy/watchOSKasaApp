@@ -1,4 +1,4 @@
-// swift-tools-version:5.5
+// swift-tools-version:5.6
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
@@ -20,15 +20,15 @@ let package = Package(
     dependencies: [
         .package(
             url: "https://github.com/pointfreeco/swift-composable-architecture.git",
-            .exact("0.33.1")
+            exact: "0.38.2"
         ),
         .package(
             url: "https://github.com/pointfreeco/swift-tagged.git",
-            .exact("0.6.0")
+            exact: "0.7.0"
         ),
         .package(
             url: "https://github.com/pointfreeco/swift-parsing.git",
-            .exact("0.7.0")
+            exact: "0.10.0"
         ),
     ],
     targets: [
