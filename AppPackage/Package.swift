@@ -22,10 +22,24 @@ let package = Package(
             dependencies: [
                 "DeviceFeature",
                 "UserFeature",
-                .product(name:"WidgetFeature", package: "WidgetFeature", condition: .when(platforms: [.iOS])),
-                .product(name: "WidgetClientLive", package: "WidgetFeature", condition: .when(platforms: [.iOS])),
-                .product(name: "UserClientLive", package: "UserFeature"),
-                .product(name: "DeviceClientLive", package: "DeviceFeature")
+                .product(
+                    name:"WidgetFeature",
+                    package: "WidgetFeature",
+                    condition: .when(platforms: [.iOS])
+                ),
+                .product(
+                    name: "WidgetClientLive",
+                    package: "WidgetFeature",
+                    condition: .when(platforms: [.iOS])
+                ),
+                .product(
+                    name: "UserClientLive",
+                    package: "UserFeature"
+                ),
+                .product(
+                    name: "DeviceClientLive",
+                    package: "DeviceFeature"
+                )
             ]),
         .testTarget(
             name: "AppPackageTests",
