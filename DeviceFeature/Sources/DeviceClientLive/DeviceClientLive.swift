@@ -11,15 +11,14 @@ extension Device.ID {
 }
 
 public extension DeviceDetailEvironment {
-    static func liveToggleDeviceRelayState(token : Token, id: Device.ID, childId: Device.ID?) -> AnyPublisher<RelayIsOn, Error> {
-        return Effect.task {
-            return try await Networking.App
-                .toggleDeviceRelayState(
-                    token: token,
-                    id: id.networkDeviceID(),
-                    childId: childId?.networkDeviceID()
-                )
-        }.eraseToAnyPublisher()
+    @Sendable
+    static func liveToggleDeviceRelayState(token : Token, id: Device.ID, childId: Device.ID?) async throws -> RelayIsOn {
+        return try await Networking.App
+            .toggleDeviceRelayState(
+                token: token,
+                id: id.networkDeviceID(),
+                childId: childId?.networkDeviceID()
+            )
     }
 }
 
@@ -42,38 +41,33 @@ extension Device {
 }
 
 public extension DevicesEnvironment {
-    static func liveDevicesCall(token: Token) -> AnyPublisher<[Device], Error> {
-        return Effect.task {
-            let devicesData = try await Networking.App.getDevicesAndSysInfo(token: token)
-            return devicesData.map(Device.init(kasa:))
-        }.eraseToAnyPublisher()
+    @Sendable
+    static func liveDevicesCall(token: Token) async throws-> [Device] {
+        let devicesData = try await Networking.App.getDevicesAndSysInfo(token: token)
+        return devicesData.map(Device.init(kasa:))
     }
 }
 
 public extension DevicesEnvironment {
-    static func liveChangeDeviceRelayState(token:Token, id: Device.ID, childId: Device.ID?, newState: RelayIsOn) -> AnyPublisher<RelayIsOn, Error> {
-        return Effect.task {
-            return try await Networking.App
-                .changeDeviceRelayState(
-                    token: token,
-                    id: id.networkDeviceID(),
-                    childId: childId?.networkDeviceID(),
-                    state: newState
-                )
-        }.eraseToAnyPublisher()
+    @Sendable
+    static func liveChangeDeviceRelayState(token:Token, id: Device.ID, childId: Device.ID?, newState: RelayIsOn) async throws-> RelayIsOn {
+        return try await Networking.App.changeDeviceRelayState(
+            token: token,
+            id: id.networkDeviceID(),
+            childId: childId?.networkDeviceID(),
+            state: newState
+        )
     }
 }
 
 public extension DevicesEnvironment {
-    static func liveGetDeviceRelayState(token:Token, id: Device.ID, childId: Device.ID?) -> AnyPublisher<RelayIsOn, Error> {
-        return Effect.task {
-            return try await Networking.App
-                .tryToGetDeviceRelayState(
-                    token: token,
-                    id: id.networkDeviceID(),
-                    childId: childId?.networkDeviceID()
-                )
-        }.eraseToAnyPublisher()
+    @Sendable
+    static func liveGetDeviceRelayState(token: Token, id: Device.ID, childId: Device.ID?) async throws -> RelayIsOn {
+        return try await Networking.App.tryToGetDeviceRelayState(
+            token: token,
+            id: id.networkDeviceID(),
+            childId: childId?.networkDeviceID()
+        )
     }
 }
 
@@ -82,22 +76,20 @@ public extension DevicesEnvironment {
     static let encoder = JSONEncoder()
     static let decoder = JSONDecoder()
     
-    static func liveSave(devices: [Device]) -> AnyPublisher<Void, Error> {
-        return Effect.catching {
-            let data = try encoder.encode(devices)
-            let string = String(data: data, encoding: .utf8)
-            UserDefaults.kasaAppGroup.setValue(string, forKeyPath: "cacheDevices")
-        }.eraseToAnyPublisher()
+    @Sendable
+    static func liveSave(devices: [Device]) async throws -> Void {
+        let data = try encoder.encode(devices)
+        let string = String(data: data, encoding: .utf8)
+        UserDefaults.kasaAppGroup.setValue(string, forKeyPath: "cacheDevices")
     }
     
-    
-    static let liveLoadCache: AnyPublisher<[Device], Error> = Effect.catching {
-        let data = try UserDefaults.kasaAppGroup
-            .string(forKey: "cacheDevices")?
-            .data(using: .utf8)
-            .map { try decoder.decode([Device].self, from: $0) }
-        return data ?? []
-    }.eraseToAnyPublisher()
+    @Sendable
+    static func liveLoadCache() async throws -> [Device] {
+        guard let dataString = UserDefaults.kasaAppGroup.string(forKey: "cacheDevices")?.data(using: .utf8) else {
+            throw DevicesCache.Failure.dataConversion
+        }
+        return try decoder.decode([Device].self, from: dataString)
+    }
 }
 
 public extension DevicesCache {

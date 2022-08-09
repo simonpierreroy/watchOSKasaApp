@@ -3,14 +3,10 @@ import WidgetClient
 import Combine
 import KasaCore
 
-public func getCacheState(environment: WidgetEnvironment) -> AnyPublisher<WidgetState, Error> {
-    return environment
-        .loadUser
-        .mapError(absurd)
-        .zip(environment.loadDevices)
-        .map(WidgetState.init(user:device:))
-        .receive(on: DispatchQueue.main)
-        .eraseToAnyPublisher()
+public func getCacheState(environment: WidgetEnvironment) async throws -> WidgetState {
+    async let user = environment.loadUser()
+    async let devices = environment.loadDevices()
+    return try await WidgetState.init(user: user, device: devices)
 }
 
 

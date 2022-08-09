@@ -19,7 +19,7 @@ public enum DevicesAtion {
     case errorHandled
     case deviceDetail(index: DeviceSate.ID, action: DeviceDetailAction)
     case closeAll
-    case doneClosingAll(())
+    case doneClosingAll
     case empty
     case saveDevicesToCache
     case attempDeepLink(Link)
@@ -140,49 +140,39 @@ public let devicesReducer = Reducer<DevicesState, DevicesAtion, DevicesEnvironme
             state.linkToComplete = link
             return .none
         }
-        
         defer { state.linkToComplete = nil }
         
         switch link {
-        case .closeAll:
-            return Just(DevicesAtion.closeAll).eraseToEffect()
+        case .closeAll: return Effect(value: .closeAll)
         case .device(let id):
             guard state.devices[id: id] != nil else { return .none }
-            return Just(DevicesAtion.deviceDetail(index: id, action: .toggle)).eraseToEffect()
-        case .error, .invalid:
-            return .none
+            return Effect(value: .deviceDetail(index: id, action: .toggle))
+        case .error, .invalid: return .none
         }
     case .set(let devices):
         state.isLoading = .loaded
         state.devices = devices
         
-        let linkPub: AnyPublisher<DevicesAtion, Never> // If a link failed to run the first time.
-        if let link = state.linkToComplete {
-            linkPub = Just(DevicesAtion.attempDeepLink(link)).eraseToAnyPublisher()
-        } else {
-            linkPub = Empty(completeImmediately: true).eraseToAnyPublisher()
+        return .run { [state] send in
+            await send(.saveDevicesToCache)
+            if let link = state.linkToComplete {
+                await send(.attempDeepLink(link))
+            }
         }
-        
-        return Just(DevicesAtion.saveDevicesToCache).merge(with: linkPub).eraseToEffect()
     case .saveDevicesToCache:
-        return  environment.cache.save(
-            state.devices.map(Device.init(deviceState:))
-        ).flatMap{ environment.reloadAppExtensions }
-        .flatMap(Empty.completeImmediately)
-        .catch(DevicesAtion.send >>> Just.init)
-        .subscribe(on: environment.backgroundQueue)
-        .receive(on: environment.mainQueue)
-        .eraseToEffect()
+        let list =  state.devices.map(Device.init(deviceState:))
+        return .fireAndForget{
+            try await environment.cache.save(list)
+            await environment.reloadAppExtensions()
+        }
     case .fetchFromRemote:
         guard let token = state.token else { return .none }
         state.isLoading = .loadingDevices
-        return environment.repo.loadDevices(token)
-            .map(map(DeviceSate.init(device:)))
-            .map(IdentifiedArrayOf<DeviceSate>.init(uniqueElements:))
-            .map(DevicesAtion.set)
-            .catch(DevicesAtion.send >>> Just.init)
-            .receive(on: environment.mainQueue)
-            .eraseToEffect()
+        return .task {
+            let devices = try await environment.repo.loadDevices(token).map(DeviceSate.init(device:))
+            let states = IdentifiedArrayOf<DeviceSate>(uniqueElements: devices)
+            return .set(to: states)
+        } catch: { return .send($0) }
     case .send(let error):
         state.isLoading = .loaded
         state.route = .error(error)
@@ -193,35 +183,28 @@ public let devicesReducer = Reducer<DevicesState, DevicesAtion, DevicesEnvironme
     case .closeAll:
         guard let token = state.token, state.isLoading != .nerverLoaded else { return .none }
         state.isLoading = .closingAll
-        
-        let effects: [[AnyPublisher<RelayIsOn, Error>]] = state.devices
-            .map { (device: DeviceSate) in
-                var closePubs: [AnyPublisher<RelayIsOn, Error>] = []
-                
-                if let _ = device.relay {
-                    closePubs.append(environment.repo.changeDeviceRelayState(token, device.id, nil, false))
+        return .task { [state] in
+            return try await withThrowingTaskGroup(of: Void.self) { group in
+                for device in state.devices {
+                    if let _ = device.relay {
+                        group.addTask {
+                            _ = try await environment.repo.changeDeviceRelayState(token, device.id, nil, false)
+                        }
+                    }
+                    for child in device.children {
+                        group.addTask {
+                            _ = try await environment.repo.changeDeviceRelayState(token, device.id, child.id, false)
+                        }
+                    }
                 }
                 
-                closePubs.append(
-                    contentsOf: device.children.map { environment.repo.changeDeviceRelayState(token, device.id, $0.id, false) }
-                )
-                
-                return closePubs
+                try await group.waitForAll()
+                return .doneClosingAll
             }
-        
-        let effectsFlatten = effects.flatMap { $0 }
-        
-        return Publishers.MergeMany(effectsFlatten)
-        .map(always)
-        .map(DevicesAtion.doneClosingAll)
-        .last()
-        .catch(DevicesAtion.send >>> Just.init)
-        .replaceEmpty(with: DevicesAtion.doneClosingAll(()))
-        .receive(on: environment.mainQueue)
-        .eraseToEffect()
+        } catch: { return .send($0) }
     case .doneClosingAll:
         state.isLoading = .loaded
-        return Just(DevicesAtion.fetchFromRemote).eraseToEffect()
+        return Effect(value: DevicesAtion.fetchFromRemote)
     case .deviceDetail: return .none
     case .empty: return .none
     }

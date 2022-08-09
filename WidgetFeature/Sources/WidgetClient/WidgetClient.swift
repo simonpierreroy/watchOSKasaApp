@@ -20,15 +20,15 @@ public struct WidgetState {
 public struct WidgetEnvironment {
     
     public init (
-        loadDevices: AnyPublisher<[Device], Error>,
-        loadUser: AnyPublisher<User?, Never>
+        loadDevices: @escaping @Sendable () async throws -> [Device],
+        loadUser: @escaping @Sendable () async -> User?
     ) {
         self.loadDevices = loadDevices
         self.loadUser = loadUser
         
     }
-    public let loadDevices: AnyPublisher<[Device], Error>
-    public let loadUser: AnyPublisher<User?, Never>
+    public let loadDevices:  @Sendable () async throws -> [Device]
+    public let loadUser: @Sendable () async -> User?
 }
 
 

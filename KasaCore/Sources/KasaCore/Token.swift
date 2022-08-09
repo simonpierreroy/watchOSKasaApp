@@ -8,5 +8,5 @@
 import Foundation
 import Tagged
 
-public enum APIToken{}
+public enum APIToken {}
 public typealias Token = Tagged<APIToken, String>

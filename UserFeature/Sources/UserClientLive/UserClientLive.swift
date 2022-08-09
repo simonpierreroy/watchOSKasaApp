@@ -11,26 +11,24 @@ extension User.Credential {
 }
 
 public extension UserEnvironment {
-    static func liveLogginEffect(credential: User.Credential) -> AnyPublisher<User, Error> {
-        return Effect.task {
-            let info = try await Networking.App.login(cred: credential.networkCredential())
-            return User(token: .init(rawValue: info.token))
-        }.eraseToAnyPublisher()
+    @Sendable
+    static func liveLogginEffect(credential: User.Credential) async throws -> User {
+        let info = try await Networking.App.login(cred: credential.networkCredential())
+        return User(token: .init(rawValue: info.token))
     }
     
-    static func liveSave(user: User?) -> AnyPublisher<Void, Never> {
-        return Effect.future { work in
-            UserDefaults.kasaAppGroup.setValue(user?.token.rawValue, forKeyPath: "userToken")
-            work(.success(()))
-        }.eraseToAnyPublisher()
+    @Sendable
+    static func liveSave(user: User?) async -> Void {
+        UserDefaults.kasaAppGroup.setValue(user?.token.rawValue, forKeyPath: "userToken")
     }
     
-    
-    static let liveLoadUser: AnyPublisher<User?, Never> = Effect.future { work in
-        let user = UserDefaults.kasaAppGroup.string(forKey: "userToken")
-            .map(Token.init(rawValue:) >>> User.init(token:))
-        work(.success(user))
-    }.eraseToAnyPublisher()
+    @Sendable
+    static func liveLoadUser() async -> User? {
+        if let token = UserDefaults.kasaAppGroup.string(forKey: "userToken") {
+            return User.init(token: .init(rawValue: token))
+        }
+        return nil
+    }
 }
 
 public extension UserCache {

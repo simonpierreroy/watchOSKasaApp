@@ -42,19 +42,13 @@ let deviceDetailStateReducer = Reducer<DeviceSate, DeviceDetailAction, DeviceDet
     switch action {
     case .toggle:
         guard let token = state.token, state.isLoading == false else { return .none }
-        
-        // No state, but has child.
-        if state.relay == nil, let firstChild = state.children.first {
-            return Just(DeviceDetailAction.deviceChild(index: firstChild.id, action: .toggleChild)).eraseToEffect()
-        }
-        
         state.isLoading = true
-        return env
-            .toggle(token, state.id, nil)
-            .map(DeviceDetailAction.didToggle)
-            .catch (DeviceDetailAction.send >>> Just.init)
-            .receive(on: env.mainQueue)
-            .eraseToEffect()
+        return .task { [state] in
+            if state.relay == nil, let firstChild = state.children.first {
+                return .deviceChild(index: firstChild.id, action: .toggleChild)
+            }
+            return try await .didToggle(state: env.toggle(token, state.id, nil))
+        } catch: { return .send($0) }
     case .didToggle(let status):
         state.isLoading = false
         state.relay = status
@@ -76,12 +70,10 @@ let deviceDetailStateReducer = Reducer<DeviceSate, DeviceDetailAction, DeviceDet
     case .deviceChild(let childId, .toggleChild):
         guard let token = state.token, let child = state.children[id: childId], state.isLoading == false else { return .none }
         state.isLoading = true
-        return env
-            .toggle(token, state.id, child.id)
-            .map { DeviceDetailAction.didToggleChild(childId: child.id, state: $0) }
-            .catch (DeviceDetailAction.send >>> Just.init)
-            .receive(on: env.mainQueue)
-            .eraseToEffect()
+        return .task { [state, child] in
+            let tog =  try await env.toggle(token, state.id, child.id)
+            return DeviceDetailAction.didToggleChild(childId: child.id, state: tog)
+        } catch: { return .send($0) }
     case .deviceChild:
         return .none
     }

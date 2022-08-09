@@ -1,8 +1,6 @@
-import ComposableArchitecture
-import Combine
 import Tagged
 import KasaCore
-
+import Foundation
 
 public struct User: Equatable {
     
@@ -25,60 +23,50 @@ public struct User: Equatable {
 public struct UserEnvironment {
     
     public init(
-        mainQueue: AnySchedulerOf<DispatchQueue>,
-        backgroundQueue: AnySchedulerOf<DispatchQueue>,
-        login: @escaping (User.Credential) -> AnyPublisher<User, Error>,
+        login: @escaping @Sendable (User.Credential) async throws -> User,
         cache: UserCache,
-        reloadAppExtensions: AnyPublisher<Void,Never>
+        reloadAppExtensions: @escaping @Sendable () async -> Void
     ) {
-        
-        self.mainQueue = mainQueue
-        self.backgroundQueue = backgroundQueue
         self.login = login
         self.cache = cache
         self.reloadAppExtensions = reloadAppExtensions
     }
     
-    public let mainQueue: AnySchedulerOf<DispatchQueue>
-    public let backgroundQueue: AnySchedulerOf<DispatchQueue>
-    public let login: (User.Credential) -> AnyPublisher<User, Error>
+    public let login: @Sendable (User.Credential) async throws -> User
     public let cache: UserCache
-    public let reloadAppExtensions: AnyPublisher<Void,Never>
+    public let reloadAppExtensions: @Sendable () async -> Void
 }
 
 
 public struct UserCache {
     public init(
-        save: @escaping (User?) -> AnyPublisher<Void, Never>,
-        load: AnyPublisher<User?, Never>
+        save: @escaping @Sendable  (User?) async -> Void,
+        load: @escaping @Sendable () async -> User?
     ) {
         self.save = save
         self.load = load
     }
     
-    public let save: (User?) -> AnyPublisher<Void, Never>
-    public let load: AnyPublisher<User?, Never>
+    public let save: @Sendable  (User?) async -> Void
+    public let load: @Sendable () async -> User?
 }
 
 #if DEBUG
 public extension UserCache {
     static let mock = Self(
-        save: { _ in Empty(completeImmediately: true).eraseToAnyPublisher() } ,
-        load: Just(Optional.some(User.init(token: "1")))
-            .eraseToAnyPublisher()
+        save: { _ in return } ,
+        load: { return  User.init(token: "1") }
     )
 }
 
 public extension UserEnvironment {
     static let mock = Self(
-        mainQueue: DispatchQueue.main.eraseToAnyScheduler(),
-        backgroundQueue: DispatchQueue.main.eraseToAnyScheduler(),
-        login:  { _ in Effect.future { $0(.success(User.init(token: "1"))) }
-            .delay(for: 2, scheduler: DispatchQueue.main)
-            .eraseToAnyPublisher()
+        login:  { _ in
+            try await Task.sleep(nanoseconds: NSEC_PER_SEC * 2)
+            return User.init(token: "1")
         },
         cache: .mock,
-        reloadAppExtensions: Empty(completeImmediately: true).eraseToAnyPublisher()
+        reloadAppExtensions: { return }
     )
 }
 #endif

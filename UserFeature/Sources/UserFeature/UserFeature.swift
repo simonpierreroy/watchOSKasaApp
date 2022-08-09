@@ -42,47 +42,33 @@ public let userReducer = Reducer<UserState, UserAction, UserEnvironment> { state
     switch action {
     case .logout:
         state.status = .logout
-        return Just(UserAction.save).eraseToEffect()
+        return Effect(value: .save)
     case .set(let user):
         state.status = .logged(.init(user: user))
-        return Just(UserAction.save).eraseToEffect()
+        return Effect(value: .save)
     case .save:
-        let userToSave: User?
-        switch state.status {
-        case .logout, .loading: userToSave = nil
-        case .logged(let stateUser): userToSave = stateUser.user
+        let userToSsave = (/UserState.UserStatus.logged).extract(from: state.status)?.user
+        return .fireAndForget {
+            await environment.cache.save(userToSsave)
+            await environment.reloadAppExtensions()
         }
-        return environment
-            .cache
-            .save(userToSave)
-            .flatMap{ environment.reloadAppExtensions }
-            .flatMap(Empty.completeImmediately)
-            .subscribe(on: environment.backgroundQueue)
-            .receive(on: environment.mainQueue)
-            .eraseToEffect()
     case .loadSavedUser:
         state.status = .loading
-        return environment
-            .cache
-            .load
-            .map { user in
-                if let user = user {
-                    return UserAction.set(user)
-                } else {
-                    return UserAction.logout
-                }
+        return .task {
+            if let user = await environment.cache.load() {
+                return .set(user)
+            } else {
+                return .logout
             }
-            .subscribe(on: environment.backgroundQueue)
-            .receive(on: environment.mainQueue)
-            .eraseToEffect()
+        }
     case .login(let credential):
         state.status = .loading
-        return environment
-            .login(credential)
-            .map(\.token >>> User.init(token:) >>> UserAction.set)
-            .catch(UserAction.send >>> Just.init)
-            .receive(on: environment.mainQueue)
-            .eraseToEffect()
+        return Effect.task {
+            let token = try await environment.login(credential).token
+            return .set(.init(token: token))
+        } catch : { error in
+            return .send(error)
+        }
     case .send(let error):
         state.status = .logout
         state.route = .error(error)

@@ -76,33 +76,27 @@ public extension Link {
 public struct DevicesEnvironment {
     
     public init(
-        mainQueue: AnySchedulerOf<DispatchQueue>,
-        backgroundQueue: AnySchedulerOf<DispatchQueue>,
         repo: DevicesRepo,
         devicesCache: DevicesCache,
-        reloadAppExtensions: AnyPublisher<Void,Never>
+        reloadAppExtensions: @escaping @Sendable () async -> Void
     ) {
-        self.mainQueue = mainQueue
-        self.backgroundQueue = backgroundQueue
         self.repo = repo
         self.cache = devicesCache
         self.reloadAppExtensions = reloadAppExtensions
     }
     
-    public let mainQueue: AnySchedulerOf<DispatchQueue>
-    public let backgroundQueue: AnySchedulerOf<DispatchQueue>
     public let repo: DevicesRepo
     public let cache: DevicesCache
-    public let reloadAppExtensions: AnyPublisher<Void,Never>
+    public let reloadAppExtensions: @Sendable () async -> Void
 }
 
 public struct DevicesRepo {
     
     public init(
-        loadDevices: @escaping (Token) -> AnyPublisher<[Device], Error>,
+        loadDevices: @escaping @Sendable (Token) async throws -> [Device],
         toggleDeviceRelayState: @escaping DeviceDetailEvironment.ToggleEffect,
-        getDeviceRelayState: @escaping (Token, Device.ID, Device.ID?) -> AnyPublisher<RelayIsOn, Error>,
-        changeDeviceRelayState: @escaping (Token, Device.ID, Device.ID?, RelayIsOn) -> AnyPublisher<RelayIsOn, Error>
+        getDeviceRelayState: @escaping @Sendable (Token, Device.ID, Device.ID?) async throws -> RelayIsOn,
+        changeDeviceRelayState: @escaping @Sendable (Token, Device.ID, Device.ID?, RelayIsOn) async throws -> RelayIsOn
     ) {
         
         
@@ -113,62 +107,54 @@ public struct DevicesRepo {
         
     }
     
-    public let loadDevices: (Token) -> AnyPublisher<[Device], Error>
+    public let loadDevices: @Sendable (Token) async throws -> [Device]
     public let toggleDeviceRelayState: DeviceDetailEvironment.ToggleEffect
-    public let getDeviceRelayState: (Token, Device.ID, Device.ID?) -> AnyPublisher<RelayIsOn, Error>
-    public let changeDeviceRelayState: (Token, Device.ID, Device.ID?, RelayIsOn) -> AnyPublisher<RelayIsOn, Error>
+    public let getDeviceRelayState: @Sendable (Token, Device.ID, Device.ID?) async throws -> RelayIsOn
+    public let changeDeviceRelayState: @Sendable (Token, Device.ID, Device.ID?, RelayIsOn) async throws -> RelayIsOn
 }
 
 public struct DevicesCache {
+    public enum Failure: Error {
+        case dataConversion
+    }
+    
     public init(
-        save: @escaping ([Device]) ->  AnyPublisher<Void, Error>,
-        load: AnyPublisher<[Device], Error>
+        save: @escaping @Sendable ([Device]) async throws ->  Void,
+        load: @escaping @Sendable () async throws -> [Device]
     ) {
         self.save = save
         self.load = load
     }
     
-    public let save: ([Device]) ->  AnyPublisher<Void, Error>
-    public let load: AnyPublisher<[Device], Error>
+    public let save: @Sendable ([Device]) async throws ->  Void
+    public let load: @Sendable () async throws -> [Device]
 }
 
 #if DEBUG
 public extension DevicesRepo {
     static let mock = Self(
-        loadDevices: { token in
-            return Effect.future{ (work) in
-                work(.success([
-                    DevicesEnvironment.debugDevice1,
-                    DevicesEnvironment.debugDevice2
-                ]))
-            }.delay(for: 2, scheduler: DispatchQueue.main)
-                .eraseToAnyPublisher()
+        loadDevices: { _ in
+            try await Task.sleep(nanoseconds: NSEC_PER_SEC * 2)
+            return [DevicesEnvironment.debugDevice1, DevicesEnvironment.debugDevice2]
         }, toggleDeviceRelayState: { (_,_, _) in
-            Just(RelayIsOn.init(rawValue: true))
-                .mapError(absurd)
-                .delay(for: 2, scheduler: DispatchQueue.main)
-            .eraseToAnyPublisher() },
+            try await Task.sleep(nanoseconds: NSEC_PER_SEC * 2)
+            return true
+        },
         getDeviceRelayState: { (_,_,_) in
-            Just(RelayIsOn.init(rawValue: true))
-                .mapError(absurd)
-                .delay(for: 2, scheduler: DispatchQueue.main)
-            .eraseToAnyPublisher() },
+            try await Task.sleep(nanoseconds: NSEC_PER_SEC * 2)
+            return true
+        },
         changeDeviceRelayState: { (_,_,_, state) in
-            Just(state.toggle())
-                .mapError(absurd)
-                .delay(for: 2, scheduler: DispatchQueue.main)
-            .eraseToAnyPublisher() }
+            try await Task.sleep(nanoseconds: NSEC_PER_SEC * 2)
+            return state.toggle()
+        }
     )
 }
 
 public extension DevicesCache {
     static let mock = Self(
-        save: { _ in Empty(completeImmediately: true).eraseToAnyPublisher() } ,
-        load: Just([
-            DevicesEnvironment.debugDevice1,
-            DevicesEnvironment.debugDevice2
-        ]).mapError(absurd)
-            .eraseToAnyPublisher()
+        save: { _ in return } ,
+        load: { [DevicesEnvironment.debugDevice1, DevicesEnvironment.debugDevice2] }
     )
 }
 
@@ -178,40 +164,21 @@ public extension DevicesEnvironment {
     static let debugDevice2 = Device.init(id: "2", name: "Test device 2", state: true)
     
     static let mock = Self(
-        mainQueue: DispatchQueue.main.eraseToAnyScheduler(),
-        backgroundQueue: DispatchQueue.main.eraseToAnyScheduler(),
         repo: .mock,
         devicesCache: .mock,
-        reloadAppExtensions: Empty(completeImmediately: true).eraseToAnyPublisher()
+        reloadAppExtensions: { return }
     )
 }
 
 public extension DevicesEnvironment {
     static func devicesEnvError(loadError: String, toggleError: String, getDevicesError: String, changeDevicesError: String) -> Self {
         return Self(
-            mainQueue: mock.mainQueue,
-            backgroundQueue: mock.backgroundQueue,
             repo: .init(
-                loadDevices:{ _ in
-                    return Just([])
-                        .tryMap{ _ in throw NSError(domain: loadError, code: 1, userInfo: nil) }
-                        .eraseToAnyPublisher()
-                },
-                toggleDeviceRelayState: { _, _, _ in
-                    return Just(RelayIsOn.init(rawValue: true))
-                        .tryMap{ _ in throw NSError(domain: toggleError, code: 2, userInfo: nil) }
-                        .eraseToAnyPublisher()
-                },
-                getDeviceRelayState:{ _,_,_ in
-                    return Just(RelayIsOn.init(rawValue: true))
-                        .tryMap{ _ in throw NSError(domain: getDevicesError, code: 3, userInfo: nil) }
-                        .eraseToAnyPublisher()
-                },
-                changeDeviceRelayState: { _,_,_,_ in
-                    return  Just(RelayIsOn.init(rawValue: true))
-                        .tryMap{ _ in throw NSError(domain: changeDevicesError, code: 4, userInfo: nil) }
-                        .eraseToAnyPublisher()
-                }),
+                loadDevices: { _ in throw NSError(domain: loadError, code: 1, userInfo: nil) },
+                toggleDeviceRelayState: { _, _, _ in throw NSError(domain: toggleError, code: 2, userInfo: nil) },
+                getDeviceRelayState:{ _,_,_ in throw NSError(domain: getDevicesError, code: 3, userInfo: nil) },
+                changeDeviceRelayState: { _,_,_,_ in throw NSError(domain: changeDevicesError, code: 4, userInfo: nil) }
+            ),
             devicesCache: .mock,
             reloadAppExtensions: mock.reloadAppExtensions
         )

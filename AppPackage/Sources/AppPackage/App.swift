@@ -19,7 +19,7 @@ import DeviceClientLive
 
 public struct AppState {
     public static let empty = Self(userState: .empty, _devicesState: .empty)
-        
+    
     public var userState: UserState
     private var _devicesState: DevicesState
     
@@ -47,22 +47,16 @@ public enum AppAction {
 
 
 public struct AppEnv {
-        
-    let mainQueue: AnySchedulerOf<DispatchQueue>
-    let backgroundQueue: AnySchedulerOf<DispatchQueue>
-    let login: (User.Credential) -> AnyPublisher<User, Error>
+    let login: @Sendable (User.Credential) async throws -> User
     let userCache: UserCache
     let devicesRepo: DevicesRepo
     let deviceCache: DevicesCache
-    let reloadAppExtensions: AnyPublisher<Void,Never>
+    let reloadAppExtensions: @Sendable () async -> Void
     let linkURLParser: Link.URLParser
-    
 }
 
 public extension AppEnv {
     static let live = Self(
-        mainQueue: DispatchQueue.main.eraseToAnyScheduler(),
-        backgroundQueue: DispatchQueue.global(qos: .userInteractive).eraseToAnyScheduler(),
         login: UserEnvironment.liveLogginEffect,
         userCache: .live,
         devicesRepo: .live,
@@ -75,8 +69,6 @@ public extension AppEnv {
 public extension UserEnvironment {
     init(appEnv: AppEnv) {
         self.init(
-            mainQueue: appEnv.mainQueue,
-            backgroundQueue: appEnv.backgroundQueue,
             login: appEnv.login,
             cache: appEnv.userCache,
             reloadAppExtensions: appEnv.reloadAppExtensions
@@ -87,8 +79,6 @@ public extension UserEnvironment {
 public extension DevicesEnvironment {
     init(appEnv: AppEnv) {
         self.init(
-            mainQueue: appEnv.mainQueue,
-            backgroundQueue: appEnv.backgroundQueue,
             repo: appEnv.devicesRepo,
             devicesCache: appEnv.deviceCache,
             reloadAppExtensions: appEnv.reloadAppExtensions
@@ -192,8 +182,6 @@ public extension DeviceListViewiOS.StateView {
 #if DEBUG
 public extension AppEnv {
     static let mock = Self(
-        mainQueue: DevicesEnvironment.mock.mainQueue,
-        backgroundQueue: DevicesEnvironment.mock.backgroundQueue,
         login: UserEnvironment.mock.login,
         userCache: .mock,
         devicesRepo: .mock,
@@ -208,13 +196,16 @@ public extension AppEnv {
 #if canImport(WidgetKit)
 import WidgetKit
 public extension AppEnv {
-    static let liveReloadAppExtensions: AnyPublisher<Void, Never> = Effect.future { work in
+    @Sendable
+    static func liveReloadAppExtensions () async -> Void {
         WidgetCenter.shared.reloadAllTimelines()
-        work(.success(()))
-    }.eraseToAnyPublisher()
+    }
 }
 #else
 public extension AppEnv {
-    static let liveReloadAppExtensions: AnyPublisher<Void, Never> = Empty(completeImmediately: true).eraseToAnyPublisher()
+    @Sendable
+    static func liveReloadAppExtensions () async -> Void {
+        return
+    }
 }
 #endif

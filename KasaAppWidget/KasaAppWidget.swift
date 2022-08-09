@@ -17,22 +17,21 @@ import DeviceClient
 
 struct Provider: TimelineProvider {
     
-    static var cancels: Set<AnyCancellable> = Set()
+    static var currentTask: Task<(), Error>? = nil
     
     func newEntry(for context: Context,  completion: @escaping (DataDeviceEntry) -> ()) {
-        var cancel: AnyCancellable? = nil
-        cancel = getCacheState(environment: .live)
-            .sink { _ in Provider.cancels.remove(cancel!) }
-                receiveValue:  { state in
-                    let entry: DataDeviceEntry
-                    if state.user == nil {
-                        entry = DataDeviceEntry(date: Date(), userIsLogged: false, devices: [])
-                    } else {
-                        entry = DataDeviceEntry(date: Date(), userIsLogged: true, devices: state.device)
-                    }
-                    completion(entry)
-                }
-        Provider.cancels.insert(cancel!)
+        
+        Provider.currentTask = Task {
+            let cache = try await getCacheState(environment: .live)
+            let entry: DataDeviceEntry
+            if cache.user == nil {
+                entry = DataDeviceEntry(date: Date(), userIsLogged: false, devices: [])
+            } else {
+                entry = DataDeviceEntry(date: Date(), userIsLogged: true, devices: cache.device)
+            }
+            // TODO: Fix @Sendable?
+            completion(entry)
+        }
     }
     
     func placeholder(in context: Context) -> DataDeviceEntry {

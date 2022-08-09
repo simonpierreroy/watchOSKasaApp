@@ -5,15 +5,13 @@ import KasaCore
 
 
 public struct DeviceDetailEvironment {
-    public typealias ToggleEffect = (Token, Device.ID, Device.ID?) -> AnyPublisher<RelayIsOn, Error>
+    public typealias ToggleEffect = @Sendable (Token, Device.ID, Device.ID?) async throws -> RelayIsOn
     public let toggle: ToggleEffect
-    public let mainQueue: AnySchedulerOf<DispatchQueue>
 }
 
 extension DeviceDetailEvironment {
     public init(devicesEnv: DevicesEnvironment) {
         self.toggle = devicesEnv.repo.toggleDeviceRelayState
-        self.mainQueue = devicesEnv.mainQueue
     }
 }
 
@@ -22,11 +20,9 @@ extension DeviceDetailEvironment {
 extension DeviceDetailEvironment {
     static let mock = Self(
         toggle: { (_,_, _) in
-            Just(RelayIsOn.init(rawValue: true))
-                .mapError(absurd)
-                .delay(for: 2, scheduler: DispatchQueue.main)
-                .eraseToAnyPublisher() },
-        mainQueue: DispatchQueue.main.eraseToAnyScheduler()
+            try await Task.sleep(nanoseconds: NSEC_PER_SEC * 2)
+            return true
+        }
     )
 }
 
