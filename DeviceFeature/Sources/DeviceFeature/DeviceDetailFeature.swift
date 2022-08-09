@@ -55,11 +55,11 @@ let deviceDetailStateReducer = Reducer<DeviceSate, DeviceDetailAction, DeviceDet
         return .none
     case .didToggleChild(let id, let status):
         state.isLoading = false
-        let effects = state.children
-            .map {
-                Just(DeviceDetailAction.deviceChild(index: $0.id, action: .didToggleChild(state: status)))
+        return .run { [state] send in
+            for childDevice in state.children {
+                await send(.deviceChild(index: childDevice.id, action: .didToggleChild(state: status)))
             }
-        return Publishers.MergeMany(effects).eraseToEffect()
+        }
     case .send(let error):
         state.isLoading = false
         state.error = error.localizedDescription
