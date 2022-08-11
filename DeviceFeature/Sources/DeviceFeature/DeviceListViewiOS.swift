@@ -381,7 +381,8 @@ struct DeviceListViewiOS_Previews: PreviewProvider {
                 store: Store<DevicesState, DevicesAtion>.init(
                     initialState: .emptyNeverLoaded,
                     reducer: devicesReducer,
-                    environment: .mock
+                    // Bump waitFor to play with live preview
+                    environment: .mock(waitFor: 0)
                 ).scope(
                     state: DeviceListViewiOS.StateView.init(devices:),
                     action: DevicesAtion.init(deviceAction:)
@@ -392,7 +393,8 @@ struct DeviceListViewiOS_Previews: PreviewProvider {
                 store: Store<DevicesState, DevicesAtion>.init(
                     initialState: .emptyLoggedLink,
                     reducer: devicesReducer,
-                    environment: .mock
+                    // Bump waitFor to play with live preview
+                    environment: .mock(waitFor: 0)
                 ).scope(
                     state: DeviceListViewiOS.StateView.init(devices:),
                     action: DevicesAtion.init(deviceAction:)
@@ -403,7 +405,8 @@ struct DeviceListViewiOS_Previews: PreviewProvider {
                 store: Store<DevicesState, DevicesAtion>.init(
                     initialState: .nDeviceLoaded(n: 5),
                     reducer: devicesReducer,
-                    environment: .mock
+                    // Bump waitFor to play with live preview
+                    environment: .mock(waitFor: 0)
                 ).scope(
                     state: DeviceListViewiOS.StateView.init(devices:),
                     action: DevicesAtion.init(deviceAction:)
@@ -414,7 +417,8 @@ struct DeviceListViewiOS_Previews: PreviewProvider {
                 store: Store<DevicesState, DevicesAtion>.init(
                     initialState: .nDeviceLoaded(n: 5, childrenCount: 4),
                     reducer: devicesReducer,
-                    environment: .mock
+                    // Bump waitFor to play with live preview
+                    environment: .mock(waitFor: 0)
                 ).scope(
                     state: DeviceListViewiOS.StateView.init(devices:),
                     action: DevicesAtion.init(deviceAction:)

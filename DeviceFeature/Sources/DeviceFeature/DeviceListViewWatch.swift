@@ -271,7 +271,8 @@ struct DeviceListView_Previews: PreviewProvider {
                 store: Store<DevicesState, DevicesAtion>.init(
                     initialState: .emptyLogged,
                     reducer: devicesReducer,
-                    environment: .mock
+                    // Bump waitFor to play with live preview
+                    environment: .mock(waitFor: 0)
                 ).scope(
                     state: DeviceListViewWatch.StateView.init(devices:),
                     action: DevicesAtion.init(deviceAction:)
@@ -282,7 +283,8 @@ struct DeviceListView_Previews: PreviewProvider {
                 store: Store<DevicesState, DevicesAtion>.init(
                     initialState: .emptyLoading,
                     reducer: devicesReducer,
-                    environment: .mock
+                    // Bump waitFor to play with live preview
+                    environment: .mock(waitFor: 1)
                 ).scope(
                     state: DeviceListViewWatch.StateView.init(devices:),
                     action: DevicesAtion.init(deviceAction:)
@@ -293,7 +295,8 @@ struct DeviceListView_Previews: PreviewProvider {
                 store: Store<DevicesState, DevicesAtion>.init(
                     initialState: .emptyNeverLoaded,
                     reducer: devicesReducer,
-                    environment: .mock
+                    // Bump waitFor to play with live preview
+                    environment: .mock(waitFor: 1)
                 ).scope(
                     state: DeviceListViewWatch.StateView.init(devices:),
                     action: DevicesAtion.init(deviceAction:)
@@ -304,7 +307,8 @@ struct DeviceListView_Previews: PreviewProvider {
                 store: Store<DevicesState, DevicesAtion>.init(
                     initialState: .oneDeviceLoaded,
                     reducer: devicesReducer,
-                    environment: .mock
+                    // Bump waitFor to play with live preview
+                    environment: .mock(waitFor: 0)
                 ).scope(
                     state: DeviceListViewWatch.StateView.init(devices:),
                     action: DevicesAtion.init(deviceAction:)
@@ -316,7 +320,8 @@ struct DeviceListView_Previews: PreviewProvider {
                 store: Store<DevicesState, DevicesAtion>.init(
                     initialState: .nDeviceLoaded(n: 5),
                     reducer: devicesReducer,
-                    environment: .mock
+                    // Bump waitFor to play with live preview
+                    environment: .mock(waitFor: 0)
                 ).scope(
                     state: DeviceListViewWatch.StateView.init(devices:),
                     action: DevicesAtion.init(deviceAction:)
@@ -328,7 +333,8 @@ struct DeviceListView_Previews: PreviewProvider {
                 store: Store<DevicesState, DevicesAtion>.init(
                     initialState: .nDeviceLoaded(n: 5, childrenCount: 3),
                     reducer: devicesReducer,
-                    environment: .mock
+                    // Bump waitFor to play with live preview
+                    environment: .mock(waitFor: 0)
                 ).scope(
                     state: DeviceListViewWatch.StateView.init(devices:),
                     action: DevicesAtion.init(deviceAction:)
@@ -340,7 +346,8 @@ struct DeviceListView_Previews: PreviewProvider {
                 store: Store<DevicesState, DevicesAtion>.init(
                     initialState: .oneDeviceLoaded,
                     reducer: devicesReducer,
-                    environment: .mock
+                    // Bump waitFor to play with live preview
+                    environment: .mock(waitFor: 0)
                 ).scope(
                     state: DeviceListViewWatch.StateView.init(devices:),
                     action: DevicesAtion.init(deviceAction:)

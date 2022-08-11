@@ -181,14 +181,16 @@ public extension DeviceListViewiOS.StateView {
 
 #if DEBUG
 public extension AppEnv {
-    static let mock = Self(
-        login: UserEnvironment.mock.login,
-        userCache: .mock,
-        devicesRepo: .mock,
-        deviceCache: .mock,
-        reloadAppExtensions: DevicesEnvironment.mock.reloadAppExtensions,
-        linkURLParser: .mockDeviceIdOne
-    )
+    static func mock(waitFor seconds: UInt64 = 2) -> Self {
+        Self(
+            login: UserEnvironment.mock(waitFor: seconds).login,
+            userCache: .mock,
+            devicesRepo: .mock(waitFor: seconds),
+            deviceCache: .mock,
+            reloadAppExtensions: DevicesEnvironment.mock(waitFor: seconds).reloadAppExtensions,
+            linkURLParser: .mockDeviceIdOne
+        )
+    }
 }
 #endif
 

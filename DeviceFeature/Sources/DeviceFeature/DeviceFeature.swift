@@ -152,10 +152,9 @@ public let devicesReducer = Reducer<DevicesState, DevicesAtion, DevicesEnvironme
     case .set(let devices):
         state.isLoading = .loaded
         state.devices = devices
-        
-        return .run { [state] send in
+        return .run { [linkToComplete = state.linkToComplete] send in
             await send(.saveDevicesToCache)
-            if let link = state.linkToComplete {
+            if let link = linkToComplete {
                 await send(.attempDeepLink(link))
             }
         }
@@ -181,23 +180,18 @@ public let devicesReducer = Reducer<DevicesState, DevicesAtion, DevicesEnvironme
         state.route = nil
         return .none
     case .closeAll:
-        guard let token = state.token, state.isLoading != .nerverLoaded else { return .none }
+        guard let token = state.token, state.isLoading == .loaded else { return .none }
         state.isLoading = .closingAll
-        return .task { [state] in
+        return .task { [devices = state.devices] in
             return try await withThrowingTaskGroup(of: Void.self) { group in
-                for device in state.devices {
+                for device in devices {
                     if let _ = device.relay {
-                        group.addTask {
-                            _ = try await environment.repo.changeDeviceRelayState(token, device.id, nil, false)
-                        }
+                        group.addTask { _ = try await environment.repo.changeDeviceRelayState(token, device.id, nil, false) }
                     }
                     for child in device.children {
-                        group.addTask {
-                            _ = try await environment.repo.changeDeviceRelayState(token, device.id, child.id, false)
-                        }
+                        group.addTask { _ = try await environment.repo.changeDeviceRelayState(token, device.id, child.id, false) }
                     }
                 }
-                
                 try await group.waitForAll()
                 return .doneClosingAll
             }

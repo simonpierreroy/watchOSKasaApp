@@ -78,7 +78,7 @@ struct ContentView_Previews: PreviewProvider {
             store: Store<AppState, AppAction>.init(
                 initialState: .empty,
                 reducer: appReducer,
-                environment: AppEnv.mock
+                environment: AppEnv.mock(waitFor: 2)
             )
         )
     }

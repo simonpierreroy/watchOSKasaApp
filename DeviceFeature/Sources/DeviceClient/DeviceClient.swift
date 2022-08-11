@@ -132,23 +132,25 @@ public struct DevicesCache {
 
 #if DEBUG
 public extension DevicesRepo {
-    static let mock = Self(
-        loadDevices: { _ in
-            try await Task.sleep(nanoseconds: NSEC_PER_SEC * 2)
-            return [DevicesEnvironment.debugDevice1, DevicesEnvironment.debugDevice2]
-        }, toggleDeviceRelayState: { (_,_, _) in
-            try await Task.sleep(nanoseconds: NSEC_PER_SEC * 2)
-            return true
-        },
-        getDeviceRelayState: { (_,_,_) in
-            try await Task.sleep(nanoseconds: NSEC_PER_SEC * 2)
-            return true
-        },
-        changeDeviceRelayState: { (_,_,_, state) in
-            try await Task.sleep(nanoseconds: NSEC_PER_SEC * 2)
-            return state.toggle()
-        }
-    )
+    static func mock(waitFor seconds: UInt64 = 2) ->  Self {
+        Self(
+            loadDevices: { _ in
+                try await taskSleep(for: seconds)
+                return [DevicesEnvironment.debugDevice1, DevicesEnvironment.debugDevice2]
+            }, toggleDeviceRelayState: { (_,_, _) in
+                try await taskSleep(for: seconds)
+                return true
+            },
+            getDeviceRelayState: { (_,_,_) in
+                try await taskSleep(for: seconds)
+                return true
+            },
+            changeDeviceRelayState: { (_,_,_, state) in
+                try await taskSleep(for: seconds)
+                return state.toggle()
+            }
+        )
+    }
 }
 
 public extension DevicesCache {
@@ -163,11 +165,12 @@ public extension DevicesEnvironment {
     static let debugDevice1 = Device.init(id: "1", name: "Test device 1", state: false)
     static let debugDevice2 = Device.init(id: "2", name: "Test device 2", state: true)
     
-    static let mock = Self(
-        repo: .mock,
-        devicesCache: .mock,
-        reloadAppExtensions: { return }
-    )
+    static func mock(waitFor seconds: UInt64 = 2) -> Self {
+        Self(repo: .mock(waitFor: seconds),
+             devicesCache: .mock,
+             reloadAppExtensions: { return }
+        )
+    }
 }
 
 public extension DevicesEnvironment {
@@ -180,7 +183,7 @@ public extension DevicesEnvironment {
                 changeDeviceRelayState: { _,_,_,_ in throw NSError(domain: changeDevicesError, code: 4, userInfo: nil) }
             ),
             devicesCache: .mock,
-            reloadAppExtensions: mock.reloadAppExtensions
+            reloadAppExtensions: mock().reloadAppExtensions
         )
     }
 }

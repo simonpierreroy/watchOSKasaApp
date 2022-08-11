@@ -119,7 +119,7 @@ struct UserLoginView_Previews: PreviewProvider {
                                     initialState:
                                         UserState.empty,
                                     reducer: userReducer,
-                                    environment: .mock
+                                    environment: .mock(waitFor: 2)
                                 ).scope(
                                     state: UserLoginViewWatch.StateView.init(userState:),
                                     action: UserAction.init(userViewAction:)
@@ -131,7 +131,7 @@ struct UserLoginView_Previews: PreviewProvider {
                                     initialState:
                                         UserState.empty,
                                     reducer: userReducer,
-                                    environment: .mock
+                                    environment: .mock(waitFor: 2)
                                 ).scope(
                                     state: UserLoginViewWatch.StateView.init(userState:),
                                     action: UserAction.init(userViewAction:)
@@ -145,7 +145,7 @@ struct UserLoginView_Previews: PreviewProvider {
                                     initialState:
                                             .init(status: .loading, route: nil),
                                     reducer: userReducer,
-                                    environment: .mock
+                                    environment: .mock(waitFor: 2)
                                 ).scope(
                                     state: UserLoginViewWatch.StateView.init(userState:),
                                     action: UserAction.init(userViewAction:)

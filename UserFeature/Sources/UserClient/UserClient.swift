@@ -60,13 +60,14 @@ public extension UserCache {
 }
 
 public extension UserEnvironment {
-    static let mock = Self(
-        login:  { _ in
-            try await Task.sleep(nanoseconds: NSEC_PER_SEC * 2)
+    static func mock(waitFor seconds: UInt64 = 2) -> Self {
+        Self(login:  { _ in
+            try await taskSleep(for: seconds)
             return User.init(token: "1")
         },
-        cache: .mock,
-        reloadAppExtensions: { return }
-    )
+             cache: .mock,
+             reloadAppExtensions: { return }
+        )
+    }
 }
 #endif

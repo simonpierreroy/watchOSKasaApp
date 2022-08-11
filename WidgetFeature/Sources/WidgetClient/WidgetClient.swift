@@ -34,9 +34,11 @@ public struct WidgetEnvironment {
 
 #if DEBUG
 public extension WidgetEnvironment {
-    static let mock = Self(
-        loadDevices: DevicesEnvironment.mock.cache.load,
-        loadUser:  UserEnvironment.mock.cache.load
-    )
+    static func mock(waitFor seconds: UInt64 = 2) -> Self {
+        Self(
+            loadDevices: DevicesEnvironment.mock(waitFor: seconds).cache.load,
+            loadUser:  UserEnvironment.mock(waitFor: seconds).cache.load
+        )
+    }
 }
 #endif

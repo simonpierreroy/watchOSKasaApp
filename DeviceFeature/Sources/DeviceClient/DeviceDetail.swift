@@ -18,12 +18,14 @@ extension DeviceDetailEvironment {
 
 #if DEBUG
 extension DeviceDetailEvironment {
-    static let mock = Self(
-        toggle: { (_,_, _) in
-            try await Task.sleep(nanoseconds: NSEC_PER_SEC * 2)
-            return true
-        }
-    )
+    static func mock(waitFor seconds: UInt64 = 2) -> Self {
+        Self(
+            toggle: { (_,_, _) in
+                try await taskSleep(for: seconds)
+                return true
+            }
+        )
+    }
 }
 
 public extension Link.URLParser {
