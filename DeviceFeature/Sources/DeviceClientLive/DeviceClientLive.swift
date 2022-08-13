@@ -73,19 +73,20 @@ public extension DevicesEnvironment {
 
 public extension DevicesEnvironment {
     
-    static let encoder = JSONEncoder()
-    static let decoder = JSONDecoder()
+    private static let encoder = JSONEncoder()
+    private static let decoder = JSONDecoder()
+    private static let deviceKey: String = "cacheDevices"
     
     @Sendable
     static func liveSave(devices: [Device]) async throws -> Void {
         let data = try encoder.encode(devices)
         let string = String(data: data, encoding: .utf8)
-        UserDefaults.kasaAppGroup.setValue(string, forKeyPath: "cacheDevices")
+        UserDefaults.kasaAppGroup.setValue(string, forKeyPath: DevicesEnvironment.deviceKey)
     }
     
     @Sendable
     static func liveLoadCache() async throws -> [Device] {
-        guard let dataString = UserDefaults.kasaAppGroup.string(forKey: "cacheDevices")?.data(using: .utf8) else {
+        guard let dataString = UserDefaults.kasaAppGroup.string(forKey: DevicesEnvironment.deviceKey)?.data(using: .utf8) else {
             throw DevicesCache.Failure.dataConversion
         }
         return try decoder.decode([Device].self, from: dataString)
