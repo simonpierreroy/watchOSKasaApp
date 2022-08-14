@@ -85,16 +85,29 @@ public extension DevicesEnvironment {
     }
     
     @Sendable
-    static func liveLoadCache() async throws -> [Device] {
-        guard let dataString = UserDefaults.kasaAppGroup.string(forKey: DevicesEnvironment.deviceKey)?.data(using: .utf8) else {
+    static func liveloadBlockingCache() throws -> [Device] {
+        guard let stringData = UserDefaults.kasaAppGroup.string(forKey: DevicesEnvironment.deviceKey) else {
+            return []
+        }
+        
+        guard let data = stringData.data(using: .utf8) else {
             throw DevicesCache.Failure.dataConversion
         }
-        return try decoder.decode([Device].self, from: dataString)
+        return try decoder.decode([Device].self, from: data)
+    }
+    
+    @Sendable
+    static func liveLoadCache() async throws -> [Device] {
+        return try DevicesEnvironment.liveloadBlockingCache()
     }
 }
 
 public extension DevicesCache {
-    static let live = Self(save: DevicesEnvironment.liveSave(devices:), load: DevicesEnvironment.liveLoadCache)
+    static let live = Self(
+        save: DevicesEnvironment.liveSave(devices:),
+        load: DevicesEnvironment.liveLoadCache,
+        loadBlocking: DevicesEnvironment.liveloadBlockingCache
+    )
 }
 
 public extension DevicesRepo {

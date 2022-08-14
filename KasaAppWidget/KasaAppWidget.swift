@@ -17,20 +17,19 @@ import DeviceClient
 
 struct Provider: TimelineProvider {
     
-    static var currentTask: Task<(), Error>? = nil
-    
     func newEntry(for context: Context,  completion: @escaping (DataDeviceEntry) -> ()) {
+        let entry: DataDeviceEntry
+        defer { completion(entry) }
         
-        Provider.currentTask = Task {
-            let cache = try await getCacheState(environment: .live)
-            let entry: DataDeviceEntry
-            if cache.user == nil {
-                entry = DataDeviceEntry(date: Date(), userIsLogged: false, devices: [])
-            } else {
-                entry = DataDeviceEntry(date: Date(), userIsLogged: true, devices: cache.device)
-            }
-            // TODO: Fix @Sendable?
-            completion(entry)
+        guard let cache = try? getCacheState(environment: .live) else {
+            entry = DataDeviceEntry(date: Date(), userIsLogged: false, devices: [])
+            return
+        }
+        
+        if cache.user == nil {
+            entry = DataDeviceEntry(date: Date(), userIsLogged: false, devices: [])
+        } else {
+            entry = DataDeviceEntry(date: Date(), userIsLogged: true, devices: cache.device)
         }
     }
     

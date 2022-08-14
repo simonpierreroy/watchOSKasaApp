@@ -120,14 +120,18 @@ public struct DevicesCache {
     
     public init(
         save: @escaping @Sendable ([Device]) async throws ->  Void,
-        load: @escaping @Sendable () async throws -> [Device]
+        load: @escaping @Sendable () async throws -> [Device],
+        loadBlocking: @escaping @Sendable () throws -> [Device]
     ) {
         self.save = save
         self.load = load
+        self.loadBlocking = loadBlocking
     }
     
     public let save: @Sendable ([Device]) async throws ->  Void
     public let load: @Sendable () async throws -> [Device]
+    public let loadBlocking: @Sendable () throws -> [Device]
+
 }
 
 #if DEBUG
@@ -156,7 +160,8 @@ public extension DevicesRepo {
 public extension DevicesCache {
     static let mock = Self(
         save: { _ in return } ,
-        load: { [DevicesEnvironment.debugDevice1, DevicesEnvironment.debugDevice2] }
+        load: { [DevicesEnvironment.debugDevice1, DevicesEnvironment.debugDevice2] },
+        loadBlocking: { [DevicesEnvironment.debugDevice1, DevicesEnvironment.debugDevice2] }
     )
 }
 

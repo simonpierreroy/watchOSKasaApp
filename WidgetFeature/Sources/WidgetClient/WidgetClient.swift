@@ -20,15 +20,15 @@ public struct WidgetState {
 public struct WidgetEnvironment {
     
     public init (
-        loadDevices: @escaping @Sendable () async throws -> [Device],
-        loadUser: @escaping @Sendable () async -> User?
+        loadDevices: @escaping @Sendable () throws -> [Device],
+        loadUser: @escaping @Sendable () -> User?
     ) {
         self.loadDevices = loadDevices
         self.loadUser = loadUser
         
     }
-    public let loadDevices:  @Sendable () async throws -> [Device]
-    public let loadUser: @Sendable () async -> User?
+    public let loadDevices:  @Sendable () throws -> [Device]
+    public let loadUser: @Sendable () -> User?
 }
 
 
@@ -36,8 +36,8 @@ public struct WidgetEnvironment {
 public extension WidgetEnvironment {
     static func mock(waitFor seconds: UInt64 = 2) -> Self {
         Self(
-            loadDevices: DevicesEnvironment.mock(waitFor: seconds).cache.load,
-            loadUser:  UserEnvironment.mock(waitFor: seconds).cache.load
+            loadDevices: DevicesEnvironment.mock(waitFor: seconds).cache.loadBlocking,
+            loadUser:  UserEnvironment.mock(waitFor: seconds).cache.loadBlocking
         )
     }
 }

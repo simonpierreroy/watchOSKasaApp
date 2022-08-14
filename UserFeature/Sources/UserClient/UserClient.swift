@@ -41,21 +41,27 @@ public struct UserEnvironment {
 public struct UserCache {
     public init(
         save: @escaping @Sendable  (User?) async -> Void,
-        load: @escaping @Sendable () async -> User?
+        load: @escaping @Sendable () async -> User?,
+        loadBlocking: @escaping @Sendable () -> User?
+
     ) {
         self.save = save
         self.load = load
+        self.loadBlocking = loadBlocking
     }
     
     public let save: @Sendable  (User?) async -> Void
     public let load: @Sendable () async -> User?
+    public let loadBlocking: @Sendable () -> User?
+
 }
 
 #if DEBUG
 public extension UserCache {
     static let mock = Self(
         save: { _ in return } ,
-        load: { return  User.init(token: "1") }
+        load: { return  User.init(token: "1") },
+        loadBlocking: { return  User.init(token: "1") }
     )
 }
 
