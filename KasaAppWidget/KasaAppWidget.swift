@@ -14,6 +14,7 @@ import WidgetFeature
 import WidgetClientLive
 import WidgetClient
 import DeviceClient
+import AppPackage
 
 struct Provider: TimelineProvider {
     
@@ -62,7 +63,15 @@ struct DataDeviceEntry: TimelineEntry {
         return DataDeviceEntry(
             date: Date(),
             userIsLogged: true,
-            devices: (1...n).map{ Device.init(id: .init(rawValue: "\($0)"), name: "Lampe du salaon \($0)", state: false) }
+            devices: (1...n).map{ Device.init(
+                id: .init(rawValue: "\($0)"),
+                name: "Lampe du salaon \($0)",
+                children: $0 == 3 ? [
+                    .init(id: .init(rawValue: "child 1\($0)"), name: "child 1 of \($0)", state: false),
+                    .init(id: .init(rawValue: "child 2\($0)"), name: "child 1 of \($0)", state: false)
+                ] : [],
+                state: false)
+            }
         )
     }
     
@@ -82,7 +91,13 @@ struct KasaAppWidgetEntryView : View {
     var entry: Provider.Entry
     
     var body: some View {
-        WidgetView(logged: entry.userIsLogged, devices: entry.devices)
+        WidgetView(logged: entry.userIsLogged, devices: entry.devices) { deviceLink in
+            do {
+                return try AppLink.URLRouter.live.print(AppLink.device(deviceLink))
+            } catch {
+                return URL(string: "urlWidgetDeepLinkIssue")!
+            }
+        }
     }
 }
 

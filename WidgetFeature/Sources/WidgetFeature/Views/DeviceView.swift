@@ -25,7 +25,8 @@ struct DeviceView : View {
     @Environment(\.widgetFamily) var widgetFamily
     
     let device: Device
-    
+    let getURL: (DeviceClient.Link) -> URL
+
     static func font(_ family: WidgetFamily) ->  (Font, Font){
         
         switch family {
@@ -43,7 +44,7 @@ struct DeviceView : View {
     }
     
     var body: some View {
-        Link(destination: device.deepLink().getURL()) {
+        Link(destination: getURL(device.deepLink())) {
             VStack {
                 if device.children.count > 0 {
                     Image(systemName: "rectangle.3.group.fill").font(DeviceView.font(widgetFamily).0)
@@ -71,21 +72,23 @@ struct DeviceView : View {
 
 struct DeviceRowMaybe : View {
     let devices: (Device?,Device?)
+    let getURL: (DeviceClient.Link) -> URL
     
     var body: some View {
         HStack {
-            DeviceViewMaybe(device: devices.0)
-            DeviceViewMaybe(device: devices.1)
+            DeviceViewMaybe(device: devices.0, getURL: getURL)
+            DeviceViewMaybe(device: devices.1, getURL: getURL)
         }
     }
 }
 
 struct DeviceViewMaybe : View {
     let device: Device?
-    
+    let getURL: (DeviceClient.Link) -> URL
+
     var body: some View {
         if let device = device {
-            DeviceView(device: device)
+            DeviceView(device: device, getURL: getURL)
         } else {
             EmptyView()
         }
@@ -93,8 +96,10 @@ struct DeviceViewMaybe : View {
 }
 
 struct CloseAll : View {
+    let getURL: (DeviceClient.Link) -> URL
+    
     var body: some View {
-        Link(destination: Link.closeAll.getURL()) {
+        Link(destination: getURL(.closeAll)) {
             VStack {
                 Image(systemName: "moon.fill").font(.largeTitle).padding()
                 Text(Strings.close_all.key, bundle: .module).font(.body)
@@ -106,31 +111,32 @@ struct CloseAll : View {
 struct StackList : View {
     @Environment(\.widgetFamily) var widgetFamily
     let devices: [Device]
+    let getURL: (DeviceClient.Link) -> URL
     
     var body: some View {
         if  devices.count > 0 {
             VStack {
                 switch widgetFamily {
                 case .systemSmall:
-                    CloseAll()
-                        .widgetURL(Link.closeAll.getURL())
+                    CloseAll(getURL: getURL)
+                        .widgetURL(getURL(.closeAll))
                 case .systemMedium :
                     VStack{
-                        DeviceRowMaybe(devices: (devices[safeIndex: 0], devices[safeIndex: 1]))
-                        DeviceRowMaybe(devices: (devices[safeIndex: 2], devices[safeIndex: 3]))
+                        DeviceRowMaybe(devices: (devices[safeIndex: 0], devices[safeIndex: 1]), getURL: getURL)
+                        DeviceRowMaybe(devices: (devices[safeIndex: 2], devices[safeIndex: 3]), getURL: getURL)
                     }
                 case .systemLarge:
                     VStack{
-                        DeviceRowMaybe(devices: (devices[safeIndex: 0], devices[safeIndex: 1]))
-                        DeviceRowMaybe(devices: (devices[safeIndex: 2], devices[safeIndex: 3]))
-                        DeviceRowMaybe(devices: (devices[safeIndex: 4], devices[safeIndex: 5]))
+                        DeviceRowMaybe(devices: (devices[safeIndex: 0], devices[safeIndex: 1]), getURL: getURL)
+                        DeviceRowMaybe(devices: (devices[safeIndex: 2], devices[safeIndex: 3]), getURL: getURL)
+                        DeviceRowMaybe(devices: (devices[safeIndex: 4], devices[safeIndex: 5]), getURL: getURL)
                     }
                 case .systemExtraLarge:
                     VStack{
-                        DeviceRowMaybe(devices: (devices[safeIndex: 0], devices[safeIndex: 1]))
-                        DeviceRowMaybe(devices: (devices[safeIndex: 2], devices[safeIndex: 3]))
-                        DeviceRowMaybe(devices: (devices[safeIndex: 4], devices[safeIndex: 5]))
-                        DeviceRowMaybe(devices: (devices[safeIndex: 6], devices[safeIndex: 7]))
+                        DeviceRowMaybe(devices: (devices[safeIndex: 0], devices[safeIndex: 1]), getURL: getURL)
+                        DeviceRowMaybe(devices: (devices[safeIndex: 2], devices[safeIndex: 3]), getURL: getURL)
+                        DeviceRowMaybe(devices: (devices[safeIndex: 4], devices[safeIndex: 5]), getURL: getURL)
+                        DeviceRowMaybe(devices: (devices[safeIndex: 6], devices[safeIndex: 7]), getURL: getURL)
                     }
                 @unknown default:
                     EmptyView()
@@ -149,7 +155,7 @@ struct DeviceView_Preview: PreviewProvider {
         .map { i in Device.init(id: "\(i)", name: "Preview no \(i)", state: false) }
     static var previews: some View {
         Group {
-            StackList(devices: DeviceView_Preview.previewDevices)
+            StackList(devices: DeviceView_Preview.previewDevices, getURL: { _ in return .mock })
                 .previewDisplayName("StackList")
         }
     }

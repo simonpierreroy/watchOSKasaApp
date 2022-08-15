@@ -13,21 +13,24 @@ public struct WidgetView: View {
     
     public init (
         logged: Bool,
-        devices: [Device]
+        devices: [Device],
+        getURL: @escaping (DeviceClient.Link) -> URL
     ) {
         self.logged = logged
         self.devices = devices
+        self.getURL = getURL
     }
     
     let logged: Bool
     let devices: [Device]
+    let getURL: (DeviceClient.Link) -> URL
     
     public var body: some View {
         VStack {
             if logged {
-                StackList(devices: devices)
+                StackList(devices: devices, getURL: getURL)
             } else {
-                LogoutView()
+                LogoutView(getURL: getURL)
             }
         }.frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(BackgroundWidget())

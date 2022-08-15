@@ -119,11 +119,11 @@ extension Networking.App {
             rawRelayState = info.relay_state
         }
         
-        guard let relayState =  getRelayState(from: rawRelayState) else {
+        guard let rawRelayState = rawRelayState else {
             throw  Networking.ResquestError(errorDescription: "Device has no relay_state")
         }
         
-        return relayState
+        return try getRelayState(from: rawRelayState)
     }
     
     public static func changeDeviceRelayState(

@@ -11,42 +11,24 @@ import Foundation
 import Parsing
 
 extension Link {
-        
-    private static let validDeviceLink = Parse(
-        String.init >>> Device.ID.init(rawValue:) >>> Link.device
-    ) {
-        StartsWith<Substring>(Link.baseURL.absoluteString)
+    
+    private static let validDeviceToggleLink = ParsePrint {
+        StartsWith<Substring>("toggle/")
         Prefix(1...) { $0.isNumber || $0.isLetter }
         End()
-    }
-    
-    private static let invalidLink = Parse(Link.invalid) {
-        StartsWith<Substring>(Link.invalidURL.absoluteString)
+    }.map(.string)
+        .map(.memberwise(Device.ID.init(rawValue:)))
+        .map(.case(Link.device))
+        
+    private static let closeAllLink = ParsePrint(.case(Link.closeAll)) {
+        StartsWith<Substring>("closeAll")
         End()
     }
     
-    private static let closeAllLink = Parse(Link.closeAll) {
-        StartsWith<Substring>(Link.cloaseAllURL.absoluteString)
-        End()
-    }
-    
-    private static let deviceLink = OneOf {
-        validDeviceLink
-        invalidLink
+    public static let deviceLinkParser = OneOf {
+        validDeviceToggleLink
         closeAllLink
     }
-    
-    static func parserDeepLink(url: URL) -> Self {
-        parserDeepLink(string: url.absoluteString)
-    }
-    
-    private static func parserDeepLink(string: String) -> Self {
-        do {
-            return try deviceLink.parse(string[...])
-        } catch {
-            return .error
-        }
-      }
 }
 
 

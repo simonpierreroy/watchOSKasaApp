@@ -11,10 +11,12 @@ import DeviceClient
 struct LogoutView: View {
     static let logoutDevicesPreview = (1...10)
         .map { i in Device.init(id: "\(i)", name: "Here is device no \(i)", state: false) }
-        
+    
+    let getURL: (DeviceClient.Link) -> URL
+    
     var body: some View {
         ZStack {
-            StackList(devices: LogoutView.logoutDevicesPreview)
+            StackList(devices: LogoutView.logoutDevicesPreview, getURL: getURL)
                 .blur(radius: 4.0)
             VStack {
                 Image(systemName: "keyboard")
@@ -30,7 +32,7 @@ struct LogoutView: View {
 struct LogoutView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
-            LogoutView()
+            LogoutView(getURL: { _ in return .mock })
                 .previewDisplayName("LogoutView")
         }
     }

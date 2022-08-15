@@ -147,7 +147,6 @@ public let devicesReducer = Reducer<DevicesState, DevicesAtion, DevicesEnvironme
         case .device(let id):
             guard state.devices[id: id] != nil else { return .none }
             return Effect(value: .deviceDetail(index: id, action: .toggle))
-        case .error, .invalid: return .none
         }
     case .set(let devices):
         state.isLoading = .loaded

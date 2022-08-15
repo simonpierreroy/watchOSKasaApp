@@ -52,7 +52,7 @@ public struct AppEnv {
     let devicesRepo: DevicesRepo
     let deviceCache: DevicesCache
     let reloadAppExtensions: @Sendable () async -> Void
-    let linkURLParser: Link.URLParser
+    let linkURLParser: AppLink.URLRouter
 }
 
 public extension AppEnv {

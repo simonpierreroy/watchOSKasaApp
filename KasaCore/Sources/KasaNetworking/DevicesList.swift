@@ -20,11 +20,11 @@ extension Networking.App {
         }
     }
 
-    public static func getRelayState(from raw: RawState?) -> RelayIsOn? {
-        switch raw?.rawValue {
-        case .some(1): return true
-        case .some(0): return false
-        case .none, .some: return nil
+    public static func getRelayState(from raw: RawState) throws -> RelayIsOn {
+        switch raw.rawValue {
+        case 1: return true
+        case 0: return false
+        default: throw NSError(domain: "Relay State is invalid" , code: -1)
         }
     }
     

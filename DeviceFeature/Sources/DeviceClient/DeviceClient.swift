@@ -39,38 +39,8 @@ public struct Device: Equatable, Identifiable, Codable {
 }
 
 public enum Link: Equatable {
-    
     case device(Device.ID)
     case closeAll
-    case invalid
-    case error
-    
-    public static let errorURL = URL(string: "link/error")!
-    public static let baseURL = URL(string: "link/device/")!
-    public static let cloaseAllURL = URL(string: "link/closeAll")!
-    public static let invalidURL = Link.baseURL.appendingPathComponent("invalid")
-    
-    public func getURL() -> URL {
-        switch self {
-        case .device(let id):
-            return Link.baseURL.appendingPathComponent("\(id.rawValue)")
-        case .invalid:
-            return Link.invalidURL
-        case .error:
-            return Link.errorURL
-        case .closeAll:
-            return Link.cloaseAllURL
-        }
-    }
-}
-
-public extension Link {
-    struct URLParser {
-        public init(parse: @escaping (URL) -> Link) {
-            self.parse = parse
-        }
-        public let parse: (URL) -> Link
-    }
 }
 
 public struct DevicesEnvironment {

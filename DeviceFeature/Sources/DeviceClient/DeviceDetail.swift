@@ -27,11 +27,5 @@ extension DeviceDetailEvironment {
         )
     }
 }
-
-public extension Link.URLParser {
-    static let mockDeviceIdOne = Self { url in
-        return .device(.init(rawValue: "1"))
-    }
-}
 #endif
 
