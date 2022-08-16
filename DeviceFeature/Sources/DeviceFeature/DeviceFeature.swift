@@ -170,7 +170,7 @@ public let devicesReducer = Reducer<DevicesState, DevicesAtion, DevicesEnvironme
             let devices = try await environment.repo.loadDevices(token).map(DeviceSate.init(device:))
             let states = IdentifiedArrayOf<DeviceSate>(uniqueElements: devices)
             return .set(to: states)
-        } catch: { return .send($0) }
+        } catch: { return .send($0) }.animation()
     case .send(let error):
         state.isLoading = .loaded
         state.route = .error(error)

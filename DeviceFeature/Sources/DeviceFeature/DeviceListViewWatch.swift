@@ -134,12 +134,9 @@ public struct DeviceChildViewWatch: View {
         WithViewStore(self.store) { viewStore in
             Button(action: { viewStore.send(.toggleChild) }) {
                 HStack {
-                    Image(
-                        systemName:
-                            viewStore.relay == true ? "lightbulb.fill" :  "lightbulb.slash.fill"
-                    ).font(.title3)
-                        .foregroundColor(viewStore.relay == true ? Color.yellow :  Color.blue)
-                    Text("\(viewStore.name)")
+                    let style = styleForRelayState(relay: viewStore.relay)
+                    Image(systemName: style.image).font(.title3).foregroundColor(style.taint)
+                    Text(viewStore.name)
                 }
             }
         }
@@ -153,21 +150,16 @@ struct DeviceDetailNoChildViewWatch: View {
     
     var body: some View {
         WithViewStore(self.store) { viewStore in
-            Button(action: { viewStore.send(.tapped) }) {
-                LoadingView(.constant(viewStore.isLoading)){
-                    HStack {
-                        switch viewStore.relay?.rawValue {
-                        case .some(true):
-                            Image(systemName: "lightbulb.fill").font(.title3).foregroundColor(Color.yellow)
-                            Text(viewStore.name).multilineTextAlignment(.center)
-                        case .some(false):
-                            Image(systemName: "lightbulb.slash.fill").font(.title3).foregroundColor(Color.blue)
-                            Text(viewStore.name).multilineTextAlignment(.center)
-                        case .none:
-                            EmptyView()
-                        }
-                        
-                    }
+            Button(action: { viewStore.send(.tapped, animation: .default) }) {
+                HStack {
+                    let style = styleForRelayState(relay: viewStore.relay)
+                    Image(systemName: style.image).font(.title3).foregroundColor(style.taint)
+                    Text(viewStore.name).multilineTextAlignment(.center)
+                    Spacer()
+                }
+            }.frame(maxWidth: .infinity).overlay(alignment: .center) {
+                HStack {
+                    if viewStore.isLoading  { ProgressView () }
                 }
             }
         }
@@ -353,8 +345,8 @@ struct DeviceListView_Previews: PreviewProvider {
                     action: DevicesAtion.init(deviceAction:)
                 )
             )
-                .environment(\.locale, .init(identifier: "fr"))
-                .previewDisplayName("1 item french")
+            .environment(\.locale, .init(identifier: "fr"))
+            .previewDisplayName("1 item french")
         }
     }
 }

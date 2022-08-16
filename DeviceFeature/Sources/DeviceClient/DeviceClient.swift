@@ -101,7 +101,7 @@ public struct DevicesCache {
     public let save: @Sendable ([Device]) async throws ->  Void
     public let load: @Sendable () async throws -> [Device]
     public let loadBlocking: @Sendable () throws -> [Device]
-
+    
 }
 
 #if DEBUG
@@ -110,7 +110,9 @@ public extension DevicesRepo {
         Self(
             loadDevices: { _ in
                 try await taskSleep(for: seconds)
-                return [DevicesEnvironment.debugDevice1, DevicesEnvironment.debugDevice2]
+                return [DevicesEnvironment.debugDevice1,
+                        DevicesEnvironment.debugDevice2,
+                        DevicesEnvironment.debugDevice3]
             }, toggleDeviceRelayState: { (_,_, _) in
                 try await taskSleep(for: seconds)
                 return true
@@ -130,8 +132,12 @@ public extension DevicesRepo {
 public extension DevicesCache {
     static let mock = Self(
         save: { _ in return } ,
-        load: { [DevicesEnvironment.debugDevice1, DevicesEnvironment.debugDevice2] },
-        loadBlocking: { [DevicesEnvironment.debugDevice1, DevicesEnvironment.debugDevice2] }
+        load: { [
+            DevicesEnvironment.debugDevice1,
+            DevicesEnvironment.debugDevice2,
+            DevicesEnvironment.debugDevice3
+        ] },
+        loadBlocking: { [DevicesEnvironment.debugDevice1, DevicesEnvironment.debugDevice2, DevicesEnvironment.debugDevice3] }
     )
 }
 
@@ -139,6 +145,16 @@ public extension DevicesEnvironment {
     
     static let debugDevice1 = Device.init(id: "1", name: "Test device 1", state: false)
     static let debugDevice2 = Device.init(id: "2", name: "Test device 2", state: true)
+    static let debugDevice3 = Device.init(
+        id: "3",
+        name: "Test device 3",
+        children: [
+            .init(id: "Child 1-3", name: "Child 1 of device 3", state: true),
+            .init(id: "Child 2-3", name: "Child 2 of device 3", state: false)
+        ],
+        state: false
+    )
+    
     
     static func mock(waitFor seconds: UInt64 = 2) -> Self {
         Self(repo: .mock(waitFor: seconds),

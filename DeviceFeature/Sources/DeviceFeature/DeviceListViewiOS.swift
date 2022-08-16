@@ -10,6 +10,7 @@ import Combine
 import ComposableArchitecture
 import DeviceClient
 import BaseUI
+import KasaCore
 
 #if os(iOS)
 
@@ -239,6 +240,7 @@ public struct DeviceDetailViewiOS: View {
                             Image(systemName: "rectangle.3.group.fill")
                             Text(Strings.device_group.key, bundle: .module)
                         }
+                        if viewStore.isLoading { ProgressView() }
                         Spacer()
                         ForEachStore(
                             self.store.scope(
@@ -269,21 +271,13 @@ public struct DeviceNoChildViewiOS: View {
     
     public var body: some View {
         WithViewStore(self.store) { viewStore in
-            Button(action: { viewStore.send(.tapped) }) {
-                LoadingView(.constant(viewStore.isLoading)){
-                    VStack {
-                        switch viewStore.relay?.rawValue {
-                        case .some(true):
-                            Image(systemName: "lightbulb.fill").font(.title3).tint(Color.yellow)
-                            Text(viewStore.name).multilineTextAlignment(.center)
-                        case .some(false):
-                            Image(systemName: "lightbulb.slash.fill").font(.title3).tint(Color.blue)
-                            Text(viewStore.name).multilineTextAlignment(.center)
-                        case .none:
-                            EmptyView()
-                        }
-                    }.padding()
-                }
+            Button(action: { viewStore.send(.tapped, animation: .default) }) {
+                VStack {
+                    let style = styleForRelayState(relay: viewStore.relay)
+                    Image(systemName: style.image).font(.title3).tint(style.taint)
+                    Text(viewStore.name).multilineTextAlignment(.center)
+                    if viewStore.isLoading { ProgressView() }
+                }.padding()
             }
         }
     }
@@ -295,14 +289,11 @@ public struct DeviceChildViewiOS: View {
     
     public var body: some View {
         WithViewStore(self.store) { viewStore in
-            Button(action: { viewStore.send(.toggleChild) }) {
+            Button(action: { viewStore.send(.toggleChild, animation: .default) }) {
                 HStack {
-                    Image(
-                        systemName:
-                            viewStore.relay == true ? "lightbulb.fill" :  "lightbulb.slash.fill"
-                    ).font(.title3)
-                        .tint(viewStore.relay == true ? Color.yellow :  Color.blue)
-                    Text("\(viewStore.name)")
+                    let style = styleForRelayState(relay: viewStore.relay)
+                    Image(systemName: style.image).font(.title3).tint(style.taint)
+                    Text(viewStore.name)
                 }
             }
         }
@@ -424,7 +415,7 @@ struct DeviceListViewiOS_Previews: PreviewProvider {
                     action: DevicesAtion.init(deviceAction:)
                 )
             ).previewDisplayName("Group")
-             
+            
             DeviceListViewiOS(
                 store: Store<DevicesState, DevicesAtion>.init(
                     initialState: .nDeviceLoaded(n: 4),
