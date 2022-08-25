@@ -9,10 +9,7 @@ import Foundation
 import Parsing
 import DeviceClientLive
 import DeviceClient
-
-public enum AppLink {
-    case device(DeviceClient.Link)
-}
+import RoutingClient
 
 extension AppLink {
     
@@ -40,33 +37,9 @@ extension AppLink {
     }
 }
 
-public extension AppLink {
-    struct URLRouter {
-        public init(
-            parse: @escaping @Sendable (URL) throws -> AppLink,
-            print: @escaping @Sendable (AppLink) throws -> URL
-        ) {
-            self.parse = parse
-            self.print = print
-        }
-        public let parse: @Sendable (URL) throws -> AppLink
-        public let print: @Sendable (AppLink) throws -> URL
-    }
-}
-
-public extension AppLink.URLRouter {
+public extension URLRouter {
     static let live = Self(
         parse: AppLink.parserDeepLink(url:),
         print: AppLink.getURL(link:)
     )
 }
-
-#if DEBUG
-public extension AppLink.URLRouter {
-    static let mockDeviceIdOne = Self(
-        parse: { _ in .device(.closeAll) },
-        print: { _ in URL(string: "mockURL")! }
-    
-    )
-}
-#endif

@@ -12,7 +12,6 @@
 		32213C8025283032009F42FD /* KasaAppWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32213C7F25283032009F42FD /* KasaAppWidget.swift */; };
 		32213C8225283032009F42FD /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 32213C8125283032009F42FD /* Assets.xcassets */; };
 		32213C8625283032009F42FD /* KasaAppWidgetExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 32213C7925283032009F42FD /* KasaAppWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		3279E27B252838FA0067FE28 /* AppPackage in Frameworks */ = {isa = PBXBuildFile; productRef = 3279E27A252838FA0067FE28 /* AppPackage */; };
 		32821CEF2526DB50005E9623 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32821CEE2526DB50005E9623 /* AppDelegate.swift */; };
 		32821CF12526DB50005E9623 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32821CF02526DB50005E9623 /* SceneDelegate.swift */; };
 		32821CF32526DB50005E9623 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32821CF22526DB50005E9623 /* ContentView.swift */; };
@@ -32,6 +31,7 @@
 		328950FA24821A3A00EC3A49 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 328950F924821A3A00EC3A49 /* Assets.xcassets */; };
 		328950FD24821A3A00EC3A49 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 328950FC24821A3A00EC3A49 /* Preview Assets.xcassets */; };
 		32D3F93525156CC300A8446C /* AppPackage in Frameworks */ = {isa = PBXBuildFile; productRef = 32D3F93425156CC300A8446C /* AppPackage */; };
+		B39BE5D928B7E76E001A4C18 /* WidgetPackage in Frameworks */ = {isa = PBXBuildFile; productRef = B39BE5D828B7E76E001A4C18 /* WidgetPackage */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -160,6 +160,7 @@
 		32D3F9232515679100A8446C /* KasaCore */ = {isa = PBXFileReference; lastKnownFileType = folder; path = KasaCore; sourceTree = "<group>"; };
 		32D3F926251568BC00A8446C /* DeviceFeature */ = {isa = PBXFileReference; lastKnownFileType = folder; path = DeviceFeature; sourceTree = "<group>"; };
 		32D3F93125156C1F00A8446C /* AppPackage */ = {isa = PBXFileReference; lastKnownFileType = folder; path = AppPackage; sourceTree = "<group>"; };
+		B33FBE9228B7DA240074BF1C /* Routing */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = Routing; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -168,7 +169,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				32213C7D25283032009F42FD /* SwiftUI.framework in Frameworks */,
-				3279E27B252838FA0067FE28 /* AppPackage in Frameworks */,
+				B39BE5D928B7E76E001A4C18 /* WidgetPackage in Frameworks */,
 				32213C7B25283032009F42FD /* WidgetKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -262,6 +263,7 @@
 			children = (
 				32A8D00D2528EACC003FD623 /* KasaAppWidgetExtension.entitlements */,
 				32D3F93125156C1F00A8446C /* AppPackage */,
+				B33FBE9228B7DA240074BF1C /* Routing */,
 				32D3F9232515679100A8446C /* KasaCore */,
 				32D3F926251568BC00A8446C /* DeviceFeature */,
 				32D3F920251566C200A8446C /* UserFeature */,
@@ -358,7 +360,7 @@
 			);
 			name = KasaAppWidgetExtension;
 			packageProductDependencies = (
-				3279E27A252838FA0067FE28 /* AppPackage */,
+				B39BE5D828B7E76E001A4C18 /* WidgetPackage */,
 			);
 			productName = KasaAppWidgetExtension;
 			productReference = 32213C7925283032009F42FD /* KasaAppWidgetExtension.appex */;
@@ -1190,10 +1192,6 @@
 /* End XCConfigurationList section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		3279E27A252838FA0067FE28 /* AppPackage */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = AppPackage;
-		};
 		32821D212526DB97005E9623 /* AppPackage */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = AppPackage;
@@ -1201,6 +1199,10 @@
 		32D3F93425156CC300A8446C /* AppPackage */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = AppPackage;
+		};
+		B39BE5D828B7E76E001A4C18 /* WidgetPackage */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = WidgetPackage;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

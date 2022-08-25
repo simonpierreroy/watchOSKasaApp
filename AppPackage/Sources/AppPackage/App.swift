@@ -16,6 +16,8 @@ import ComposableArchitecture
 import KasaCore
 import UserClientLive
 import DeviceClientLive
+import RoutingClient
+import RoutingClientLive
 
 public struct AppState {
     public static let empty = Self(userState: .empty, _devicesState: .empty)
@@ -52,7 +54,7 @@ public struct AppEnv {
     let devicesRepo: DevicesRepo
     let deviceCache: DevicesCache
     let reloadAppExtensions: @Sendable () async -> Void
-    let linkURLParser: AppLink.URLRouter
+    let linkURLParser: URLRouter
 }
 
 public extension AppEnv {
@@ -188,7 +190,7 @@ public extension AppEnv {
             devicesRepo: .mock(waitFor: seconds),
             deviceCache: .mock,
             reloadAppExtensions: DevicesEnvironment.mock(waitFor: seconds).reloadAppExtensions,
-            linkURLParser: .mockDeviceIdOne
+            linkURLParser: .mock(link: .device(.closeAll), print: nil)
         )
     }
 }

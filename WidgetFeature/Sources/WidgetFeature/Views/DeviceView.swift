@@ -8,6 +8,7 @@
 import SwiftUI
 import WidgetKit
 import DeviceClient
+import RoutingClient
 
 struct NoDevicesView: View {
     var body: some View {
@@ -25,8 +26,8 @@ struct DeviceView : View {
     @Environment(\.widgetFamily) var widgetFamily
     
     let device: Device
-    let getURL: (DeviceClient.Link) -> URL
-
+    let getURL: (AppLink) -> URL
+    
     static func font(_ family: WidgetFamily) ->  (Font, Font){
         
         switch family {
@@ -44,14 +45,14 @@ struct DeviceView : View {
     }
     
     var body: some View {
-        Link(destination: getURL(device.deepLink())) {
+        Link(destination: getURL(.device(device.deepLink()))) {
             VStack {
                 if device.children.count > 0 {
                     Image(systemName: "rectangle.3.group.fill").font(DeviceView.font(widgetFamily).0)
                     (Text(Strings.device_group.key, bundle: .module).font(DeviceView.font(widgetFamily).1)
-                    +
-                    Text(" (\(device.children.count))").font(DeviceView.font(widgetFamily).1))
-                        .multilineTextAlignment(.center)
+                     +
+                     Text(" (\(device.children.count))").font(DeviceView.font(widgetFamily).1))
+                    .multilineTextAlignment(.center)
                 } else {
                     Image(systemName: "light.max")
                         .font(DeviceView.font(widgetFamily).0)
@@ -72,7 +73,7 @@ struct DeviceView : View {
 
 struct DeviceRowMaybe : View {
     let devices: (Device?,Device?)
-    let getURL: (DeviceClient.Link) -> URL
+    let getURL: (AppLink) -> URL
     
     var body: some View {
         HStack {
@@ -84,8 +85,8 @@ struct DeviceRowMaybe : View {
 
 struct DeviceViewMaybe : View {
     let device: Device?
-    let getURL: (DeviceClient.Link) -> URL
-
+    let getURL: (AppLink) -> URL
+    
     var body: some View {
         if let device = device {
             DeviceView(device: device, getURL: getURL)
@@ -96,10 +97,10 @@ struct DeviceViewMaybe : View {
 }
 
 struct CloseAll : View {
-    let getURL: (DeviceClient.Link) -> URL
+    let getURL: (AppLink) -> URL
     
     var body: some View {
-        Link(destination: getURL(.closeAll)) {
+        Link(destination: getURL(.device(.closeAll))) {
             VStack {
                 Image(systemName: "moon.fill").font(.largeTitle).padding()
                 Text(Strings.close_all.key, bundle: .module).font(.body)
@@ -111,7 +112,7 @@ struct CloseAll : View {
 struct StackList : View {
     @Environment(\.widgetFamily) var widgetFamily
     let devices: [Device]
-    let getURL: (DeviceClient.Link) -> URL
+    let getURL: (AppLink) -> URL
     
     var body: some View {
         if  devices.count > 0 {
@@ -119,7 +120,7 @@ struct StackList : View {
                 switch widgetFamily {
                 case .systemSmall:
                     CloseAll(getURL: getURL)
-                        .widgetURL(getURL(.closeAll))
+                        .widgetURL(getURL(.device(.closeAll)))
                 case .systemMedium :
                     VStack{
                         DeviceRowMaybe(devices: (devices[safeIndex: 0], devices[safeIndex: 1]), getURL: getURL)

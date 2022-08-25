@@ -9,11 +9,17 @@ let package = Package(
     products: [
         .library(
             name: "AppPackage",
-            targets: ["AppPackage"]),
+            targets: ["AppPackage"]
+        ),
+        .library(
+            name: "WidgetPackage",
+            targets: ["WidgetPackage"]
+        ),
     ],
     dependencies: [
         .package(path: "DeviceFeature"),
         .package(path: "UserFeature"),
+        .package(path: "Routing"),
         .package(path: "WidgetFeature")
     ],
     targets: [
@@ -22,27 +28,23 @@ let package = Package(
             dependencies: [
                 "DeviceFeature",
                 "UserFeature",
-                .product(
-                    name:"WidgetFeature",
-                    package: "WidgetFeature",
-                    condition: .when(platforms: [.iOS])
-                ),
-                .product(
-                    name: "WidgetClientLive",
-                    package: "WidgetFeature",
-                    condition: .when(platforms: [.iOS])
-                ),
-                .product(
-                    name: "UserClientLive",
-                    package: "UserFeature"
-                ),
-                .product(
-                    name: "DeviceClientLive",
-                    package: "DeviceFeature"
-                )
+                .product(name: "UserClientLive", package: "UserFeature"),
+                .product(name: "DeviceClientLive", package: "DeviceFeature"),
+                .product(name: "RoutingClientLive", package: "Routing"),
+                .product(name: "RoutingClient",package: "Routing")
+            ]),
+        .target(
+            name: "WidgetPackage",
+            dependencies: [
+                .product(name: "DeviceClientLive",package: "DeviceFeature"),
+                .product(name: "RoutingClientLive",package: "Routing"),
+                .product(name: "RoutingClient",package: "Routing"),
+                "WidgetFeature",
+                .product(name: "WidgetClientLive",package: "WidgetFeature"),
             ]),
         .testTarget(
             name: "AppPackageTests",
-            dependencies: ["AppPackage"]),
+            dependencies: ["AppPackage"]
+        ),
     ]
 )

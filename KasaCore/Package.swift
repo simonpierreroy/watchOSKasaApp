@@ -9,13 +9,17 @@ let package = Package(
     products: [
         .library(
             name: "KasaCore",
-            targets: ["KasaCore"]),
+            targets: ["KasaCore"]
+        ),
         .library(
             name: "KasaNetworking",
-            targets: ["KasaNetworking"]),
+            targets: ["KasaNetworking"]
+        )
+        ,
         .library(
             name: "BaseUI",
-            targets: ["BaseUI"]),
+            targets: ["BaseUI"]
+        ),
     ],
     dependencies: [
         .package(
@@ -47,9 +51,11 @@ let package = Package(
             ]),
         .target(
             name: "BaseUI",
-            dependencies: []),
+            dependencies: []
+        ),
         .testTarget(
             name: "KasaCoreTests",
-            dependencies: ["KasaCore"]),
+            dependencies: ["KasaCore"]
+        ),
     ]
 )

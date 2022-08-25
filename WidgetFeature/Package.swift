@@ -8,33 +8,39 @@ let package = Package(
     defaultLocalization: "en",
     platforms: [.iOS(.v15)],
     products: [
-        // Products define the executables and libraries a package produces, and make them visible to other packages.
         .library(
             name: "WidgetFeature",
-            targets: ["WidgetFeature"]),
+            targets: ["WidgetFeature"]
+        ),
         .library(
             name: "WidgetClient",
-            targets: ["WidgetClient"]),
+            targets: ["WidgetClient"]
+        ),
         .library(
             name: "WidgetClientLive",
-            targets: ["WidgetClientLive"])
+            targets: ["WidgetClientLive"]
+        )
     ],
     dependencies: [
         .package(path: "KasaCore"),
         .package(path: "DeviceFeature"),
-        .package(path: "UserFeature")
+        .package(path: "UserFeature"),
+        .package(path: "Routing")
     ],
     targets: [
-        // Targets are the basic building blocks of a package. A target can define a module or a test suite.
-        // Targets can depend on other targets in this package, and on products in packages this package depends on.
         .target(
             name: "WidgetFeature",
-            dependencies: ["KasaCore", "WidgetClient"]),
+            dependencies: [
+                "KasaCore",
+                "WidgetClient",
+                .product(name: "RoutingClient",package: "Routing"),
+            ]),
         .target(
             name: "WidgetClient",
             dependencies: [
                 .product(name: "DeviceClient", package: "DeviceFeature"),
                 .product(name: "UserClient", package: "UserFeature"),
+                .product(name: "RoutingClient",package: "Routing"),
             ]),
         .target(
             name: "WidgetClientLive",
@@ -42,9 +48,11 @@ let package = Package(
                 "WidgetClient",
                 .product(name: "DeviceClientLive", package: "DeviceFeature"),
                 .product(name: "UserClientLive", package: "UserFeature"),
+                .product(name: "RoutingClientLive",package: "Routing"),
             ]),
         .testTarget(
             name: "WidgetFeatureTests",
-            dependencies: ["WidgetFeature"]),
+            dependencies: ["WidgetFeature"]
+        ),
     ]
 )

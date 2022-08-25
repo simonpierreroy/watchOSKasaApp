@@ -7,14 +7,14 @@
 
 import SwiftUI
 import DeviceClient
-
+import RoutingClient
 
 public struct WidgetView: View {
     
     public init (
         logged: Bool,
         devices: [Device],
-        getURL: @escaping (DeviceClient.Link) -> URL
+        getURL: @escaping (AppLink) -> URL
     ) {
         self.logged = logged
         self.devices = devices
@@ -23,7 +23,7 @@ public struct WidgetView: View {
     
     let logged: Bool
     let devices: [Device]
-    let getURL: (DeviceClient.Link) -> URL
+    let getURL: (AppLink) -> URL
     
     public var body: some View {
         VStack {
@@ -33,6 +33,6 @@ public struct WidgetView: View {
                 LogoutView(getURL: getURL)
             }
         }.frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(BackgroundWidget())
+            .background(BackgroundWidget())
     }
 }

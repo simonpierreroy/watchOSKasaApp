@@ -10,13 +10,16 @@ let package = Package(
     products: [
         .library(
             name: "UserFeature",
-            targets: ["UserFeature"]),
+            targets: ["UserFeature"]
+        ),
         .library(
             name: "UserClient",
-            targets: ["UserClient"]),
+            targets: ["UserClient"]
+        ),
         .library(
             name: "UserClientLive",
-            targets: ["UserClientLive"]),
+            targets: ["UserClientLive"]
+        ),
     ],
     dependencies: [
         .package(path: "KasaCore")
@@ -30,7 +33,8 @@ let package = Package(
             ]),
         .target(
             name: "UserClient",
-            dependencies: ["KasaCore"]),
+            dependencies: ["KasaCore"]
+        ),
         .target(
             name: "UserClientLive",
             dependencies: [
@@ -39,6 +43,7 @@ let package = Package(
             ]),
         .testTarget(
             name: "UserFeatureTests",
-            dependencies: ["UserFeature"]),
+            dependencies: ["UserFeature"]
+        ),
     ]
 )

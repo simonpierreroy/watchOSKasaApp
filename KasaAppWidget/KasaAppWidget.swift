@@ -14,7 +14,6 @@ import WidgetFeature
 import WidgetClientLive
 import WidgetClient
 import DeviceClient
-import AppPackage
 
 struct Provider: TimelineProvider {
     
@@ -92,11 +91,7 @@ struct KasaAppWidgetEntryView : View {
     
     var body: some View {
         WidgetView(logged: entry.userIsLogged, devices: entry.devices) { deviceLink in
-            do {
-                return try AppLink.URLRouter.live.print(AppLink.device(deviceLink))
-            } catch {
-                return URL(string: "urlWidgetDeepLinkIssue")!
-            }
+            WidgetEnvironment.live.getURL(deviceLink)
         }
     }
 }

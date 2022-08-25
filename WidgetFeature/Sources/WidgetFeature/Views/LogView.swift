@@ -7,12 +7,13 @@
 
 import SwiftUI
 import DeviceClient
+import RoutingClient
 
 struct LogoutView: View {
     static let logoutDevicesPreview = (1...10)
         .map { i in Device.init(id: "\(i)", name: "Here is device no \(i)", state: false) }
     
-    let getURL: (DeviceClient.Link) -> URL
+    let getURL: (AppLink) -> URL
     
     var body: some View {
         ZStack {
