@@ -56,10 +56,8 @@ let deviceDetailStateReducer = Reducer<DeviceSate, DeviceDetailAction, DeviceDet
         return .none
     case .didToggleChild(let id, let status):
         state.isLoading = false
-        return .run { [children = state.children] send in
-            for childDevice in children {
-                await send(.deviceChild(index: childDevice.id, action: .didToggleChild(state: status)), animation: .default)
-            }
+        return .run { send in
+            await send(.deviceChild(index: id, action: .didToggleChild(state: status)), animation: .default)
         }
     case .send(let error):
         state.isLoading = false
