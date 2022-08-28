@@ -13,7 +13,17 @@ import KasaCore
 extension Networking.App {
     
     private struct System<SubSystem: Codable>: Codable {
+        struct Context: Codable {
+            let child_ids: [String]
+        }
+        
+        init(system: SubSystem, context: Context? = nil) {
+            self.system = system
+            self.context = context
+        }
+        
         let system: SubSystem
+        let context: Context?
     }
     
     private struct SystemInfoDiscover: Codable {}
@@ -56,23 +66,18 @@ extension Networking.App {
     
     private struct ChangeDeviceStateParam: Encodable {
         
-        struct Context: Encodable {
-            let child_ids: [String]
-        }
-        
         init(deviceId: DeviceID, state: RelayIsOn, children: [DeviceID]) {
             self.deviceId = deviceId.rawValue
-            self.context = .init(child_ids: children.map(\.rawValue))
             
             self.requestData = .init(
                 wrapping: .init(
-                    system: .init(set_relay_state: .init(state: relayIsOnToRelayState(state)))
+                    system: .init(set_relay_state: .init(state: relayIsOnToRelayState(state))),
+                    context: .init(child_ids: .init(children.map(\.rawValue)))
                 )
             )
         }
         
         let deviceId: String
-        let context: Context
         //Pass to API: "{\"system\":{\"set_relay_state\":{\"state\":\(boolState)}}}"
         let requestData: RawStringJSONContainer<System<SetRelayState<RelayStatePut>>>
     }

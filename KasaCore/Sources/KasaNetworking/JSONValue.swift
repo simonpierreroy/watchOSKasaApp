@@ -8,6 +8,8 @@
 
 import Foundation
 
+#if DEBUG
+// Usefull to debug JSON
 @dynamicMemberLookup
 public enum JSONValue {
     case null
@@ -134,6 +136,7 @@ extension JSONValue: ExpressibleByDictionaryLiteral {
         self = .object(Dictionary(uniqueKeysWithValues: elements))
     }
 }
+#endif
 
 let rawEncoder = JSONEncoder()
 let rawDecoder = JSONDecoder()
@@ -145,7 +148,7 @@ struct RawStringJSONContainer<Model: Codable>: Codable {
     }
     
     let wrapping: Model
-
+    
     
     func encode(to encoder: Encoder) throws {
         var container = encoder.singleValueContainer()

@@ -19,7 +19,7 @@ extension Networking.App {
             return 0
         }
     }
-
+    
     public static func getRelayState(from raw: RawState) throws -> RelayIsOn {
         switch raw.rawValue {
         case 1: return true
@@ -55,7 +55,7 @@ extension Networking.App {
         public let alias: Alias
         public let state: RawState
     }
-
+    
     public struct KasaDeviceSystemInfo: Codable {
         public let alias: Alias
         public let deviceId: DeviceID
@@ -63,23 +63,24 @@ extension Networking.App {
         public let relay_state: RawState?
         public let sw_ver: String
         public let model: String
+        public let mac: String
         let err_code: Int
     }
     
     public static func getDevices(token: Token) async throws -> KasaDeviceList {
-        let request = Request<JSONValue>(method: .getDeviceList, params: [:])
+        let request = Request<[String: String]>(method: .getDeviceList, params: [:])
         return try await performResquest(request: request, queryItems: ["token": token.rawValue])
     }
     
     public static func getDevicesAndInfo(token: Token) async throws -> KasaDeviceList {
-        let request = Request<JSONValue>(method: .getDeviceList, params: [:])
+        let request = Request<[String: String]>(method: .getDeviceList, params: [:])
         return try await performResquest(request: request, queryItems: ["token": token.rawValue])
     }
     
     public static func getDevicesAndSysInfo(token: Token) async throws -> [KasaDeviceAndSystemInfo] {
         let mainDeviceList = try await getDevices(token: token).deviceList
         try Task.checkCancellation()
-
+        
         
         return try await withThrowingTaskGroup(of: KasaDeviceAndSystemInfo.self) { group -> [KasaDeviceAndSystemInfo] in
             
