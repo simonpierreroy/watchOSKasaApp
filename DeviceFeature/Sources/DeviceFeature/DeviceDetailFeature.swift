@@ -44,11 +44,7 @@ let deviceDetailStateReducer = Reducer<DeviceSate, DeviceDetailAction, DeviceDet
         guard let token = state.token, state.isLoading == false else { return .none }
         state.isLoading = true
         return .run { [state] send in
-            if state.relay == nil, let firstChild = state.children.first {
-                await send(.deviceChild(index: firstChild.id, action: .toggleChild), animation: .default)
-            } else {
-                try await send(.didToggle(state: env.toggle(token, state.id, nil)), animation: .default)
-            }
+            try await send(.didToggle(state: env.toggle(token, state.id, nil)), animation: .default)
         } catch: { error, send in await send(.send(error)) }
     case .didToggle(let status):
         state.isLoading = false
