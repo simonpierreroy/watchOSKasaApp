@@ -38,7 +38,7 @@ public struct DeviceListViewWatch: View {
                     )
                     
                     
-                    Button(action: { viewStore.send(.tappedCloseAll)}) {
+                    Button(action: { viewStore.send(.tappedCloseAll, animation: .default)}) {
                         LoadingView(.constant(viewStore.isRefreshingDevices == .closingAll)) {
                             HStack {
                                 Image(systemName: "moon.fill")
@@ -48,7 +48,7 @@ public struct DeviceListViewWatch: View {
                     }
                     .foregroundColor(Color.moon).listRowPlatterColor(Color.moon.opacity(0.17))
                     
-                    Button(action: { viewStore.send(.tappedRefreshButton)}) {
+                    Button(action: { viewStore.send(.tappedRefreshButton, animation: .default)}) {
                         HStack {
                             LoadingView(.constant(viewStore.isRefreshingDevices == .loadingDevices)) {
                                 Image(systemName: "arrow.clockwise.circle.fill")
@@ -60,7 +60,7 @@ public struct DeviceListViewWatch: View {
                 }.disabled(viewStore.isRefreshingDevices.isInFlight)
                 
                 Button {
-                    viewStore.send(.tappedLogoutButton)
+                    viewStore.send(.tappedLogoutButton, animation: .default)
                 } label: {
                     Text(Strings.logout_app.key, bundle: .module)
                         .foregroundColor(Color.logout)
@@ -132,7 +132,7 @@ public struct DeviceChildViewWatch: View {
     
     public var body: some View {
         WithViewStore(self.store) { viewStore in
-            Button(action: { viewStore.send(.toggleChild) }) {
+            Button(action: { viewStore.send(.toggleChild, animation: .default) }) {
                 HStack {
                     let style = styleForRelayState(relay: viewStore.relay)
                     Image(systemName: style.image).font(.title3).foregroundColor(style.taint)
