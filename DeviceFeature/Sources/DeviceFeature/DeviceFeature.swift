@@ -194,7 +194,7 @@ public let devicesReducer = Reducer<DevicesState, DevicesAtion, DevicesEnvironme
                 try await group.waitForAll()
                 return .doneClosingAll
             }
-        } catch: { return .send($0) }
+        } catch: { return .send($0) }.animation()
     case .doneClosingAll:
         state.isLoading = .loaded
         return Effect(value: DevicesAtion.fetchFromRemote)

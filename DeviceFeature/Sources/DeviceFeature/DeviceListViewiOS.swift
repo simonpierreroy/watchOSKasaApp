@@ -32,7 +32,7 @@ public struct DeviceListViewiOS: View {
                             .navigationBarItems(
                                 trailing:
                                     Button {
-                                        viewStore.send(.tappedLogout)
+                                        viewStore.send(.tappedLogout, animation: .default)
                                     } label: {
                                         Text(Strings.logout_app.key, bundle: .module)
                                             .foregroundColor(Color.logout)
@@ -84,7 +84,7 @@ private struct DeviceListViewSideBar: View {
             List(ListSideBar.allCases) { tab in
                 switch tab {
                 case .refresh:
-                    Button(action: { viewStore.send(.tappedRefreshButton)}) {
+                    Button(action: { viewStore.send(.tappedRefreshButton, animation: .default)}) {
                         LoadingView(.constant(viewStore.isRefreshingDevices == .loadingDevices)){
                             HStack {
                                 Image(systemName: "arrow.clockwise.circle.fill")
@@ -95,7 +95,7 @@ private struct DeviceListViewSideBar: View {
                     }
                 case .logout:
                     Button {
-                        viewStore.send(.tappedLogout)
+                        viewStore.send(.tappedLogout, animation: .default)
                     } label: {
                         HStack {
                             Image(systemName: "book.closed.fill")
@@ -104,7 +104,7 @@ private struct DeviceListViewSideBar: View {
                         }
                     }
                 case .closeAll:
-                    Button(action: { viewStore.send(.tappedCloseAll)}) {
+                    Button(action: { viewStore.send(.tappedCloseAll, animation: .default)}) {
                         LoadingView(.constant(viewStore.isRefreshingDevices == .closingAll)) {
                             HStack {
                                 Image(systemName: "moon.fill")
@@ -155,7 +155,7 @@ private struct DeviceListViewBase: View {
                     )
                     
                     if horizontalSizeClass == .compact {
-                        Button(action: { viewStore.send(.tappedCloseAll)}) {
+                        Button(action: { viewStore.send(.tappedCloseAll, animation: .default)}) {
                             LoadingView(.constant(viewStore.isRefreshingDevices == .closingAll)) {
                                 Image(systemName: "moon.fill")
                                 Text(Strings.close_all.key, bundle: .module)
@@ -163,7 +163,7 @@ private struct DeviceListViewBase: View {
                         }
                         .modifier(ContentStyle(isLoading: viewStore.isRefreshingDevices.isInFlight))
                         
-                        Button(action: { viewStore.send(.tappedRefreshButton)}) {
+                        Button(action: { viewStore.send(.tappedRefreshButton, animation: .default)}) {
                             LoadingView(.constant(viewStore.isRefreshingDevices == .loadingDevices)){ Image(systemName: "arrow.clockwise.circle.fill")
                                 Text(Strings.refresh_list.key, bundle: .module)
                             }

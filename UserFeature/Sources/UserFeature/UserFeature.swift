@@ -68,7 +68,7 @@ public let userReducer = Reducer<UserState, UserAction, UserEnvironment> { state
             return .set(.init(token: token))
         } catch : { error in
             return .send(error)
-        }
+        }.animation()
     case .send(let error):
         state.status = .logout
         state.route = .error(error)
