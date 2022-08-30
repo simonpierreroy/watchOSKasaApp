@@ -24,6 +24,15 @@ extension Networking.App {
         
         let system: SubSystem
         let context: Context?
+        
+        func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+            try container.encode(system, forKey: .system)
+            // Only Encode none empty context
+            if let context = context, context.child_ids.count > 0 {
+                try container.encode(context, forKey: .context)
+            }
+        }
     }
     
     private struct SystemInfoDiscover: Codable {}
