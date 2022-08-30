@@ -11,6 +11,7 @@ import ComposableArchitecture
 import DeviceClient
 import BaseUI
 import KasaCore
+import Foundation
 
 #if os(iOS)
 

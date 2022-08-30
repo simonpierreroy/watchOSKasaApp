@@ -11,6 +11,7 @@ import Combine
 import KasaCore
 import DeviceClient
 import BaseUI
+import Foundation
 
 
 #if os(watchOS)

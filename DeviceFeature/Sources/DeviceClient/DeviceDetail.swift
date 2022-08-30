@@ -2,6 +2,7 @@ import ComposableArchitecture
 import Combine
 import Tagged
 import KasaCore
+import Foundation
 
 
 public struct DeviceDetailEvironment {

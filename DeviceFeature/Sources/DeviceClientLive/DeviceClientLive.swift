@@ -3,6 +3,7 @@ import DeviceClient
 import ComposableArchitecture
 import Combine
 import KasaCore
+import Foundation
 
 extension Device.ID {
     func networkDeviceID() -> Networking.App.DeviceID {

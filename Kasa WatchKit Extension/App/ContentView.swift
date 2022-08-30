@@ -12,6 +12,7 @@ import KasaCore
 import DeviceFeature
 import UserFeature
 import AppPackage
+import Foundation
 
 struct ContentView: View {
     

@@ -15,6 +15,7 @@ import DeviceClient
 import DeviceClientLive
 import KasaCore
 import AppPackage
+import Foundation
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {

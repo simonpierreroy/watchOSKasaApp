@@ -13,6 +13,7 @@ import ComposableArchitecture
 import AppPackage
 import KasaCore
 import DeviceClient
+import Foundation
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     

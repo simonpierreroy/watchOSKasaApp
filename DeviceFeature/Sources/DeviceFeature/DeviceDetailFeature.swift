@@ -4,6 +4,7 @@ import Combine
 import Tagged
 import KasaCore
 import DeviceClient
+import Foundation
 
 public struct DeviceSate: Equatable, Identifiable {
     

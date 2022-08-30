@@ -14,6 +14,7 @@ import DeviceClient
 import DeviceClientLive
 import KasaCore
 import AppPackage
+import Foundation
 
 class ExtensionDelegate: NSObject, WKExtensionDelegate {
     
