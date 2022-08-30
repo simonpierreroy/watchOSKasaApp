@@ -15,75 +15,28 @@ import WidgetClientLive
 import WidgetClient
 import DeviceClient
 
+extension DataDeviceEntry: TimelineEntry { }
+
 struct Provider: TimelineProvider {
     
-    func newEntry(for context: Context,  completion: @escaping (DataDeviceEntry) -> ()) {
-        let entry: DataDeviceEntry
-        defer { completion(entry) }
-        
-        guard let cache = try? getCacheState(environment: .live) else {
-            entry = DataDeviceEntry(date: Date(), userIsLogged: false, devices: [])
-            return
-        }
-        
-        if cache.user == nil {
-            entry = DataDeviceEntry(date: Date(), userIsLogged: false, devices: [])
-        } else {
-            entry = DataDeviceEntry(date: Date(), userIsLogged: true, devices: cache.device)
-        }
-    }
-    
     func placeholder(in context: Context) -> DataDeviceEntry {
-        DataDeviceEntry.preview(10)
+        .preview(10)
     }
     
     func getSnapshot(in context: Context, completion: @escaping (DataDeviceEntry) -> ()) {
-        newEntry(for: context, completion: completion)
+        completion(newEntry(env: .live, for: context))
     }
     
     func getTimeline(in context: Context, completion: @escaping (Timeline<Entry>) -> ()) {
-        newEntry(for: context) { entry in
-            let currentDate = Date()
-            let entryDate = Calendar.current.date(byAdding: .hour, value: 24, to: currentDate)!
-            let timeline = Timeline(
-                entries: [entry],
-                policy: .after(entryDate)
-            )
-            completion(timeline)
-        }
-    }
-}
-
-struct DataDeviceEntry: TimelineEntry {
-    static func preview(_ n: Int) -> DataDeviceEntry  {
-        guard n > 0 else {
-            return DataDeviceEntry.init(date: Date(), userIsLogged: true, devices: [])
-        }
-        return DataDeviceEntry(
-            date: Date(),
-            userIsLogged: true,
-            devices: (1...n).map{ Device.init(
-                id: .init(rawValue: "\($0)"),
-                name: "Lampe du salaon \($0)",
-                children: $0 == 3 ? [
-                    .init(id: .init(rawValue: "child 1\($0)"), name: "child 1 of \($0)", state: false),
-                    .init(id: .init(rawValue: "child 2\($0)"), name: "child 1 of \($0)", state: false)
-                ] : [],
-                state: false)
-            }
+        let entry = newEntry(env: .live, for: context)
+        let currentDate = Date()
+        let entryDate = Calendar.current.date(byAdding: .hour, value: 24, to: currentDate)!
+        let timeline = Timeline(
+            entries: [entry],
+            policy: .after(entryDate)
         )
+        completion(timeline)
     }
-    
-    static let previewLogout = DataDeviceEntry(
-        date: Date(),
-        userIsLogged: false,
-        devices: []
-    )
-    
-    let date: Date
-    let userIsLogged: Bool
-    let devices: [Device]
-    
 }
 
 struct KasaAppWidgetEntryView : View {
