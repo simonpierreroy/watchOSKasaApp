@@ -32,11 +32,12 @@ public struct DeviceListViewWatch: View {
                     ForEachStore(
                         self.store.scope(
                             state: \.devicesToDisplay,
-                            action: Action.tappedDevice(index:action:)
+                            action: { index, action in
+                                Action.tappedDevice(index: index.parent, action: action)
+                            }
                         ),
                         content: DeviceDetailViewWatch.init(store:)
                     )
-                    
                     
                     Button(action: { viewStore.send(.tappedCloseAll, animation: .default)}) {
                         LoadingView(.constant(viewStore.isRefreshingDevices == .closingAll)) {
@@ -81,44 +82,39 @@ public struct DeviceListViewWatch: View {
     }
 }
 
-extension DeviceListViewWatch {
-    struct AlertInfo: Identifiable {
-        var title: String
-        var id: String { self.title }
-    }
+struct AlertInfo: Identifiable {
+    var title: String
+    var id: String { self.title }
 }
 
 struct DeviceDetailViewWatch: View {
     
-    let store: Store<DeviceSate, DeviceListViewWatch.Action.DeviceAction>
+    let store: Store<ListEntry, DeviceListViewWatch.Action.DeviceAction>
     
     var body: some View {
         WithViewStore(self.store) { viewStore in
-            VStack {
-                switch viewStore.relay?.rawValue {
-                case .some(true), .some(false):
-                    DeviceDetailNoChildViewWatch(store: self.store)
-                case .none:
-                    VStack(alignment: .center) {
-                        HStack {
-                            Image(systemName: "rectangle.3.group.fill")
-                            Text(Strings.device_group.key, bundle: .module)
-                        }
-                        Spacer()
-                        ForEachStore(
-                            self.store.scope(
-                                state: \DeviceSate.children,
-                                action: DeviceListViewWatch.Action.DeviceAction.tappedDeviceChild(index:action:)
-                            ) , content: { store in
-                                DeviceChildViewWatch(store: store)
-                            })
-                    }.padding()
+            Button(action: {
+                if let child = viewStore.child {
+                    viewStore.send(.tappedDeviceChild(index: child.id, action: .toggleChild), animation: .default)
+                } else {
+                    viewStore.send(.tapped, animation: .default)
                 }
-            }
-            .disabled(viewStore.isLoading)
-            .alert(
+            }) {
+                HStack {
+                    let style = styleForRelayState(relay: viewStore.child?.relay ?? viewStore.device.relay)
+                    Image(systemName: style.image).font(.title3)
+                        .foregroundColor(style.taint)
+                    Text(viewStore.child?.name ?? viewStore.device.name)
+                        .multilineTextAlignment(.center)
+                    Spacer()
+                }
+            }.frame(maxWidth: .infinity).overlay(alignment: .center) {
+                HStack {
+                    if (viewStore.device.isLoading)  { ProgressView () }
+                }
+            }.alert(
                 item: viewStore.binding(
-                    get: { $0.error.map(AlertInfo.init(title:))},
+                    get: { $0.device.error.map(AlertInfo.init(title:))},
                     send: .tappedErrorAlert
                 ),
                 content: { Alert(title: Text($0.title)) }
@@ -126,60 +122,31 @@ struct DeviceDetailViewWatch: View {
         }
     }
 }
-public struct DeviceChildViewWatch: View {
-    
-    let store: Store<DeviceSate.DeviceChildrenSate, DeviceChildAction>
-    
-    public var body: some View {
-        WithViewStore(self.store) { viewStore in
-            Button(action: { viewStore.send(.toggleChild, animation: .default) }) {
-                HStack {
-                    let style = styleForRelayState(relay: viewStore.relay)
-                    Image(systemName: style.image).font(.title3).foregroundColor(style.taint)
-                    Text(viewStore.name)
-                }
-            }
-        }
-    }
-}
 
 
-struct DeviceDetailNoChildViewWatch: View {
-    
-    let store: Store<DeviceSate, DeviceListViewWatch.Action.DeviceAction>
-    
-    var body: some View {
-        WithViewStore(self.store) { viewStore in
-            Button(action: { viewStore.send(.tapped, animation: .default) }) {
-                HStack {
-                    let style = styleForRelayState(relay: viewStore.relay)
-                    Image(systemName: style.image).font(.title3).foregroundColor(style.taint)
-                    Text(viewStore.name).multilineTextAlignment(.center)
-                    Spacer()
-                }
-            }.frame(maxWidth: .infinity).overlay(alignment: .center) {
-                HStack {
-                    if viewStore.isLoading  { ProgressView () }
-                }
-            }
-        }
+public struct ListEntry: Equatable, Identifiable  {
+    public struct DoubleID: Equatable, Hashable {
+        let parent: Device.ID
+        let child: Device.ID?
     }
-}
-
-extension DeviceDetailViewWatch {
-    struct AlertInfo: Identifiable {
-        var title: String
-        var id: String { self.title }
+    
+    public init(device: DeviceSate, child: DeviceSate.DeviceChildrenSate?) {
+        self.device = device
+        self.child = child
     }
+    
+    public var id: DoubleID  { .init(parent: self.device.id, child: self.child?.id) }
+    let device: DeviceSate
+    let child: DeviceSate.DeviceChildrenSate?
 }
 
 public extension DeviceListViewWatch {
-    
+        
     struct StateView: Equatable {
         public init(
             errorMessageToDisplayText: String?,
             isRefreshingDevices: DevicesState.Loading,
-            devicesToDisplay: IdentifiedArrayOf<DeviceSate>
+            devicesToDisplay: IdentifiedArrayOf<ListEntry>
         ) {
             self.errorMessageToDisplayText = errorMessageToDisplayText
             self.isRefreshingDevices = isRefreshingDevices
@@ -188,7 +155,7 @@ public extension DeviceListViewWatch {
         
         let errorMessageToDisplayText: String?
         let isRefreshingDevices: DevicesState.Loading
-        let devicesToDisplay: IdentifiedArrayOf<DeviceSate>
+        let devicesToDisplay: IdentifiedArrayOf<ListEntry>
     }
     
     enum Action {
@@ -222,8 +189,7 @@ public extension DeviceDetailAction {
     }
 }
 
-#if DEBUG
-extension DeviceListViewWatch.StateView {
+public extension DeviceListViewWatch.StateView {
     init(devices: DevicesState) {
         switch devices.route {
         case nil:
@@ -232,11 +198,21 @@ extension DeviceListViewWatch.StateView {
             self.errorMessageToDisplayText = error.localizedDescription
         }
         
-        self.devicesToDisplay = devices.devices
+        var entries: [ListEntry] = []
+        for device in devices.devices {
+            if device.children.isEmpty {
+                entries.append(ListEntry(device: device, child: nil))
+            } else {
+                entries.append(contentsOf: device.children.map { ListEntry(device: device, child: $0) })
+            }
+        }
+        
+        self.devicesToDisplay = .init(uniqueElements: entries)
         self.isRefreshingDevices = devices.isLoading
     }
 }
 
+#if DEBUG
 extension DevicesAtion {
     init(deviceAction: DeviceListViewWatch.Action) {
         switch deviceAction {
@@ -254,7 +230,6 @@ extension DevicesAtion {
         }
     }
 }
-
 
 struct DeviceListView_Previews: PreviewProvider {
     static var previews: some View {

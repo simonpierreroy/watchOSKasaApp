@@ -126,20 +126,7 @@ public extension AppAction {
 
 public extension DeviceListViewWatch.StateView {
     init(appState: AppState) {
-        let errorMessageToDisplayText: String?
-        
-        switch appState.devicesState.route {
-        case nil:
-            errorMessageToDisplayText = nil
-        case .some(.error(let error)):
-            errorMessageToDisplayText = error.localizedDescription
-        }
-        
-        self.init(
-            errorMessageToDisplayText: errorMessageToDisplayText,
-            isRefreshingDevices: appState.devicesState.isLoading,
-            devicesToDisplay: appState.devicesState.devices
-        )
+        self.init(devices: appState.devicesState)
     }
 }
 #elseif os(iOS)
@@ -163,20 +150,7 @@ public extension AppAction {
 
 public extension DeviceListViewiOS.StateView {
     init(appState: AppState) {
-        let errorMessageToDisplayText: String?
-        
-        switch appState.devicesState.route {
-        case nil:
-            errorMessageToDisplayText = nil
-        case .some(.error(let error)):
-            errorMessageToDisplayText = error.localizedDescription
-        }
-        
-        self.init(
-            errorMessageToDisplayText: errorMessageToDisplayText,
-            isRefreshingDevices: appState.devicesState.isLoading,
-            devicesToDisplay: appState.devicesState.devices
-        )
+        self.init(devices: appState.devicesState)
     }
 }
 #endif

@@ -331,8 +331,8 @@ public extension DeviceDetailAction {
     }
 }
 
-#if DEBUG
-extension DeviceListViewiOS.StateView {
+
+public extension DeviceListViewiOS.StateView {
     init(devices: DevicesState) {
         switch devices.route {
         case nil:
@@ -346,6 +346,7 @@ extension DeviceListViewiOS.StateView {
     }
 }
 
+#if DEBUG
 extension DevicesAtion {
     init(deviceAction: DeviceListViewiOS.Action) {
         switch deviceAction {
