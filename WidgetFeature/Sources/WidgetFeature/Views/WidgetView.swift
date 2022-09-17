@@ -8,6 +8,7 @@
 import SwiftUI
 import DeviceClient
 import RoutingClient
+import WidgetKit
 
 public struct WidgetView: View {
     
@@ -24,6 +25,23 @@ public struct WidgetView: View {
     let logged: Bool
     let devices: [Device]
     let getURL: (AppLink) -> URL
+    @Environment(\.widgetFamily) var widgetFamily
+    
+    @ViewBuilder
+    static func getBackground(for widgetFamily: WidgetFamily) -> some View {
+        Group {
+            switch widgetFamily {
+            case  .accessoryCircular, .accessoryInline:
+                AccessoryWidgetBackground()
+            case  .accessoryRectangular:
+                EmptyView()
+            case .systemMedium, .systemSmall, .systemLarge, .systemExtraLarge :
+                GradientBackgroundWidget()
+            @unknown default:
+                EmptyView()
+            }
+        }
+    }
     
     public var body: some View {
         VStack {
@@ -33,6 +51,6 @@ public struct WidgetView: View {
                 LogoutView(getURL: getURL)
             }
         }.frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background(BackgroundWidget())
+            .background(WidgetView.getBackground(for: widgetFamily))
     }
 }

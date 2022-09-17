@@ -62,6 +62,7 @@ extension Networking.App {
         public let children: [KasaChildrenDevice]?
         public let relay_state: RawState?
         public let sw_ver: String
+        public let hw_ver: String
         public let model: String
         public let mac: String
         let err_code: Int

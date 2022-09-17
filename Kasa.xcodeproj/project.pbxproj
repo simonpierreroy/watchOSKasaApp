@@ -11,7 +11,7 @@
 		32213C7D25283032009F42FD /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 32213C7C25283032009F42FD /* SwiftUI.framework */; };
 		32213C8025283032009F42FD /* KasaAppWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32213C7F25283032009F42FD /* KasaAppWidget.swift */; };
 		32213C8225283032009F42FD /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 32213C8125283032009F42FD /* Assets.xcassets */; };
-		32213C8625283032009F42FD /* KasaAppWidgetExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 32213C7925283032009F42FD /* KasaAppWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		32213C8625283032009F42FD /* KasaAppWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 32213C7925283032009F42FD /* KasaAppWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		32821CEF2526DB50005E9623 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32821CEE2526DB50005E9623 /* AppDelegate.swift */; };
 		32821CF12526DB50005E9623 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32821CF02526DB50005E9623 /* SceneDelegate.swift */; };
 		32821CF32526DB50005E9623 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32821CF22526DB50005E9623 /* ContentView.swift */; };
@@ -22,15 +22,12 @@
 		32821D112526DB50005E9623 /* KasaAppUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32821D102526DB50005E9623 /* KasaAppUITests.swift */; };
 		32821D222526DB97005E9623 /* AppPackage in Frameworks */ = {isa = PBXBuildFile; productRef = 32821D212526DB97005E9623 /* AppPackage */; };
 		328950E024821A3800EC3A49 /* Kasa.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 328950DF24821A3800EC3A49 /* Kasa.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		328950E624821A3800EC3A49 /* Interface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 328950E424821A3800EC3A49 /* Interface.storyboard */; };
 		328950E824821A3900EC3A49 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 328950E724821A3900EC3A49 /* Assets.xcassets */; };
-		328950EF24821A3900EC3A49 /* Kasa WatchKit Extension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 328950EE24821A3900EC3A49 /* Kasa WatchKit Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		328950F424821A3900EC3A49 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 328950F324821A3900EC3A49 /* ContentView.swift */; };
-		328950F624821A3900EC3A49 /* HostingController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 328950F524821A3900EC3A49 /* HostingController.swift */; };
-		328950F824821A3900EC3A49 /* ExtensionDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 328950F724821A3900EC3A49 /* ExtensionDelegate.swift */; };
-		328950FA24821A3A00EC3A49 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 328950F924821A3A00EC3A49 /* Assets.xcassets */; };
+		328950F624821A3900EC3A49 /* KasaWatchAppApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 328950F524821A3900EC3A49 /* KasaWatchAppApp.swift */; };
+		328950F824821A3900EC3A49 /* KasaWatchAppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 328950F724821A3900EC3A49 /* KasaWatchAppDelegate.swift */; };
 		328950FD24821A3A00EC3A49 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 328950FC24821A3A00EC3A49 /* Preview Assets.xcassets */; };
-		32D3F93525156CC300A8446C /* AppPackage in Frameworks */ = {isa = PBXBuildFile; productRef = 32D3F93425156CC300A8446C /* AppPackage */; };
+		B34A03D528D568640012C6BB /* AppPackage in Frameworks */ = {isa = PBXBuildFile; productRef = B34EB0C328D1984B00FA99BD /* AppPackage */; };
 		B39BE5D928B7E76E001A4C18 /* WidgetPackage in Frameworks */ = {isa = PBXBuildFile; productRef = B39BE5D828B7E76E001A4C18 /* WidgetPackage */; };
 /* End PBXBuildFile section */
 
@@ -63,36 +60,18 @@
 			remoteGlobalIDString = 328950DE24821A3800EC3A49;
 			remoteInfo = "Kasa WatchKit App";
 		};
-		328950F024821A3900EC3A49 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 328950D524821A3800EC3A49 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 328950ED24821A3900EC3A49;
-			remoteInfo = "Kasa WatchKit Extension";
-		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		32213C8725283032009F42FD /* Embed App Extensions */ = {
+		32213C8725283032009F42FD /* Embed Foundation Extensions */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
-				32213C8625283032009F42FD /* KasaAppWidgetExtension.appex in Embed App Extensions */,
+				32213C8625283032009F42FD /* KasaAppWidgetExtension.appex in Embed Foundation Extensions */,
 			);
-			name = "Embed App Extensions";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		3289510424821A3A00EC3A49 /* Embed App Extensions */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 13;
-			files = (
-				328950EF24821A3900EC3A49 /* Kasa WatchKit Extension.appex in Embed App Extensions */,
-			);
-			name = "Embed App Extensions";
+			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		3289510824821A3A00EC3A49 /* Embed Watch Content */ = {
@@ -119,7 +98,6 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		320B1DD12528F0F300614090 /* Kasa WatchKit Extension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "Kasa WatchKit Extension.entitlements"; sourceTree = "<group>"; };
 		320B1DD22528F10600614090 /* Kasa.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Kasa.entitlements; sourceTree = "<group>"; };
 		32213C7925283032009F42FD /* KasaAppWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = KasaAppWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		32213C7A25283032009F42FD /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
@@ -143,16 +121,12 @@
 		32821D122526DB50005E9623 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		328950DB24821A3800EC3A49 /* Kasa.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Kasa.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		328950DF24821A3800EC3A49 /* Kasa.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Kasa.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		328950E524821A3800EC3A49 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Interface.storyboard; sourceTree = "<group>"; };
 		328950E724821A3900EC3A49 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		328950E924821A3900EC3A49 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		328950EE24821A3900EC3A49 /* Kasa WatchKit Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Kasa WatchKit Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
 		328950F324821A3900EC3A49 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
-		328950F524821A3900EC3A49 /* HostingController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HostingController.swift; sourceTree = "<group>"; };
-		328950F724821A3900EC3A49 /* ExtensionDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExtensionDelegate.swift; sourceTree = "<group>"; };
-		328950F924821A3A00EC3A49 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		328950F524821A3900EC3A49 /* KasaWatchAppApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KasaWatchAppApp.swift; sourceTree = "<group>"; };
+		328950F724821A3900EC3A49 /* KasaWatchAppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KasaWatchAppDelegate.swift; sourceTree = "<group>"; };
 		328950FC24821A3A00EC3A49 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
-		328950FE24821A3A00EC3A49 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		32A8D00C2528EA9C003FD623 /* KasaApp.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = KasaApp.entitlements; sourceTree = "<group>"; };
 		32A8D00D2528EACC003FD623 /* KasaAppWidgetExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = KasaAppWidgetExtension.entitlements; sourceTree = "<group>"; };
 		32CC942225CF14D8009E2176 /* WidgetFeature */ = {isa = PBXFileReference; lastKnownFileType = folder; path = WidgetFeature; sourceTree = "<group>"; };
@@ -200,7 +174,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				32D3F93525156CC300A8446C /* AppPackage in Frameworks */,
+				B34A03D528D568640012C6BB /* AppPackage in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -269,7 +243,6 @@
 				32D3F920251566C200A8446C /* UserFeature */,
 				32CC942225CF14D8009E2176 /* WidgetFeature */,
 				328950E324821A3800EC3A49 /* Kasa WatchKit App */,
-				328950F224821A3900EC3A49 /* Kasa WatchKit Extension */,
 				32821CED2526DB50005E9623 /* KasaApp */,
 				32821D042526DB50005E9623 /* KasaAppTests */,
 				32821D0F2526DB50005E9623 /* KasaAppUITests */,
@@ -284,7 +257,6 @@
 			children = (
 				328950DB24821A3800EC3A49 /* Kasa.app */,
 				328950DF24821A3800EC3A49 /* Kasa.app */,
-				328950EE24821A3900EC3A49 /* Kasa WatchKit Extension.appex */,
 				32821CEC2526DB50005E9623 /* KasaApp.app */,
 				32821D012526DB50005E9623 /* KasaAppTests.xctest */,
 				32821D0C2526DB50005E9623 /* KasaAppUITests.xctest */,
@@ -297,25 +269,14 @@
 			isa = PBXGroup;
 			children = (
 				320B1DD22528F10600614090 /* Kasa.entitlements */,
-				328950E424821A3800EC3A49 /* Interface.storyboard */,
 				328950E724821A3900EC3A49 /* Assets.xcassets */,
 				328950E924821A3900EC3A49 /* Info.plist */,
-			);
-			path = "Kasa WatchKit App";
-			sourceTree = "<group>";
-		};
-		328950F224821A3900EC3A49 /* Kasa WatchKit Extension */ = {
-			isa = PBXGroup;
-			children = (
-				320B1DD12528F0F300614090 /* Kasa WatchKit Extension.entitlements */,
-				3289512C2482321800EC3A49 /* App */,
-				328950F524821A3900EC3A49 /* HostingController.swift */,
-				328950F724821A3900EC3A49 /* ExtensionDelegate.swift */,
-				328950F924821A3A00EC3A49 /* Assets.xcassets */,
-				328950FE24821A3A00EC3A49 /* Info.plist */,
+				328950F524821A3900EC3A49 /* KasaWatchAppApp.swift */,
+				328950F724821A3900EC3A49 /* KasaWatchAppDelegate.swift */,
+				328950F324821A3900EC3A49 /* ContentView.swift */,
 				328950FB24821A3A00EC3A49 /* Preview Content */,
 			);
-			path = "Kasa WatchKit Extension";
+			path = "Kasa WatchKit App";
 			sourceTree = "<group>";
 		};
 		328950FB24821A3A00EC3A49 /* Preview Content */ = {
@@ -324,14 +285,6 @@
 				328950FC24821A3A00EC3A49 /* Preview Assets.xcassets */,
 			);
 			path = "Preview Content";
-			sourceTree = "<group>";
-		};
-		3289512C2482321800EC3A49 /* App */ = {
-			isa = PBXGroup;
-			children = (
-				328950F324821A3900EC3A49 /* ContentView.swift */,
-			);
-			path = App;
 			sourceTree = "<group>";
 		};
 		32EE973C248368AC00C2E7E5 /* Frameworks */ = {
@@ -373,7 +326,7 @@
 				32821CE82526DB50005E9623 /* Sources */,
 				32821CE92526DB50005E9623 /* Frameworks */,
 				32821CEA2526DB50005E9623 /* Resources */,
-				32213C8725283032009F42FD /* Embed App Extensions */,
+				32213C8725283032009F42FD /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
@@ -446,38 +399,21 @@
 			buildConfigurationList = 3289510524821A3A00EC3A49 /* Build configuration list for PBXNativeTarget "Kasa WatchKit App" */;
 			buildPhases = (
 				328950DD24821A3800EC3A49 /* Resources */,
-				3289510424821A3A00EC3A49 /* Embed App Extensions */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				328950F124821A3900EC3A49 /* PBXTargetDependency */,
-			);
-			name = "Kasa WatchKit App";
-			productName = "Kasa WatchKit App";
-			productReference = 328950DF24821A3800EC3A49 /* Kasa.app */;
-			productType = "com.apple.product-type.application.watchapp2";
-		};
-		328950ED24821A3900EC3A49 /* Kasa WatchKit Extension */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 3289510124821A3A00EC3A49 /* Build configuration list for PBXNativeTarget "Kasa WatchKit Extension" */;
-			buildPhases = (
 				328950EA24821A3900EC3A49 /* Sources */,
 				328950EB24821A3900EC3A49 /* Frameworks */,
-				328950EC24821A3900EC3A49 /* Resources */,
 				3289511D24821B8C00EC3A49 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
-			name = "Kasa WatchKit Extension";
+			name = "Kasa WatchKit App";
 			packageProductDependencies = (
-				32D3F93425156CC300A8446C /* AppPackage */,
+				B34EB0C328D1984B00FA99BD /* AppPackage */,
 			);
-			productName = "Kasa WatchKit Extension";
-			productReference = 328950EE24821A3900EC3A49 /* Kasa WatchKit Extension.appex */;
-			productType = "com.apple.product-type.watchkit2-extension";
+			productName = "Kasa WatchKit App";
+			productReference = 328950DF24821A3800EC3A49 /* Kasa.app */;
+			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
 
@@ -486,7 +422,7 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 1200;
-				LastUpgradeCheck = 1200;
+				LastUpgradeCheck = 1400;
 				ORGANIZATIONNAME = Simon;
 				TargetAttributes = {
 					32213C7825283032009F42FD = {
@@ -509,9 +445,6 @@
 					328950DE24821A3800EC3A49 = {
 						CreatedOnToolsVersion = 11.4.1;
 					};
-					328950ED24821A3900EC3A49 = {
-						CreatedOnToolsVersion = 11.4.1;
-					};
 				};
 			};
 			buildConfigurationList = 328950D824821A3800EC3A49 /* Build configuration list for PBXProject "Kasa" */;
@@ -532,7 +465,6 @@
 			targets = (
 				328950DA24821A3800EC3A49 /* Kasa */,
 				328950DE24821A3800EC3A49 /* Kasa WatchKit App */,
-				328950ED24821A3900EC3A49 /* Kasa WatchKit Extension */,
 				32821CEB2526DB50005E9623 /* KasaApp */,
 				32821D002526DB50005E9623 /* KasaAppTests */,
 				32821D0B2526DB50005E9623 /* KasaAppUITests */,
@@ -586,16 +518,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				328950E824821A3900EC3A49 /* Assets.xcassets in Resources */,
-				328950E624821A3800EC3A49 /* Interface.storyboard in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		328950EC24821A3900EC3A49 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
 				328950FD24821A3A00EC3A49 /* Preview Assets.xcassets in Resources */,
-				328950FA24821A3A00EC3A49 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -640,9 +563,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				328950F624821A3900EC3A49 /* HostingController.swift in Sources */,
+				328950F624821A3900EC3A49 /* KasaWatchAppApp.swift in Sources */,
 				328950F424821A3900EC3A49 /* ContentView.swift in Sources */,
-				328950F824821A3900EC3A49 /* ExtensionDelegate.swift in Sources */,
+				328950F824821A3900EC3A49 /* KasaWatchAppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -669,11 +592,6 @@
 			target = 328950DE24821A3800EC3A49 /* Kasa WatchKit App */;
 			targetProxy = 328950E124821A3800EC3A49 /* PBXContainerItemProxy */;
 		};
-		328950F124821A3900EC3A49 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 328950ED24821A3900EC3A49 /* Kasa WatchKit Extension */;
-			targetProxy = 328950F024821A3900EC3A49 /* PBXContainerItemProxy */;
-		};
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
@@ -683,14 +601,6 @@
 				32821CFA2526DB50005E9623 /* Base */,
 			);
 			name = LaunchScreen.storyboard;
-			sourceTree = "<group>";
-		};
-		328950E424821A3800EC3A49 /* Interface.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				328950E524821A3800EC3A49 /* Base */,
-			);
-			name = Interface.storyboard;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */
@@ -705,7 +615,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = K7R4MCZ9EX;
 				INFOPLIST_FILE = KasaAppWidget/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -728,7 +638,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = K7R4MCZ9EX;
 				INFOPLIST_FILE = KasaAppWidget/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -754,7 +664,7 @@
 				DEVELOPMENT_TEAM = K7R4MCZ9EX;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = KasaApp/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -778,7 +688,7 @@
 				DEVELOPMENT_TEAM = K7R4MCZ9EX;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = KasaApp/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -797,7 +707,7 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				INFOPLIST_FILE = KasaAppTests/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -818,7 +728,7 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				INFOPLIST_FILE = KasaAppTests/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -838,7 +748,7 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				INFOPLIST_FILE = KasaAppUITests/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -858,7 +768,7 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				INFOPLIST_FILE = KasaAppUITests/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -924,6 +834,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -931,6 +842,7 @@
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				WATCHOS_DEPLOYMENT_TARGET = 9.0;
 			};
 			name = Debug;
 		};
@@ -980,6 +892,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				OTHER_SWIFT_FLAGS = "-Xfrontend -warn-concurrency -Xfrontend -enable-actor-data-race-checks";
@@ -987,100 +900,53 @@
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				VALIDATE_PRODUCT = YES;
-			};
-			name = Release;
-		};
-		3289510224821A3A00EC3A49 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_COMPLICATION_NAME = Complication;
-				CODE_SIGN_ENTITLEMENTS = "Kasa WatchKit Extension/Kasa WatchKit Extension.entitlements";
-				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_ASSET_PATHS = "\"Kasa WatchKit Extension/Preview Content\"";
-				DEVELOPMENT_TEAM = K7R4MCZ9EX;
-				ENABLE_PREVIEWS = YES;
-				INFOPLIST_FILE = "Kasa WatchKit Extension/Info.plist";
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@executable_path/../../Frameworks",
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.kasa.KasaWatchApp.watchkitapp.watchkitextension;
-				PRODUCT_NAME = "${TARGET_NAME}";
-				PROVISIONING_PROFILE_SPECIFIER = "";
-				SDKROOT = watchos;
-				SKIP_INSTALL = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 4;
-				WATCHOS_DEPLOYMENT_TARGET = 8.0;
-			};
-			name = Debug;
-		};
-		3289510324821A3A00EC3A49 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_COMPLICATION_NAME = Complication;
-				CODE_SIGN_ENTITLEMENTS = "Kasa WatchKit Extension/Kasa WatchKit Extension.entitlements";
-				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_ASSET_PATHS = "\"Kasa WatchKit Extension/Preview Content\"";
-				DEVELOPMENT_TEAM = K7R4MCZ9EX;
-				ENABLE_PREVIEWS = YES;
-				INFOPLIST_FILE = "Kasa WatchKit Extension/Info.plist";
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@executable_path/../../Frameworks",
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.kasa.KasaWatchApp.watchkitapp.watchkitextension;
-				PRODUCT_NAME = "${TARGET_NAME}";
-				PROVISIONING_PROFILE_SPECIFIER = "";
-				SDKROOT = watchos;
-				SKIP_INSTALL = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 4;
-				WATCHOS_DEPLOYMENT_TARGET = 8.0;
+				WATCHOS_DEPLOYMENT_TARGET = 9.0;
 			};
 			name = Release;
 		};
 		3289510624821A3A00EC3A49 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_COMPLICATION_NAME = Complication;
 				CODE_SIGN_ENTITLEMENTS = "Kasa WatchKit App/Kasa.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = K7R4MCZ9EX;
-				IBSC_MODULE = Kasa_WatchKit_Extension;
 				INFOPLIST_FILE = "Kasa WatchKit App/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.kasa.KasaWatchApp.watchkitapp;
 				PRODUCT_NAME = Kasa;
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 4;
-				WATCHOS_DEPLOYMENT_TARGET = 8.0;
+				WATCHOS_DEPLOYMENT_TARGET = 9.0;
 			};
 			name = Debug;
 		};
 		3289510724821A3A00EC3A49 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_COMPLICATION_NAME = Complication;
 				CODE_SIGN_ENTITLEMENTS = "Kasa WatchKit App/Kasa.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = K7R4MCZ9EX;
-				IBSC_MODULE = Kasa_WatchKit_Extension;
 				INFOPLIST_FILE = "Kasa WatchKit App/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.kasa.KasaWatchApp.watchkitapp;
 				PRODUCT_NAME = Kasa;
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 4;
-				WATCHOS_DEPLOYMENT_TARGET = 8.0;
+				WATCHOS_DEPLOYMENT_TARGET = 9.0;
 			};
 			name = Release;
 		};
@@ -1091,6 +957,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = K7R4MCZ9EX;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.kasa.KasaWatchApp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1106,6 +973,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = K7R4MCZ9EX;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.kasa.KasaWatchApp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1162,15 +1030,6 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		3289510124821A3A00EC3A49 /* Build configuration list for PBXNativeTarget "Kasa WatchKit Extension" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				3289510224821A3A00EC3A49 /* Debug */,
-				3289510324821A3A00EC3A49 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
 		3289510524821A3A00EC3A49 /* Build configuration list for PBXNativeTarget "Kasa WatchKit App" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -1196,7 +1055,7 @@
 			isa = XCSwiftPackageProductDependency;
 			productName = AppPackage;
 		};
-		32D3F93425156CC300A8446C /* AppPackage */ = {
+		B34EB0C328D1984B00FA99BD /* AppPackage */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = AppPackage;
 		};

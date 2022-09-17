@@ -11,12 +11,40 @@ import DeviceClient
 import RoutingClient
 
 struct NoDevicesView: View {
+    
+    @Environment(\.widgetFamily) var widgetFamily
+    
+    static func showText(widgetFamily: WidgetFamily) -> Bool {
+        switch widgetFamily {
+        case .accessoryInline, .systemMedium, .systemSmall,
+                .systemLarge, .systemExtraLarge, .accessoryRectangular:
+            return true
+        case .accessoryCircular :
+            return false
+        @unknown default:
+            return false
+        }
+    }
+    
+    static func font(widgetFamily: WidgetFamily) -> Font {
+        switch widgetFamily {
+        case .accessoryRectangular:
+            return .callout
+        case .systemMedium,.systemSmall,.systemLarge,
+                .systemExtraLarge,.accessoryInline,.accessoryCircular:
+            return .largeTitle
+        @unknown default:
+            return .largeTitle
+        }
+    }
+
     var body: some View {
         VStack {
             Image(systemName: "lightbulb.slash.fill")
-                .padding()
-                .font(.largeTitle)
-            Text(Strings.no_device.key, bundle: .module)
+                .font(NoDevicesView.font(widgetFamily: widgetFamily))
+            if NoDevicesView.showText(widgetFamily: widgetFamily) {
+                Text(Strings.no_device.key, bundle: .module)
+            }
         }
     }
 }
@@ -38,6 +66,8 @@ struct DeviceView : View {
         case .systemSmall:
             return (.title, .body)
         case .systemExtraLarge:
+            return (.title, .body)
+        case .accessoryRectangular, .accessoryInline, .accessoryCircular:
             return (.title, .body)
         @unknown default:
             return (.title, .body)
@@ -98,12 +128,42 @@ struct DeviceViewMaybe : View {
 
 struct CloseAll : View {
     let getURL: (AppLink) -> URL
+    let toltalNumberDevices: Int
+    @Environment(\.widgetFamily) var widgetFamily
+
+    
+    static func showText(widgetFamily: WidgetFamily) -> Bool {
+        switch widgetFamily {
+        case .accessoryInline, .systemMedium, .systemSmall,
+                .systemLarge, .systemExtraLarge, .accessoryRectangular:
+            return true
+        case .accessoryCircular :
+            return false
+        @unknown default:
+            return false
+        }
+    }
+    
+    static func font(widgetFamily: WidgetFamily) -> Font {
+        switch widgetFamily {
+        case .accessoryRectangular:
+            return .callout
+        case .systemMedium,.systemSmall,.systemLarge,
+                .systemExtraLarge,.accessoryInline,.accessoryCircular:
+            return .largeTitle
+        @unknown default:
+            return .largeTitle
+        }
+    }
     
     var body: some View {
         Link(destination: getURL(.device(.closeAll))) {
             VStack {
-                Image(systemName: "moon.fill").font(.largeTitle).padding()
-                Text(Strings.close_all.key, bundle: .module).font(.body)
+                Image(systemName: "moon.zzz.fill")
+                    .font(CloseAll.font(widgetFamily: widgetFamily))
+                if CloseAll.showText(widgetFamily: widgetFamily) {
+                    Text(Strings.close_all.key, bundle: .module)
+                }
             }
         }
     }
@@ -118,9 +178,11 @@ struct StackList : View {
         if  devices.count > 0 {
             VStack {
                 switch widgetFamily {
-                case .systemSmall:
-                    CloseAll(getURL: getURL)
-                        .widgetURL(getURL(.device(.closeAll)))
+                case .systemSmall, .accessoryCircular, .accessoryInline, .accessoryRectangular:
+                    CloseAll(
+                        getURL: getURL,
+                        toltalNumberDevices: devices.count
+                    ).widgetURL(getURL(.device(.closeAll)))
                 case .systemMedium :
                     VStack{
                         DeviceRowMaybe(devices: (devices[safeIndex: 0], devices[safeIndex: 1]), getURL: getURL)

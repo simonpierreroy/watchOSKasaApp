@@ -57,6 +57,9 @@ struct KasaAppWidget: Widget {
         StaticConfiguration(kind: kind, provider: Provider()) { entry in
             KasaAppWidgetEntryView(entry: entry)
         }
+        .supportedFamilies([.accessoryCircular,.accessoryInline,
+                            .accessoryRectangular,.systemExtraLarge,
+                            .systemLarge,.systemMedium,.systemSmall])
         .configurationDisplayName("Kasa")
         .description(WidgetFeature.Strings.description_widget.string)
         

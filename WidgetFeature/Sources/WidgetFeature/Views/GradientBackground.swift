@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct BackgroundWidget: View {
+struct GradientBackgroundWidget: View {
     
     var body: some View {
         ContainerRelativeShape().fill(
@@ -27,10 +27,10 @@ struct BackgroundWidget_Previews: PreviewProvider {
 
     static var previews: some View {
         Group {
-            BackgroundWidget()
+            GradientBackgroundWidget()
                 .previewDisplayName("Background Darck")
                 .environment(\.colorScheme, .dark)
-            BackgroundWidget()
+            GradientBackgroundWidget()
                 .previewDisplayName("Background")
                 .environment(\.colorScheme, .light)
         }
