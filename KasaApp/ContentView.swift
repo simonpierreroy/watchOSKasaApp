@@ -17,9 +17,9 @@ import Foundation
 struct ContentView: View {
     
     let store: Store<StateView, Never>
-    let globalStore: Store<AppState, AppAction>
+    let globalStore: StoreOf<AppReducer>
     
-    init(store: Store<AppState, AppAction>) {
+    init(store: StoreOf<AppReducer>) {
         self.globalStore = store
         self.store = store
             .scope(
@@ -32,19 +32,25 @@ struct ContentView: View {
         WithViewStore(self.store) { viewStore in
             HStack {
                 if viewStore.isUserLogged {
-                    DeviceListViewiOS(store: self.globalStore.scope(
-                        state: DeviceListViewiOS.StateView.init(appState:),
-                        action: AppAction.init(deviceAction:)
-                    )
+                    DeviceListViewiOS(
+                        store: self.globalStore
+                            .scope(
+                                state: \.devicesState,
+                                action: AppReducer.Action.devicesAction
+                            )
+                            .scope(
+                                state: DeviceListViewiOS.StateView.init(devices:),
+                                action: DevicesReducer.Action.init(deviceAction:)
+                            )
                     )
                 } else {
                     UserLoginViewiOS(
                         store: self.globalStore.scope(
                             state: \.userState,
-                            action: AppAction.userAction
+                            action: AppReducer.Action.userAction
                         ).scope(
                             state: UserLoginViewiOS.StateView.init(userState:),
-                            action: UserAction.init(userViewAction:)
+                            action: UserReducer.Action.init(userViewAction:)
                         )
                     )
                 }
@@ -61,7 +67,7 @@ extension ContentView {
 }
 
 extension ContentView.StateView {
-    init(appState: AppState) {
+    init(appState: AppReducer.State) {
         switch appState.userState.status {
         case  .loading , .logout:
             self.isUserLogged = false
@@ -76,10 +82,9 @@ extension ContentView.StateView {
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         ContentView(
-            store: Store<AppState, AppAction>.init(
+            store: Store(
                 initialState: .empty,
-                reducer: appReducer,
-                environment: AppEnv.mock(waitFor: 2)
+                reducer: AppReducer()
             )
         )
     }

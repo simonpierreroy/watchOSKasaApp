@@ -20,20 +20,18 @@ import Foundation
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
     
-    static let store: Store<AppState, AppAction> = .init(
-        initialState: AppState.empty,
-        reducer: appReducer,
-        environment: .live
+    static let store = StoreOf<AppReducer>(
+        initialState: .empty,
+        reducer: AppReducer()._printChanges()
     )
     
-    private static let viewStore: ViewStore<Void, AppAction> = {
+    private static let viewStore: ViewStore<Void, AppReducer.Action> = {
         ViewStore(
-            AppDelegate.store
-                .scope(state: always, action: { $0 }),
+            AppDelegate.store.scope(state: always, action: { $0 }),
             removeDuplicates: { _,_ in true }
         )
     }()
-        
+    
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         AppDelegate.viewStore.send(.delegate(.applicationDidFinishLaunching))
         return true
@@ -48,7 +46,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     
     func application(_ application: UIApplication, didDiscardSceneSessions sceneSessions: Set<UISceneSession>) {
- 
+        
     }
     
     func applicationWillTerminate(_ application: UIApplication) {

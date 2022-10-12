@@ -48,7 +48,7 @@ public struct DeviceListViewiOS: View {
                 }
             }.alert(
                 item: viewStore.binding(
-                    get: { $0.errorMessageToDisplayText.map(DeviceListViewiOS.AlertInfo.init(title:))},
+                    get: { $0.errorMessageToDisplayText.map(DeviceListViewiOS.AlertInfo.init(title:)) },
                     send: .tappedErrorAlert
                 ),
                 content: { Alert(title: Text($0.title)) }
@@ -187,8 +187,8 @@ public extension DeviceListViewiOS {
     struct StateView: Equatable {
         public init(
             errorMessageToDisplayText: String?,
-            isRefreshingDevices: DevicesState.Loading,
-            devicesToDisplay: IdentifiedArrayOf<DeviceSate>
+            isRefreshingDevices: DevicesReducer.State.Loading,
+            devicesToDisplay: IdentifiedArrayOf<DeviceReducer.State>
         ) {
             self.errorMessageToDisplayText = errorMessageToDisplayText
             self.isRefreshingDevices = isRefreshingDevices
@@ -196,8 +196,8 @@ public extension DeviceListViewiOS {
         }
         
         let errorMessageToDisplayText: String?
-        let isRefreshingDevices: DevicesState.Loading
-        let devicesToDisplay: IdentifiedArrayOf<DeviceSate>
+        let isRefreshingDevices: DevicesReducer.State.Loading
+        let devicesToDisplay: IdentifiedArrayOf<DeviceReducer.State>
     }
     
     enum Action {
@@ -205,7 +205,7 @@ public extension DeviceListViewiOS {
         public enum DeviceAction {
             case tapped
             case tappedErrorAlert
-            case tappedDeviceChild(index: DeviceSate.ID, action: DeviceChildAction)
+            case tappedDeviceChild(index: DeviceChildReducer.State.ID, action: DeviceChildReducer.Action)
         }
         
         case tappedCloseAll
@@ -213,7 +213,7 @@ public extension DeviceListViewiOS {
         case tappedLogout
         case viewAppearReload
         case tappedRefreshButton
-        case tappedDevice(index: DeviceSate.ID, action: DeviceAction)
+        case tappedDevice(index: DeviceReducer.State.ID, action: DeviceAction)
     }
 }
 
@@ -227,7 +227,7 @@ extension DeviceListViewiOS {
 
 public struct DeviceDetailViewiOS: View {
     
-    let store: Store<DeviceSate, DeviceListViewiOS.Action.DeviceAction>
+    let store: Store<DeviceReducer.State, DeviceListViewiOS.Action.DeviceAction>
     
     public var body: some View {
         WithViewStore(self.store) { viewStore in
@@ -245,7 +245,7 @@ public struct DeviceDetailViewiOS: View {
                         Spacer()
                         ForEachStore(
                             self.store.scope(
-                                state: \DeviceSate.children,
+                                state: \DeviceReducer.State.children,
                                 action: DeviceListViewiOS.Action.DeviceAction.tappedDeviceChild(index:action:)
                             ) , content: { store in
                                 DeviceChildViewiOS(store: store)
@@ -268,7 +268,7 @@ public struct DeviceDetailViewiOS: View {
 
 public struct DeviceNoChildViewiOS: View {
     
-    let store: Store<DeviceSate, DeviceListViewiOS.Action.DeviceAction>
+    let store: Store<DeviceReducer.State, DeviceListViewiOS.Action.DeviceAction>
     
     public var body: some View {
         WithViewStore(self.store) { viewStore in
@@ -286,7 +286,7 @@ public struct DeviceNoChildViewiOS: View {
 
 public struct DeviceChildViewiOS: View {
     
-    let store: Store<DeviceSate.DeviceChildrenSate, DeviceChildAction>
+    let store: Store<DeviceChildReducer.State, DeviceChildReducer.Action>
     
     public var body: some View {
         WithViewStore(self.store) { viewStore in
@@ -319,7 +319,7 @@ struct ContentStyle: ViewModifier {
     }
 }
 
-public extension DeviceDetailAction {
+public extension DeviceReducer.Action {
     init(viewDetailAction: DeviceListViewiOS.Action.DeviceAction) {
         switch viewDetailAction {
         case .tapped:
@@ -334,7 +334,7 @@ public extension DeviceDetailAction {
 
 
 public extension DeviceListViewiOS.StateView {
-    init(devices: DevicesState) {
+    init(devices: DevicesReducer.State) {
         switch devices.route {
         case nil:
             self.errorMessageToDisplayText = nil
@@ -347,12 +347,11 @@ public extension DeviceListViewiOS.StateView {
     }
 }
 
-#if DEBUG
-extension DevicesAtion {
+public extension DevicesReducer.Action {
     init(deviceAction: DeviceListViewiOS.Action) {
         switch deviceAction {
         case .tappedDevice(index: let idx, action: let action):
-            let deviceDetailAction = DeviceDetailAction.init(viewDetailAction: action)
+            let deviceDetailAction = DeviceReducer.Action.init(viewDetailAction: action)
             self = .deviceDetail(index: idx, action: deviceDetailAction)
         case .tappedErrorAlert:
             self = .errorHandled
@@ -361,76 +360,70 @@ extension DevicesAtion {
         case .tappedCloseAll:
             self = .closeAll
         case .tappedLogout:
-            self = .empty
+            self = .logout
         }
     }
 }
 
-
+#if DEBUG
 struct DeviceListViewiOS_Previews: PreviewProvider {
     static var previews: some View {
         Group {
             DeviceListViewiOS(
-                store: Store<DevicesState, DevicesAtion>.init(
+                store: Store(
                     initialState: .emptyNeverLoaded,
-                    reducer: devicesReducer,
-                    // Bump waitFor to play with live preview
-                    environment: .mock(waitFor: 0)
+                    reducer: DevicesReducer()
                 ).scope(
                     state: DeviceListViewiOS.StateView.init(devices:),
-                    action: DevicesAtion.init(deviceAction:)
+                    action: DevicesReducer.Action.init(deviceAction:)
                 )
             ).previewDisplayName("empty")
             
             DeviceListViewiOS(
-                store: Store<DevicesState, DevicesAtion>.init(
+                store: Store(
                     initialState: .emptyLoggedLink,
-                    reducer: devicesReducer,
-                    // Bump waitFor to play with live preview
-                    environment: .mock(waitFor: 0)
+                    reducer: DevicesReducer()
                 ).scope(
                     state: DeviceListViewiOS.StateView.init(devices:),
-                    action: DevicesAtion.init(deviceAction:)
+                    action: DevicesReducer.Action.init(deviceAction:)
                 )
             ).previewDisplayName("Link")
             
             DeviceListViewiOS(
-                store: Store<DevicesState, DevicesAtion>.init(
+                store: Store(
                     initialState: .nDeviceLoaded(n: 5),
-                    reducer: devicesReducer,
-                    // Bump waitFor to play with live preview
-                    environment: .mock(waitFor: 0)
+                    reducer: DevicesReducer()
                 ).scope(
                     state: DeviceListViewiOS.StateView.init(devices:),
-                    action: DevicesAtion.init(deviceAction:)
+                    action: DevicesReducer.Action.init(deviceAction:)
                 )
             ).previewDisplayName("5 item")
             
             DeviceListViewiOS(
-                store: Store<DevicesState, DevicesAtion>.init(
+                store: Store(
                     initialState: .nDeviceLoaded(n: 5, childrenCount: 4),
-                    reducer: devicesReducer,
-                    // Bump waitFor to play with live preview
-                    environment: .mock(waitFor: 0)
+                    reducer: DevicesReducer()
                 ).scope(
                     state: DeviceListViewiOS.StateView.init(devices:),
-                    action: DevicesAtion.init(deviceAction:)
+                    action: DevicesReducer.Action.init(deviceAction:)
                 )
             ).previewDisplayName("Group")
             
             DeviceListViewiOS(
-                store: Store<DevicesState, DevicesAtion>.init(
+                store: Store(
                     initialState: .nDeviceLoaded(n: 4),
-                    reducer: devicesReducer,
-                    environment: .devicesEnvError(
-                        loadError: "Load",
-                        toggleError: "Toggle",
-                        getDevicesError: "Get",
-                        changeDevicesError: "Change"
+                    reducer: DevicesReducer().dependency(
+                        \.devicesClient,
+                         .devicesEnvError(
+                            loadError: "Load",
+                            toggleError: "Toggle",
+                            getDevicesError: "Get",
+                            changeDevicesError: "Change"
+                         )
                     )
                 ).scope(
                     state: DeviceListViewiOS.StateView.init(devices:),
-                    action: DevicesAtion.init(deviceAction:)
+                    action: DevicesReducer.Action.init(deviceAction:)
                 )
             ).preferredColorScheme(.dark)
                 .previewDisplayName("Error on item")

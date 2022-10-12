@@ -3,68 +3,15 @@ import ComposableArchitecture
 import Combine
 import Tagged
 import KasaCore
+import XCTestDynamicOverlay
 
-public struct Device: Equatable, Identifiable, Codable {
+public struct DevicesClient {
     
-    public struct DeviceChild: Equatable, Identifiable, Codable {
-        public init(id: Id, name: String, state: RelayIsOn) {
-            self.id = id
-            self.name = name
-            self.state = state
-        }
-        
-        public let id: Id
-        public let name: String
-        public var state: RelayIsOn
-    }
-    
-    
-    public init(id: Id, name: String, children: [DeviceChild] = [], state: RelayIsOn?) {
-        self.id = id
-        self.name = name
-        self.children = children
-        self.state = state
-    }
-    
-    public typealias Id = Tagged<Device, String>
-    
-    public let id: Id
-    public let name: String
-    public let children: [DeviceChild]
-    public var state: RelayIsOn?
-    
-    public func deepLink() -> Link {
-        return Link.device(self.id)
-    }
-}
-
-public enum Link: Equatable {
-    case device(Device.ID)
-    case closeAll
-}
-
-public struct DevicesEnvironment {
-    
-    public init(
-        repo: DevicesRepo,
-        devicesCache: DevicesCache,
-        reloadAppExtensions: @escaping @Sendable () async -> Void
-    ) {
-        self.repo = repo
-        self.cache = devicesCache
-        self.reloadAppExtensions = reloadAppExtensions
-    }
-    
-    public let repo: DevicesRepo
-    public let cache: DevicesCache
-    public let reloadAppExtensions: @Sendable () async -> Void
-}
-
-public struct DevicesRepo {
+    public typealias ToggleEffect = @Sendable (Token, Device.ID, Device.ID?) async throws -> RelayIsOn
     
     public init(
         loadDevices: @escaping @Sendable (Token) async throws -> [Device],
-        toggleDeviceRelayState: @escaping DeviceDetailEvironment.ToggleEffect,
+        toggleDeviceRelayState: @escaping ToggleEffect,
         getDeviceRelayState: @escaping @Sendable (Token, Device.ID, Device.ID?) async throws -> RelayIsOn,
         changeDeviceRelayState: @escaping @Sendable (Token, Device.ID, Device.ID?, RelayIsOn) async throws -> RelayIsOn
     ) {
@@ -78,41 +25,37 @@ public struct DevicesRepo {
     }
     
     public let loadDevices: @Sendable (Token) async throws -> [Device]
-    public let toggleDeviceRelayState: DeviceDetailEvironment.ToggleEffect
+    public let toggleDeviceRelayState: ToggleEffect
     public let getDeviceRelayState: @Sendable (Token, Device.ID, Device.ID?) async throws -> RelayIsOn
     public let changeDeviceRelayState: @Sendable (Token, Device.ID, Device.ID?, RelayIsOn) async throws -> RelayIsOn
 }
 
-public struct DevicesCache {
-    public enum Failure: Error {
-        case dataConversion
-    }
+extension DevicesClient: TestDependencyKey {
+    public static let testValue = DevicesClient(
+        loadDevices: XCTUnimplemented("\(Self.self).loadDevices", placeholder: [.debugDevice1]),
+        toggleDeviceRelayState: XCTUnimplemented("\(Self.self).toggleDeviceRelayState", placeholder: true),
+        getDeviceRelayState: XCTUnimplemented("\(Self.self).getDeviceRelayState", placeholder: true),
+        changeDeviceRelayState: XCTUnimplemented("\(Self.self).changeDeviceRelayState", placeholder: true)
+    )
     
-    public init(
-        save: @escaping @Sendable ([Device]) async throws ->  Void,
-        load: @escaping @Sendable () async throws -> [Device],
-        loadBlocking: @escaping @Sendable () throws -> [Device]
-    ) {
-        self.save = save
-        self.load = load
-        self.loadBlocking = loadBlocking
-    }
-    
-    public let save: @Sendable ([Device]) async throws ->  Void
-    public let load: @Sendable () async throws -> [Device]
-    public let loadBlocking: @Sendable () throws -> [Device]
-    
+    public static let previewValue = DevicesClient.mock()
 }
 
-#if DEBUG
-public extension DevicesRepo {
-    static func mock(waitFor seconds: UInt64 = 2) ->  Self {
+public extension DependencyValues {
+    var devicesClient: DevicesClient {
+        get { self[DevicesClient.self] }
+        set { self[DevicesClient.self] = newValue }
+    }
+}
+
+public extension DevicesClient {
+    static func mock(waitFor seconds: Duration = .seconds(2)) ->  Self {
         Self(
             loadDevices: { _ in
                 try await taskSleep(for: seconds)
-                return [DevicesEnvironment.debugDevice1,
-                        DevicesEnvironment.debugDevice2,
-                        DevicesEnvironment.debugDevice3]
+                return [.debugDevice1,
+                        .debugDevice2,
+                        .debugDevice3]
             }, toggleDeviceRelayState: { (_,_, _) in
                 try await taskSleep(for: seconds)
                 return true
@@ -127,57 +70,14 @@ public extension DevicesRepo {
             }
         )
     }
-}
-
-public extension DevicesCache {
-    static let mock = Self(
-        save: { _ in return } ,
-        load: { [
-            DevicesEnvironment.debugDevice1,
-            DevicesEnvironment.debugDevice2,
-            DevicesEnvironment.debugDevice3
-        ] },
-        loadBlocking: { [DevicesEnvironment.debugDevice1, DevicesEnvironment.debugDevice2, DevicesEnvironment.debugDevice3] }
-    )
-}
-
-public extension DevicesEnvironment {
     
-    static let debugDevice1 = Device.init(id: "1", name: "Test device 1", state: false)
-    static let debugDevice2 = Device.init(id: "2", name: "Test device 2", state: true)
-    static let debugDevice3 = Device.init(
-        id: "3",
-        name: "Test device 3",
-        children: [
-            .init(id: "Child 1-3", name: "Child 1 of device 3", state: true),
-            .init(id: "Child 2-3", name: "Child 2 of device 3", state: false)
-        ],
-        state: false
-    )
-    
-    
-    static func mock(waitFor seconds: UInt64 = 2) -> Self {
-        Self(repo: .mock(waitFor: seconds),
-             devicesCache: .mock,
-             reloadAppExtensions: { return }
-        )
-    }
-}
-
-public extension DevicesEnvironment {
     static func devicesEnvError(loadError: String, toggleError: String, getDevicesError: String, changeDevicesError: String) -> Self {
-        return Self(
-            repo: .init(
-                loadDevices: { _ in throw NSError(domain: loadError, code: 1, userInfo: nil) },
-                toggleDeviceRelayState: { _, _, _ in throw NSError(domain: toggleError, code: 2, userInfo: nil) },
-                getDeviceRelayState:{ _,_,_ in throw NSError(domain: getDevicesError, code: 3, userInfo: nil) },
-                changeDeviceRelayState: { _,_,_,_ in throw NSError(domain: changeDevicesError, code: 4, userInfo: nil) }
-            ),
-            devicesCache: .mock,
-            reloadAppExtensions: mock().reloadAppExtensions
+        Self(
+            loadDevices: { _ in throw NSError(domain: loadError, code: 1, userInfo: nil) },
+            toggleDeviceRelayState: { _, _, _ in throw NSError(domain: toggleError, code: 2, userInfo: nil) },
+            getDeviceRelayState:{ _,_,_ in throw NSError(domain: getDevicesError, code: 3, userInfo: nil) },
+            changeDeviceRelayState: { _,_,_,_ in throw NSError(domain: changeDevicesError, code: 4, userInfo: nil) }
         )
     }
 }
-#endif
-
 

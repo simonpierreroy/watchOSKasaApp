@@ -42,8 +42,8 @@ public struct UserLoginViewiOS: View {
                         .textContentType(.emailAddress)
                         
                     }.padding()
-                    .background(Color.orange.opacity(0.2))
-                    .cornerRadius(8)
+                        .background(Color.orange.opacity(0.2))
+                        .cornerRadius(8)
                     
                     HStack {
                         Image(systemName: "key.icloud")
@@ -52,8 +52,8 @@ public struct UserLoginViewiOS: View {
                         SecureField(Strings.log_password.string, text: self.$password)
                             .textContentType(.password)
                     }.padding()
-                    .background(Color.orange.opacity(0.2))
-                    .cornerRadius(8)
+                        .background(Color.orange.opacity(0.2))
+                        .cornerRadius(8)
                     
                     Spacer(minLength: 16)
                     
@@ -65,20 +65,20 @@ public struct UserLoginViewiOS: View {
                             Text(Strings.login_app.key, bundle: .module)
                                 .foregroundColor(Color.green)
                         }.frame(maxWidth: .infinity)
-                        .padding()
+                            .padding()
                     }
                     .background(Color.green.opacity(0.2))
                     .cornerRadius(32)
                 }.frame(maxWidth: 500).padding()
             }.frame(maxWidth: .infinity)
-            .disabled(viewStore.isLoadingUser)
-            .alert(
-                item: viewStore.binding(
-                    get: { $0.errorMessageToDisplayText.map(AlertInfo.init(title:))},
-                    send: .tappedErrorAlert
-                ),
-                content: { Alert(title: Text($0.title)) }
-            )
+                .disabled(viewStore.isLoadingUser)
+                .alert(
+                    item: viewStore.binding(
+                        get: { $0.errorMessageToDisplayText.map(AlertInfo.init(title:))},
+                        send: .tappedErrorAlert
+                    ),
+                    content: { Alert(title: Text($0.title)) }
+                )
             
         }.foregroundColor(.orange)
     }
@@ -105,7 +105,7 @@ public extension UserLoginViewiOS {
 }
 
 public extension UserLoginViewiOS.StateView {
-    init(userState: UserState) {
+    init(userState: UserReducer.State) {
         switch userState.status {
         case .loading:
             self.isLoadingUser = true
@@ -114,15 +114,15 @@ public extension UserLoginViewiOS.StateView {
         }
         
         switch userState.route {
-            case nil:
-                self.errorMessageToDisplayText = nil
+        case nil:
+            self.errorMessageToDisplayText = nil
         case .some(.error(let error)):
             self.errorMessageToDisplayText = error.localizedDescription
         }
     }
 }
 
-public extension UserAction {
+public extension UserReducer.Action {
     init(userViewAction: UserLoginViewiOS.Action) {
         switch userViewAction {
         case .tappedErrorAlert:
@@ -138,41 +138,35 @@ struct UserLoginView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
             UserLoginViewiOS(store:
-                                Store<UserState, UserAction>.init(
-                                    initialState:
-                                        .empty,
-                                    reducer: userReducer,
-                                    environment: .mock(waitFor: 2)
+                                Store(
+                                    initialState: .empty,
+                                    reducer: UserReducer()
                                 ).scope(
                                     state: UserLoginViewiOS.StateView.init(userState:),
-                                    action: UserAction.init(userViewAction:)
+                                    action: UserReducer.Action.init(userViewAction:)
                                 )
             ).preferredColorScheme(.dark)
-            .previewDisplayName("Login")
+                .previewDisplayName("Login")
             
             UserLoginViewiOS(store:
-                                Store<UserState, UserAction>.init(
-                                    initialState:
-                                        .empty,
-                                    reducer: userReducer,
-                                    environment: .mock(waitFor: 2)
+                                Store(
+                                    initialState: .empty,
+                                    reducer: UserReducer()
                                 ).scope(
                                     state: UserLoginViewiOS.StateView.init(userState:),
-                                    action: UserAction.init(userViewAction:)
+                                    action: UserReducer.Action.init(userViewAction:)
                                 )
             )
             .environment(\.locale, .init(identifier: "fr"))
             .previewDisplayName("Login French")
             
             UserLoginViewiOS(store:
-                                Store<UserState, UserAction>.init(
-                                    initialState:
-                                            .init(status: .loading, route: nil),
-                                    reducer: userReducer,
-                                    environment: .mock(waitFor: 2)
+                                Store(
+                                    initialState: .init(status: .loading, route: nil),
+                                    reducer: UserReducer()
                                 ).scope(
                                     state: UserLoginViewiOS.StateView.init(userState:),
-                                    action: UserAction.init(userViewAction:)
+                                    action: UserReducer.Action.init(userViewAction:)
                                 )
             ).previewDisplayName("Loading")
         }

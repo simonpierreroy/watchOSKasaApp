@@ -10,6 +10,7 @@ import Parsing
 import DeviceClientLive
 import DeviceClient
 import RoutingClient
+import Dependencies
 
 extension AppLink {
     
@@ -37,8 +38,8 @@ extension AppLink {
     }
 }
 
-public extension URLRouter {
-    static let live = Self(
+extension URLRouter: DependencyKey {
+    public static var liveValue = Self(
         parse: AppLink.parserDeepLink(url:),
         print: AppLink.getURL(link:)
     )

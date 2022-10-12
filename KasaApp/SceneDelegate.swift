@@ -17,7 +17,7 @@ import Foundation
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     
-    private static let viewStore: ViewStore<Void, AppAction> = {
+    private static let viewStore: ViewStore<Void, AppReducer.Action> = {
         ViewStore(
             AppDelegate.store.scope(state: always, action: { $0 }),
             removeDuplicates: { _,_ in true }
@@ -28,7 +28,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     
     
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
-  
+        
         let contentView = ContentView(store: AppDelegate.store)
         
         // Use a UIHostingController as window root view controller.

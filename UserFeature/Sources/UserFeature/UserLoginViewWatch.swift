@@ -82,7 +82,7 @@ public extension UserLoginViewWatch {
 }
 
 public extension UserLoginViewWatch.StateView {
-    init(userState: UserState) {
+    init(userState: UserReducer.State) {
         switch userState.status {
         case .loading:
             self.isLoadingUser = true
@@ -91,15 +91,15 @@ public extension UserLoginViewWatch.StateView {
         }
         
         switch userState.route {
-            case nil:
-                self.errorMessageToDisplayText = nil
+        case nil:
+            self.errorMessageToDisplayText = nil
         case .some(.error(let error)):
             self.errorMessageToDisplayText = error.localizedDescription
         }
     }
 }
 
-public extension UserAction {
+public extension UserReducer.Action {
     init(userViewAction: UserLoginViewWatch.Action) {
         switch userViewAction {
         case .tappedErrorAlert:
@@ -115,40 +115,34 @@ struct UserLoginView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
             UserLoginViewWatch(store:
-                                Store<UserState, UserAction>.init(
-                                    initialState:
-                                        UserState.empty,
-                                    reducer: userReducer,
-                                    environment: .mock(waitFor: 2)
+                                Store(
+                                    initialState: .empty,
+                                    reducer: UserReducer()
                                 ).scope(
                                     state: UserLoginViewWatch.StateView.init(userState:),
-                                    action: UserAction.init(userViewAction:)
+                                    action: UserReducer.Action.init(userViewAction:)
                                 )
             ).previewDisplayName("Login")
             
             UserLoginViewWatch(store:
-                                Store<UserState, UserAction>.init(
-                                    initialState:
-                                        UserState.empty,
-                                    reducer: userReducer,
-                                    environment: .mock(waitFor: 2)
+                                Store(
+                                    initialState: .empty,
+                                    reducer: UserReducer()
                                 ).scope(
                                     state: UserLoginViewWatch.StateView.init(userState:),
-                                    action: UserAction.init(userViewAction:)
+                                    action: UserReducer.Action.init(userViewAction:)
                                 )
             )
             .environment(\.locale, .init(identifier: "fr"))
             .previewDisplayName("Login French")
             
             UserLoginViewWatch(store:
-                                Store<UserState, UserAction>.init(
-                                    initialState:
-                                            .init(status: .loading, route: nil),
-                                    reducer: userReducer,
-                                    environment: .mock(waitFor: 2)
+                                Store(
+                                    initialState: .init(status: .loading, route: nil),
+                                    reducer: UserReducer()
                                 ).scope(
                                     state: UserLoginViewWatch.StateView.init(userState:),
-                                    action: UserAction.init(userViewAction:)
+                                    action: UserReducer.Action.init(userViewAction:)
                                 )
             ).previewDisplayName("Loading")
         }

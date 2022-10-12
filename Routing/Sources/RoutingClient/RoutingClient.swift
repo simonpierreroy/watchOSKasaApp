@@ -8,6 +8,8 @@
 import Foundation
 import DeviceClient
 import KasaCore
+import Dependencies
+import XCTestDynamicOverlay
 
 public enum AppLink {
     case device(DeviceClient.Link)
@@ -25,7 +27,22 @@ public struct URLRouter {
     public let print: @Sendable (AppLink) throws -> URL
 }
 
-#if DEBUG
+extension URLRouter: TestDependencyKey {
+    public static var testValue = URLRouter(
+        parse:  XCTUnimplemented("\(Self.self).parse", placeholder: .device(.closeAll)),
+        print:  XCTUnimplemented("\(Self.self).print", placeholder: .mock)
+    )
+    
+    public static let previewValue = URLRouter.mock(link: .device(.closeAll), print: nil)
+}
+
+public extension DependencyValues {
+    var urlRouter: URLRouter {
+        get { self[URLRouter.self] }
+        set { self[URLRouter.self] = newValue }
+    }
+}
+
 public extension URLRouter {
     static func mock(link: AppLink, print url: URL?) -> Self  {
         Self(
@@ -34,4 +51,3 @@ public extension URLRouter {
         )
     }
 }
-#endif

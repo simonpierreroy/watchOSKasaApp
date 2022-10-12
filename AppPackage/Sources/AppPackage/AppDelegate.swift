@@ -9,30 +9,31 @@ import Foundation
 import ComposableArchitecture
 import DeviceClient
 import UserClient
+import Dependencies
 
-public enum AppDelegateAction: Equatable {
-    case applicationDidFinishLaunching
-    case applicationWillTerminate
-    case applicationWillResignActive
-    case openURLContexts([URL])
-}
-
-let delegateReducer = Reducer<AppState, AppAction, AppEnv> { state, action, environment in
+struct AppDelegateReducer: ReducerProtocol {
+    typealias State = AppReducer.State
+    typealias Action = AppReducer.Action
     
-    switch action {
-    case .delegate(.applicationDidFinishLaunching):
-        return Effect(value: .userAction(.loadSavedUser))
-    case .delegate(.applicationWillResignActive), .delegate(.applicationWillTerminate):
-        return Effect(value: .userAction(.save))
-    case .delegate(.openURLContexts(let urls)):
-        for url in urls {
-            if let link = try? environment.linkURLParser.parse(url) {
-                switch link {
-                case .device(let deviceLink): return  Effect(value: .devicesAction(.attempDeepLink(deviceLink)))
+    @Dependency(\.urlRouter.parse) var parse
+    
+    func reduce(into state: inout State, action: Action) -> Effect<Action, Never> {
+        switch action {
+        case .delegate(.applicationDidFinishLaunching):
+            return Effect(value: .userAction(.loadSavedUser))
+        case .delegate(.applicationWillResignActive), .delegate(.applicationWillTerminate):
+            return Effect(value: .userAction(.save))
+        case .delegate(.openURLContexts(let urls)):
+            for url in urls {
+                if let link = try? parse(url) {
+                    switch link {
+                    case .device(let deviceLink): return  Effect(value: .devicesAction(.attempDeepLink(deviceLink)))
+                    }
                 }
             }
+            return .none
+        default: return .none
         }
-        return .none
-    default: return .none
     }
 }
+

@@ -19,171 +19,51 @@ import DeviceClientLive
 import RoutingClient
 import RoutingClientLive
 
-public struct AppState {
-    public static let empty = Self(userState: .empty, _devicesState: .empty)
+public struct AppReducer: ReducerProtocol {
     
-    public var userState: UserState
-    private var _devicesState: DevicesState
+    public init() {}
     
-    var devicesState: DevicesState {
-        get {
-            var copy = self._devicesState
-            switch userState.status {
-            case .logout, .loading:
-                copy.token = nil
-            case .logged(let userState):
-                copy.token  = userState.user.token
+    public struct State {
+        public static let empty = Self(userState: .empty, _devicesState: .empty)
+        
+        public var userState: UserReducer.State
+        private var _devicesState: DevicesReducer.State
+        
+        public var devicesState: DevicesReducer.State {
+            get {
+                var copy = self._devicesState
+                switch userState.status {
+                case .logout, .loading:
+                    copy.token = nil
+                case .logged(let userState):
+                    copy.token  = userState.user.token
+                }
+                return copy
             }
-            return copy
-        }
-        set { self._devicesState = newValue }
-    }
-    
-}
-
-public enum AppAction {
-    case delegate(AppDelegateAction)
-    case userAction(UserAction)
-    case devicesAction(DevicesAtion)
-}
-
-
-public struct AppEnv {
-    let login: @Sendable (User.Credential) async throws -> User
-    let userCache: UserCache
-    let devicesRepo: DevicesRepo
-    let deviceCache: DevicesCache
-    let reloadAppExtensions: @Sendable () async -> Void
-    let linkURLParser: URLRouter
-}
-
-public extension AppEnv {
-    static let live = Self(
-        login: UserEnvironment.liveLogginEffect,
-        userCache: .live,
-        devicesRepo: .live,
-        deviceCache: .live,
-        reloadAppExtensions: AppEnv.liveReloadAppExtensions,
-        linkURLParser: .live
-    )
-}
-
-public extension UserEnvironment {
-    init(appEnv: AppEnv) {
-        self.init(
-            login: appEnv.login,
-            cache: appEnv.userCache,
-            reloadAppExtensions: appEnv.reloadAppExtensions
-        )
-    }
-}
-
-public extension DevicesEnvironment {
-    init(appEnv: AppEnv) {
-        self.init(
-            repo: appEnv.devicesRepo,
-            devicesCache: appEnv.deviceCache,
-            reloadAppExtensions: appEnv.reloadAppExtensions
-        )
-    }
-}
-
-public let appReducer = Reducer<AppState, AppAction, AppEnv>.combine(
-    
-    delegateReducer,
-    
-    userReducer.pullback(
-        state: \.userState,
-        action: /AppAction.userAction,
-        environment: UserEnvironment.init(appEnv:)
-    ),
-    
-    devicesReducer.pullback(
-        state: \.devicesState,
-        action: /AppAction.devicesAction,
-        environment:DevicesEnvironment.init(appEnv:)
-    )
-).debug()
-
-#if os(watchOS)
-public extension AppAction {
-    init(deviceAction: DeviceListViewWatch.Action) {
-        switch deviceAction {
-        case .tappedDevice(index: let idx, action: let action):
-            let deviceDetailAction = DeviceDetailAction.init(viewDetailAction: action)
-            self = .devicesAction(.deviceDetail(index: idx, action: deviceDetailAction))
-        case .tappedErrorAlert:
-            self = .devicesAction(.errorHandled)
-        case .tappedLogoutButton:
-            self = .userAction(.logout)
-        case .tappedRefreshButton, .viewAppearReload:
-            self = .devicesAction(.fetchFromRemote)
-        case .tappedCloseAll:
-            self = .devicesAction(.closeAll)
+            set { self._devicesState = newValue }
         }
     }
-}
-
-public extension DeviceListViewWatch.StateView {
-    init(appState: AppState) {
-        self.init(devices: appState.devicesState)
-    }
-}
-#elseif os(iOS)
-public extension AppAction {
-    init(deviceAction: DeviceListViewiOS.Action) {
-        switch deviceAction {
-        case .tappedDevice(index: let idx, action: let action):
-            let deviceDetailAction = DeviceDetailAction.init(viewDetailAction: action)
-            self = .devicesAction(.deviceDetail(index: idx, action: deviceDetailAction))
-        case .tappedErrorAlert:
-            self = .devicesAction(.errorHandled)
-        case .tappedLogout:
-            self = .userAction(.logout)
-        case .tappedRefreshButton, .viewAppearReload:
-            self = .devicesAction(.fetchFromRemote)
-        case .tappedCloseAll:
-            self = .devicesAction(.closeAll)
+    
+    public enum Action {
+        public enum AppDelegate: Equatable {
+            case applicationDidFinishLaunching
+            case applicationWillTerminate
+            case applicationWillResignActive
+            case openURLContexts([URL])
         }
+        case delegate(AppDelegate)
+        case userAction(UserReducer.Action)
+        case devicesAction(DevicesReducer.Action)
+    }
+    
+    public var body: some ReducerProtocol<State, Action> {
+        Scope(state: \State.userState, action: /Action.userAction) {
+            UserReducer()
+        }
+        Scope(state: \State.devicesState, action: /Action.devicesAction) {
+            DevicesReducer()
+        }
+        GlueFeatures()
+        AppDelegateReducer()
     }
 }
-
-public extension DeviceListViewiOS.StateView {
-    init(appState: AppState) {
-        self.init(devices: appState.devicesState)
-    }
-}
-#endif
-
-#if DEBUG
-public extension AppEnv {
-    static func mock(waitFor seconds: UInt64 = 2) -> Self {
-        Self(
-            login: UserEnvironment.mock(waitFor: seconds).login,
-            userCache: .mock,
-            devicesRepo: .mock(waitFor: seconds),
-            deviceCache: .mock,
-            reloadAppExtensions: DevicesEnvironment.mock(waitFor: seconds).reloadAppExtensions,
-            linkURLParser: .mock(link: .device(.closeAll), print: nil)
-        )
-    }
-}
-#endif
-
-
-#if canImport(WidgetKit)
-import WidgetKit
-public extension AppEnv {
-    @Sendable
-    static func liveReloadAppExtensions () async -> Void {
-        WidgetCenter.shared.reloadAllTimelines()
-    }
-}
-#else
-public extension AppEnv {
-    @Sendable
-    static func liveReloadAppExtensions () async -> Void {
-        return
-    }
-}
-#endif

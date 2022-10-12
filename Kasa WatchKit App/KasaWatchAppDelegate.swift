@@ -18,13 +18,12 @@ import Foundation
 
 class KasaWatchAppDelegate: NSObject, WKApplicationDelegate {
     
-    static let store: Store<AppState, AppAction> = .init(
-        initialState: AppState.empty,
-        reducer: appReducer,
-        environment: .live
+    static let store = StoreOf<AppReducer>(
+        initialState: .empty,
+        reducer: AppReducer()._printChanges()
     )
     
-    private static let viewStore: ViewStore<Void, AppAction> = {
+    private static let viewStore: ViewStore<Void, AppReducer.Action> = {
         ViewStore(
             KasaWatchAppDelegate.store.scope(state: always, action: { $0 }),
             removeDuplicates: { _,_ in true }

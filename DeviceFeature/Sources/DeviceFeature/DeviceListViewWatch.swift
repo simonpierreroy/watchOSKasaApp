@@ -12,11 +12,9 @@ import KasaCore
 import DeviceClient
 import BaseUI
 import Foundation
-
-
-#if os(watchOS)
 import SwiftUI
 
+#if os(watchOS)
 public struct DeviceListViewWatch: View {
     
     private let store: Store<StateView, Action>
@@ -131,22 +129,22 @@ public struct ListEntry: Equatable, Identifiable  {
         let child: Device.ID?
     }
     
-    public init(device: DeviceSate, child: DeviceSate.DeviceChildrenSate?) {
+    public init(device: DeviceReducer.State, child: DeviceChildReducer.State?) {
         self.device = device
         self.child = child
     }
     
     public var id: DoubleID  { .init(parent: self.device.id, child: self.child?.id) }
-    let device: DeviceSate
-    let child: DeviceSate.DeviceChildrenSate?
+    let device: DeviceReducer.State
+    let child: DeviceChildReducer.State?
 }
 
 public extension DeviceListViewWatch {
-        
+    
     struct StateView: Equatable {
         public init(
             errorMessageToDisplayText: String?,
-            isRefreshingDevices: DevicesState.Loading,
+            isRefreshingDevices: DevicesReducer.State.Loading,
             devicesToDisplay: IdentifiedArrayOf<ListEntry>
         ) {
             self.errorMessageToDisplayText = errorMessageToDisplayText
@@ -155,7 +153,7 @@ public extension DeviceListViewWatch {
         }
         
         let errorMessageToDisplayText: String?
-        let isRefreshingDevices: DevicesState.Loading
+        let isRefreshingDevices: DevicesReducer.State.Loading
         let devicesToDisplay: IdentifiedArrayOf<ListEntry>
     }
     
@@ -164,7 +162,7 @@ public extension DeviceListViewWatch {
         public enum DeviceAction {
             case tapped
             case tappedErrorAlert
-            case tappedDeviceChild(index: DeviceSate.ID, action: DeviceChildAction)
+            case tappedDeviceChild(index: DeviceChildReducer.State.ID, action: DeviceChildReducer.Action)
         }
         
         case tappedCloseAll
@@ -172,12 +170,12 @@ public extension DeviceListViewWatch {
         case viewAppearReload
         case tappedLogoutButton
         case tappedRefreshButton
-        case tappedDevice(index: DeviceSate.ID, action: DeviceAction)
+        case tappedDevice(index: DeviceReducer.State.ID, action: DeviceAction)
     }
 }
 
 
-public extension DeviceDetailAction {
+public extension DeviceReducer.Action {
     init(viewDetailAction: DeviceListViewWatch.Action.DeviceAction) {
         switch viewDetailAction {
         case .tapped:
@@ -191,7 +189,7 @@ public extension DeviceDetailAction {
 }
 
 public extension DeviceListViewWatch.StateView {
-    init(devices: DevicesState) {
+    init(devices: DevicesReducer.State) {
         switch devices.route {
         case nil:
             self.errorMessageToDisplayText = nil
@@ -213,17 +211,17 @@ public extension DeviceListViewWatch.StateView {
     }
 }
 
-#if DEBUG
-extension DevicesAtion {
+
+public extension DevicesReducer.Action {
     init(deviceAction: DeviceListViewWatch.Action) {
         switch deviceAction {
         case .tappedDevice(index: let idx, action: let action):
-            let deviceDetailAction = DeviceDetailAction.init(viewDetailAction: action)
+            let deviceDetailAction = DeviceReducer.Action.init(viewDetailAction: action)
             self = .deviceDetail(index: idx, action: deviceDetailAction)
         case .tappedErrorAlert:
             self = .errorHandled
         case .tappedLogoutButton:
-            self = .empty
+            self = .logout
         case .tappedRefreshButton, .viewAppearReload:
             self = .fetchFromRemote
         case .tappedCloseAll:
@@ -232,97 +230,103 @@ extension DevicesAtion {
     }
 }
 
+#if DEBUG
 struct DeviceListView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
             DeviceListViewWatch(
-                store: Store<DevicesState, DevicesAtion>.init(
+                store: Store(
                     initialState: .emptyLogged,
-                    reducer: devicesReducer,
-                    // Bump waitFor to play with live preview
-                    environment: .mock(waitFor: 0)
+                    reducer: DevicesReducer()
                 ).scope(
                     state: DeviceListViewWatch.StateView.init(devices:),
-                    action: DevicesAtion.init(deviceAction:)
+                    action: DevicesReducer.Action.init(deviceAction:)
                 )
             ).previewDisplayName("List")
             
             DeviceListViewWatch(
-                store: Store<DevicesState, DevicesAtion>.init(
+                store: Store(
                     initialState: .emptyLoading,
-                    reducer: devicesReducer,
-                    // Bump waitFor to play with live preview
-                    environment: .mock(waitFor: 1)
+                    reducer: DevicesReducer()
                 ).scope(
                     state: DeviceListViewWatch.StateView.init(devices:),
-                    action: DevicesAtion.init(deviceAction:)
+                    action: DevicesReducer.Action.init(deviceAction:)
                 )
             ).previewDisplayName("Loading")
             
             DeviceListViewWatch(
-                store: Store<DevicesState, DevicesAtion>.init(
+                store: Store(
                     initialState: .emptyNeverLoaded,
-                    reducer: devicesReducer,
-                    // Bump waitFor to play with live preview
-                    environment: .mock(waitFor: 1)
+                    reducer: DevicesReducer()
                 ).scope(
                     state: DeviceListViewWatch.StateView.init(devices:),
-                    action: DevicesAtion.init(deviceAction:)
+                    action: DevicesReducer.Action.init(deviceAction:)
                 )
             ).previewDisplayName("Never Loaded")
             
             DeviceListViewWatch(
-                store: Store<DevicesState, DevicesAtion>.init(
+                store: Store(
                     initialState: .oneDeviceLoaded,
-                    reducer: devicesReducer,
-                    // Bump waitFor to play with live preview
-                    environment: .mock(waitFor: 0)
+                    reducer: DevicesReducer()
                 ).scope(
                     state: DeviceListViewWatch.StateView.init(devices:),
-                    action: DevicesAtion.init(deviceAction:)
+                    action: DevicesReducer.Action.init(deviceAction:)
                 )
             ).preferredColorScheme(.dark)
                 .previewDisplayName("1 item")
             
             DeviceListViewWatch(
-                store: Store<DevicesState, DevicesAtion>.init(
+                store: Store(
                     initialState: .nDeviceLoaded(n: 5),
-                    reducer: devicesReducer,
-                    // Bump waitFor to play with live preview
-                    environment: .mock(waitFor: 0)
+                    reducer: DevicesReducer()
                 ).scope(
                     state: DeviceListViewWatch.StateView.init(devices:),
-                    action: DevicesAtion.init(deviceAction:)
+                    action: DevicesReducer.Action.init(deviceAction:)
                 )
             ).preferredColorScheme(.dark)
                 .previewDisplayName("5 items")
             
             DeviceListViewWatch(
-                store: Store<DevicesState, DevicesAtion>.init(
+                store: Store(
                     initialState: .nDeviceLoaded(n: 5, childrenCount: 3),
-                    reducer: devicesReducer,
-                    // Bump waitFor to play with live preview
-                    environment: .mock(waitFor: 0)
+                    reducer: DevicesReducer()
                 ).scope(
                     state: DeviceListViewWatch.StateView.init(devices:),
-                    action: DevicesAtion.init(deviceAction:)
+                    action: DevicesReducer.Action.init(deviceAction:)
                 )
             ).preferredColorScheme(.dark)
                 .previewDisplayName("Group")
             
             DeviceListViewWatch(
-                store: Store<DevicesState, DevicesAtion>.init(
+                store: Store(
                     initialState: .oneDeviceLoaded,
-                    reducer: devicesReducer,
-                    // Bump waitFor to play with live preview
-                    environment: .mock(waitFor: 0)
+                    reducer: DevicesReducer()
                 ).scope(
                     state: DeviceListViewWatch.StateView.init(devices:),
-                    action: DevicesAtion.init(deviceAction:)
+                    action: DevicesReducer.Action.init(deviceAction:)
                 )
             )
             .environment(\.locale, .init(identifier: "fr"))
             .previewDisplayName("1 item french")
+            
+            DeviceListViewWatch(
+                store: Store(
+                    initialState: .nDeviceLoaded(n: 4),
+                    reducer: DevicesReducer()
+                        .dependency(\.devicesClient,
+                                     .devicesEnvError(
+                                        loadError: "loadError",
+                                        toggleError: "toggleError",
+                                        getDevicesError: "getDevicesError",
+                                        changeDevicesError: "changeDevicesError"
+                                     )
+                        )
+                ).scope(
+                    state: DeviceListViewWatch.StateView.init(devices:),
+                    action: DevicesReducer.Action.init(deviceAction:)
+                )
+            ).preferredColorScheme(.dark)
+                .previewDisplayName("Error on item")
         }
     }
 }

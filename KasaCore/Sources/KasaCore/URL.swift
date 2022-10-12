@@ -7,9 +7,7 @@
 
 import Foundation
 
-#if DEBUG
 public extension URL {
     static let mock = Self(string: "mock")!
 }
 
-#endif

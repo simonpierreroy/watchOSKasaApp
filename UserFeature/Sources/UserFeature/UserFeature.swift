@@ -5,76 +5,84 @@ import Tagged
 import UserClient
 import KasaCore
 
-public enum UserAction {
-    case logout
-    case set(User)
-    case save
-    case loadSavedUser
-    case login(User.Credential)
-    case send(Error)
-    case errorHandled
-}
-
-public struct UserState {
-    public static let empty = Self(status: .logout, route: nil)
+public struct UserReducer: ReducerProtocol {
     
-    public struct LoggedUserState {
-        public var user: User
-    }
+    public init() { }
     
-    public enum UserStatus {
-        case logged(LoggedUserState)
-        case loading
+    public enum Action {
         case logout
+        case set(User)
+        case save
+        case loadSavedUser
+        case login(User.Credential)
+        case send(Error)
+        case errorHandled
     }
     
-    public enum Route {
-        case error(Error)
-    }
-    
-    public var status: UserStatus
-    public var route: Route?
-}
-
-
-public let userReducer = Reducer<UserState, UserAction, UserEnvironment> { state, action, environment in
-    
-    switch action {
-    case .logout:
-        state.status = .logout
-        return Effect(value: .save)
-    case .set(let user):
-        state.status = .logged(.init(user: user))
-        return Effect(value: .save)
-    case .save:
-        let userToSsave = (/UserState.UserStatus.logged).extract(from: state.status)?.user
-        return .fireAndForget {
-            await environment.cache.save(userToSsave)
-            await environment.reloadAppExtensions()
+    public struct State {
+        public static let empty = Self(status: .logout, route: nil)
+        
+        public struct LoggedUserState {
+            public var user: User
         }
-    case .loadSavedUser:
-        state.status = .loading
-        return .task {
-            if let user = await environment.cache.load() {
-                return .set(user)
-            } else {
-                return .logout
+        
+        public enum UserStatus {
+            case logged(LoggedUserState)
+            case loading
+            case logout
+        }
+        
+        public enum Route {
+            case error(Error)
+        }
+        
+        public var status: UserStatus
+        public var route: Route?
+    }
+    
+    @Dependency(\.userCache) var userCache
+    @Dependency(\.userClient) var client
+    @Dependency(\.reloadAppExtensions) var reloadAppExtensions
+    
+    public func reduce(into state: inout State, action: Action) -> Effect<Action, Never> {
+        
+        switch action {
+        case .logout:
+            state.status = .logout
+            return Effect(value: .save)
+        case .set(let user):
+            state.status = .logged(.init(user: user))
+            return Effect(value: .save)
+        case .save:
+            let userToSave = (/State.UserStatus.logged).extract(from: state.status)?.user
+            return .fireAndForget {
+                await userCache.save(userToSave)
+                await reloadAppExtensions()
             }
+        case .loadSavedUser:
+            state.status = .loading
+            return .task {
+                if let user = await userCache.load() {
+                    return .set(user)
+                } else {
+                    return .logout
+                }
+            }
+        case .login(let credential):
+            state.status = .loading
+            return Effect.task {
+                let token = try await client.login(credential).token
+                return .set(.init(token: token))
+            } catch : { error in
+                return .send(error)
+            }.animation()
+        case .send(let error):
+            state.status = .logout
+            state.route = .error(error)
+            return .none
+        case .errorHandled:
+            state.route = nil
+            return .none
         }
-    case .login(let credential):
-        state.status = .loading
-        return Effect.task {
-            let token = try await environment.login(credential).token
-            return .set(.init(token: token))
-        } catch : { error in
-            return .send(error)
-        }.animation()
-    case .send(let error):
-        state.status = .logout
-        state.route = .error(error)
-        return .none
-    case .errorHandled:
-        state.route = nil
-        return .none
     }
 }
