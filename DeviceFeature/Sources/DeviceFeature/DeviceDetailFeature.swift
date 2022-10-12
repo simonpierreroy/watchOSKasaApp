@@ -38,7 +38,8 @@ public struct DeviceReducer: ReducerProtocol {
                 guard let token = state.token, state.isLoading == false else { return .none }
                 state.isLoading = true
                 return .run { [state] send in
-                    try await send(.didToggle(state: toggleDeviceRelayState(token, state.id, nil)), animation: .default)
+                    let newState = try await toggleDeviceRelayState(token, state.id, nil)
+                    await send(.didToggle(state: newState), animation: .default)
                 } catch: { error, send in await send(.send(error)) }
             case .didToggle(let status):
                 state.isLoading = false
