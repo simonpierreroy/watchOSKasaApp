@@ -49,35 +49,52 @@ public extension DependencyValues {
 }
 
 public extension DevicesClient {
-    static func mock(waitFor seconds: Duration = .seconds(2)) ->  Self {
+    static func mock(waitFor delay: Duration = .seconds(2)) ->  Self {
         Self(
             loadDevices: { _ in
-                try await taskSleep(for: seconds)
+                try await taskSleep(for: delay)
                 return [.debugDevice1,
                         .debugDevice2,
                         .debugDevice3]
             }, toggleDeviceRelayState: { (_,_, _) in
-                try await taskSleep(for: seconds)
-                return true
+                try await taskSleep(for: delay)
+                return .init(rawValue: Bool.random())
             },
             getDeviceRelayState: { (_,_,_) in
-                try await taskSleep(for: seconds)
+                try await taskSleep(for: delay)
                 return true
             },
             changeDeviceRelayState: { (_,_,_, state) in
-                try await taskSleep(for: seconds)
+                try await taskSleep(for: delay)
                 return state.toggle()
             }
         )
     }
     
-    static func devicesEnvError(loadError: String, toggleError: String, getDevicesError: String, changeDevicesError: String) -> Self {
-        Self(
-            loadDevices: { _ in throw NSError(domain: loadError, code: 1, userInfo: nil) },
-            toggleDeviceRelayState: { _, _, _ in throw NSError(domain: toggleError, code: 2, userInfo: nil) },
-            getDeviceRelayState:{ _,_,_ in throw NSError(domain: getDevicesError, code: 3, userInfo: nil) },
-            changeDeviceRelayState: { _,_,_,_ in throw NSError(domain: changeDevicesError, code: 4, userInfo: nil) }
-        )
-    }
+    static func devicesEnvError(
+        waitFor delay: Duration = .seconds(2),
+        loadError: String,
+        toggleError: String,
+        getDevicesError: String,
+        changeDevicesError: String) -> Self {
+            Self(
+                loadDevices: { _ in
+                    try await taskSleep(for: delay)
+                    throw NSError(domain: loadError, code: 1, userInfo: nil)
+                },
+                toggleDeviceRelayState: { _, _, _ in
+                    try await taskSleep(for: delay)
+                    throw NSError(domain: toggleError, code: 2, userInfo: nil)
+                },
+                getDeviceRelayState:{ _,_,_ in
+                    try await taskSleep(for: delay)
+                    throw NSError(domain: getDevicesError, code: 3, userInfo: nil)
+                },
+                changeDeviceRelayState: { _,_,_,_ in
+                    try await taskSleep(for: delay)
+                    throw NSError(domain: changeDevicesError, code: 4, userInfo: nil)
+                }
+            )
+        }
 }
 

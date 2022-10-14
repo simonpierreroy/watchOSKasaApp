@@ -31,9 +31,9 @@ public extension DependencyValues {
 }
 
 public extension UserClient {
-    static func mock(waitFor seconds: Duration = .seconds(2)) -> Self {
+    static func mock(waitFor delay: Duration = .seconds(2)) -> Self {
         Self { _ in
-            try await taskSleep(for: seconds)
+            try await taskSleep(for: delay)
             return .mock
         }
     }
