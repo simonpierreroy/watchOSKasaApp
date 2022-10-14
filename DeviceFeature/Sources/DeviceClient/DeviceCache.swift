@@ -27,8 +27,8 @@ public struct DevicesCache {
 }
 
 extension DevicesCache: TestDependencyKey {
-    public static let testValue = DevicesCache.mock
-    public static let previewValue = DevicesCache(
+    public static let previewValue = DevicesCache.mock
+    public static let testValue = DevicesCache(
         save: XCTUnimplemented("\(Self.self).save"),
         load: XCTUnimplemented("\(Self.self).load", placeholder: [.debugDevice1]),
         loadBlocking: XCTUnimplemented("\(Self.self).loadBlocking", placeholder: [.debugDevice1])

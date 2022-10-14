@@ -313,13 +313,14 @@ struct DeviceListView_Previews: PreviewProvider {
                 store: Store(
                     initialState: .nDeviceLoaded(n: 4),
                     reducer: DevicesReducer()
-                        .dependency(\.devicesClient,
-                                     .devicesEnvError(
-                                        loadError: "loadError",
-                                        toggleError: "toggleError",
-                                        getDevicesError: "getDevicesError",
-                                        changeDevicesError: "changeDevicesError"
-                                     )
+                        .dependency(
+                            \.devicesClient,
+                             .devicesEnvError(
+                                loadError: "loadError",
+                                toggleError: "toggleError",
+                                getDevicesError: "getDevicesError",
+                                changeDevicesError: "changeDevicesError"
+                             )
                         )
                 ).scope(
                     state: DeviceListViewWatch.StateView.init(devices:),

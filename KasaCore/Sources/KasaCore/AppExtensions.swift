@@ -8,6 +8,7 @@
 import Foundation
 import Dependencies
 import XCTestDynamicOverlay
+import WidgetKit
 
 extension DependencyValues {
     public var reloadAppExtensions: @Sendable () async -> Void {
@@ -15,33 +16,16 @@ extension DependencyValues {
         set { self[ReloadAppExtensionsKey.self] = newValue }
     }
     
-    private enum ReloadAppExtensionsKey: DependencyKey {
-        typealias Value = @Sendable () async -> Void
+    public enum ReloadAppExtensionsKey: DependencyKey {
+        public typealias Value = @Sendable () async -> Void
         
-        static let liveValue: @Sendable () async -> Void = {
+        public static let liveValue: Value = {
             await MainActor.run {
-                liveReloadAppExtensions()
+                WidgetCenter.shared.reloadAllTimelines()
             }
         }
-        static let testValue: @Sendable () async -> Void = XCTUnimplemented(
-            #"@Dependency(\.reloadAppExtensions)"#
-        )
         
-        static let previewValue: @Sendable () async -> Void = { }
+        public static let testValue: Value = XCTUnimplemented(#"@Dependency(\.reloadAppExtensions)"#)
+        public static let previewValue: Value = { }
     }
 }
-
-
-#if canImport(WidgetKit)
-import WidgetKit
-@Sendable
-private func liveReloadAppExtensions () -> Void {
-    WidgetCenter.shared.reloadAllTimelines()
-}
-#else
-@Sendable
-private func liveReloadAppExtensions () -> Void {
-    return
-}
-
-#endif

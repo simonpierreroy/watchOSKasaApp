@@ -412,15 +412,16 @@ struct DeviceListViewiOS_Previews: PreviewProvider {
             DeviceListViewiOS(
                 store: Store(
                     initialState: .nDeviceLoaded(n: 4),
-                    reducer: DevicesReducer().dependency(
-                        \.devicesClient,
-                         .devicesEnvError(
-                            loadError: "Load",
-                            toggleError: "Toggle",
-                            getDevicesError: "Get",
-                            changeDevicesError: "Change"
-                         )
-                    )
+                    reducer: DevicesReducer()
+                        .dependency(
+                            \.devicesClient,
+                             .devicesEnvError(
+                                loadError: "loadError",
+                                toggleError: "toggleError",
+                                getDevicesError: "getDevicesError",
+                                changeDevicesError: "changeDevicesError"
+                             )
+                        )
                 ).scope(
                     state: DeviceListViewiOS.StateView.init(devices:),
                     action: DevicesReducer.Action.init(deviceAction:)
