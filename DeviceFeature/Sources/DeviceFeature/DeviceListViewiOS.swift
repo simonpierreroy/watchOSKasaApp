@@ -257,7 +257,11 @@ public struct DeviceDetailViewiOS: View {
             .disabled(viewStore.isLoading)
             .alert(
                 item: viewStore.binding(
-                    get: { $0.error.map(AlertInfo.init(title:))},
+                    get: {
+                        CasePath(DeviceReducer.State.Route.error)
+                            .extract(from: $0.route)
+                            .map{ AlertInfo(title: $0) }
+                    },
                     send: .tappedErrorAlert
                 ),
                 content: { Alert(title: Text($0.title)) }
@@ -388,6 +392,19 @@ struct DeviceListViewiOS_Previews: PreviewProvider {
                     action: DevicesReducer.Action.init(deviceAction:)
                 )
             ).previewDisplayName("Link")
+            
+            DeviceListViewiOS(
+                store: Store(
+                    initialState: .multiRoutes(
+                        parentError: "Erorr parent",
+                        childError: "Error child"
+                    ),
+                    reducer: DevicesReducer()
+                ).scope(
+                    state: DeviceListViewiOS.StateView.init(devices:),
+                    action: DevicesReducer.Action.init(deviceAction:)
+                )
+            ).previewDisplayName("Routes")
             
             DeviceListViewiOS(
                 store: Store(

@@ -10,9 +10,13 @@ public struct DeviceReducer: ReducerProtocol {
     
     public struct State: Equatable, Identifiable {
         
+        public enum Route: Equatable {
+            case error(String)
+        }
+        
         public var isLoading: Bool = false
-        public var error: String? = nil
         public var token: Token? = nil
+        public var route: Route? = nil
         
         public let id: Device.Id
         public let name: String
@@ -52,10 +56,10 @@ public struct DeviceReducer: ReducerProtocol {
                 }
             case .send(let error):
                 state.isLoading = false
-                state.error = error.localizedDescription
+                state.route = .error(error.localizedDescription)
                 return .none
             case .errorHandled:
-                state.error = nil
+                state.route = nil
                 return .none
             case .deviceChild(let childId, .toggleChild):
                 guard let token = state.token, let child = state.children[id: childId], state.isLoading == false else { return .none }

@@ -190,6 +190,22 @@ extension DevicesReducer.State {
     static let emptyLoading = Self(devices: [], isLoading: .loadingDevices, route: nil, token: "logged")
     static let emptyNeverLoaded = Self(devices: [], isLoading: .nerverLoaded, route: nil, token: "logged")
     static let oneDeviceLoaded = Self(devices: [.init(device: .debugDevice1)], isLoading: .loaded, route: nil, token: "logged")
+    static func multiRoutes(parentError: String?, childError: String?) -> Self {
+        Self(
+            devices: [ .init(
+                isLoading: false,
+                route: childError.map { .error($0) },
+                id: .init(rawValue: "1"),
+                name: "1",
+                children: .init())
+            ],
+            isLoading: .loaded,
+            route: parentError.map { .error(NSError(domain: $0, code: 1)) },
+            token: "logged",
+            link: nil
+        )
+    }
+    
     static func nDeviceLoaded(n: Int, childrenCount: Int = 0) -> Self {
         var children: [Device.DeviceChild] = []
         var state: RelayIsOn? = false

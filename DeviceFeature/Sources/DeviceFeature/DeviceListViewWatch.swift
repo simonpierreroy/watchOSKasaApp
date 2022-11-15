@@ -113,7 +113,11 @@ struct DeviceDetailViewWatch: View {
                 }
             }.alert(
                 item: viewStore.binding(
-                    get: { $0.device.error.map(AlertInfo.init(title:))},
+                    get: {
+                        CasePath(DeviceReducer.State.Route.error)
+                            .extract(from: $0.device.route)
+                            .map{ AlertInfo(title: $0) }
+                    },
                     send: .tappedErrorAlert
                 ),
                 content: { Alert(title: Text($0.title)) }
