@@ -37,7 +37,7 @@ struct NoDevicesView: View {
             return .largeTitle
         }
     }
-
+    
     var body: some View {
         VStack {
             Image(systemName: "lightbulb.slash.fill")
@@ -97,7 +97,7 @@ struct DeviceView : View {
                 .background(Color.button.opacity(0.2))
                 .cornerRadius(16)
             
-        }
+        }.widgetURL(getURL(.device(device.deepLink()))) // widgetURL when is small view
     }
 }
 
@@ -130,7 +130,7 @@ struct CloseAll : View {
     let getURL: (AppLink) -> URL
     let toltalNumberDevices: Int
     @Environment(\.widgetFamily) var widgetFamily
-
+    
     
     static func showText(widgetFamily: WidgetFamily) -> Bool {
         switch widgetFamily {
@@ -165,7 +165,7 @@ struct CloseAll : View {
                     Text(Strings.close_all.key, bundle: .module)
                 }
             }
-        }
+        }.widgetURL(getURL(.device(.closeAll))) // for small views
     }
 }
 
@@ -173,16 +173,21 @@ struct StackList : View {
     @Environment(\.widgetFamily) var widgetFamily
     let devices: [Device]
     let getURL: (AppLink) -> URL
+    let staticIntent: Bool
     
     var body: some View {
         if  devices.count > 0 {
             VStack {
                 switch widgetFamily {
                 case .systemSmall, .accessoryCircular, .accessoryInline, .accessoryRectangular:
-                    CloseAll(
-                        getURL: getURL,
-                        toltalNumberDevices: devices.count
-                    ).widgetURL(getURL(.device(.closeAll)))
+                    if staticIntent {
+                        CloseAll(
+                            getURL: getURL,
+                            toltalNumberDevices: devices.count
+                        )
+                    } else {
+                        DeviceViewMaybe(device: devices[safeIndex: 0], getURL: getURL)
+                    }
                 case .systemMedium :
                     VStack{
                         DeviceRowMaybe(devices: (devices[safeIndex: 0], devices[safeIndex: 1]), getURL: getURL)
@@ -218,8 +223,10 @@ struct DeviceView_Preview: PreviewProvider {
         .map { i in Device.init(id: "\(i)", name: "Preview no \(i)", state: false) }
     static var previews: some View {
         Group {
-            StackList(devices: DeviceView_Preview.previewDevices, getURL: { _ in return .mock })
+            StackList(devices: DeviceView_Preview.previewDevices, getURL: { _ in return .mock }, staticIntent: false)
                 .previewDisplayName("StackList")
+            StackList(devices: DeviceView_Preview.previewDevices, getURL: { _ in return .mock }, staticIntent: true)
+                .previewDisplayName("StackList Static")
         }
     }
 }

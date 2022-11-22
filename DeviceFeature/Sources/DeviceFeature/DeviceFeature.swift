@@ -25,14 +25,14 @@ public struct DevicesReducer: ReducerProtocol {
         case closeAll
         case doneClosingAll
         case saveDevicesToCache
-        case attempDeepLink(Link)
+        case attempDeepLink(DeviceLink)
         case logout
     }
     
     public struct State {
         public static let empty = Self(devices: [], isLoading: .nerverLoaded, route: nil, token: nil)
         
-        init(devices: [DeviceReducer.State], isLoading: Loading, route: Route?, token: Token?, link: Link? = nil) {
+        init(devices: [DeviceReducer.State], isLoading: Loading, route: Route?, token: Token?, link: DeviceLink? = nil) {
             self._devices = .init(uniqueElements: devices)
             self.isLoading = isLoading
             self.route = route
@@ -75,7 +75,7 @@ public struct DevicesReducer: ReducerProtocol {
         public var token: Token?
         public var isLoading: Loading
         public var route: Route?
-        public var linkToComplete: Link?
+        public var linkToComplete: DeviceLink?
     }
     
     @Dependency(\.devicesCache.save) var saveToCache

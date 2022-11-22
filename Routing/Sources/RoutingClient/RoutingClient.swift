@@ -12,7 +12,7 @@ import Dependencies
 import XCTestDynamicOverlay
 
 public enum AppLink {
-    case device(DeviceClient.Link)
+    case device(DeviceLink)
 }
 
 public struct URLRouter {

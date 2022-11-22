@@ -16,7 +16,7 @@ extension AppLink {
     
     private static let deviceEntryLink = ParsePrint(.case(Self.device)) {
         StartsWith<Substring>("device/")
-        DeviceClient.Link.deviceLinkParser
+        DeviceLink.deviceLinkParser
     }
     
     public static let appLinkParser = OneOf {

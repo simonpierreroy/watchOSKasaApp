@@ -6,6 +6,8 @@ import WidgetKit
 import Dependencies
 import UserClient
 import DeviceClient
+import Intents
+import IdentifiedCollections
 
 public struct WidgetDataCache {
     
@@ -29,8 +31,11 @@ public func getCacheState(cache: WidgetDataCache) throws -> WidgetState {
     return WidgetState.init(user: user, device: devices)
 }
 
+extension DataDeviceEntry: TimelineEntry { }
+
 public func newEntry(
     cache: WidgetDataCache,
+    intentSelection: [String]?,
     for context: TimelineProviderContext
 ) -> DataDeviceEntry {
     guard let cache = try? getCacheState(cache: cache) else {
@@ -40,8 +45,15 @@ public func newEntry(
     if cache.user == nil {
         return DataDeviceEntry(date: Date(), userIsLogged: false, devices: [])
     } else {
-        return DataDeviceEntry(date: Date(), userIsLogged: true, devices: cache.device)
-    }    
+        if let intentSelection {
+            let ids = intentSelection.map { Device.ID.init(rawValue: $0) }
+            let devicesWithId = IdentifiedArray(uniqueElements: cache.device)
+            let foundDevices = ids.compactMap { devicesWithId[id: $0] }
+            return DataDeviceEntry(date: Date(), userIsLogged: true, devices: foundDevices)
+        } else {
+            return DataDeviceEntry(date: Date(), userIsLogged: true, devices: cache.device)
+        }
+    }
 }
 
 

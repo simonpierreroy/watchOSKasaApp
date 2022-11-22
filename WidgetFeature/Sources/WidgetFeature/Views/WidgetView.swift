@@ -15,16 +15,20 @@ public struct WidgetView: View {
     public init (
         logged: Bool,
         devices: [Device],
-        getURL: @escaping (AppLink) -> URL
+        getURL: @escaping (AppLink) -> URL,
+        staticIntent: Bool
     ) {
         self.logged = logged
         self.devices = devices
         self.getURL = getURL
+        self.staticIntent = staticIntent
     }
     
     let logged: Bool
     let devices: [Device]
     let getURL: (AppLink) -> URL
+    let staticIntent: Bool
+    
     @Environment(\.widgetFamily) var widgetFamily
     
     @ViewBuilder
@@ -46,9 +50,9 @@ public struct WidgetView: View {
     public var body: some View {
         VStack {
             if logged {
-                StackList(devices: devices, getURL: getURL)
+                StackList(devices: devices, getURL: getURL, staticIntent: staticIntent)
             } else {
-                LogoutView(getURL: getURL)
+                LogoutView(getURL: getURL, staticIntent: staticIntent)
             }
         }.frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(WidgetView.getBackground(for: widgetFamily))

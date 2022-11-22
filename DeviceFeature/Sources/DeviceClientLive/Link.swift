@@ -10,7 +10,7 @@ import KasaCore
 import Foundation
 import Parsing
 
-extension Link {
+extension DeviceLink {
     
     private static let validDeviceToggleLink = ParsePrint {
         StartsWith<Substring>("toggle/")
@@ -18,9 +18,9 @@ extension Link {
         End()
     }.map(.string)
         .map(.memberwise(Device.ID.init(rawValue:)))
-        .map(.case(Link.device))
+        .map(.case(Self.device))
         
-    private static let closeAllLink = ParsePrint(.case(Link.closeAll)) {
+    private static let closeAllLink = ParsePrint(.case(Self.closeAll)) {
         StartsWith<Substring>("closeAll")
         End()
     }

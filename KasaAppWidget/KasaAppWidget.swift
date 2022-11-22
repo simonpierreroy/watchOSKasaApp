@@ -17,28 +17,83 @@ import WidgetClient
 import DeviceClient
 import Dependencies
 
-extension DataDeviceEntry: TimelineEntry { }
-
-struct Provider: TimelineProvider {
+struct ProviderConfig {
     
     @Dependency(\.userCache.loadBlocking) var loadUser
     @Dependency(\.devicesCache.loadBlocking) var loadDevices
     @Dependency(\.urlRouter.print) var getURL
     
+    func render(link: AppLink) -> URL {
+        do {
+            return try getURL(link)
+        } catch {
+            return URL(string: "urlWidgetDeepLinkIssue")!
+        }
+    }
+    
+}
+
+struct StaticProvider: TimelineProvider {
+    
+    let config = ProviderConfig()
+    
     func placeholder(in context: Context) -> DataDeviceEntry {
         .preview(10)
     }
     
-    func getSnapshot(in context: Context, completion: @escaping (DataDeviceEntry) -> ()) {
+    func getSnapshot(in context: Context, completion: @escaping (WidgetClient.DataDeviceEntry) -> Void) {
         completion(newEntry(
-            cache: .init(loadDevices: loadDevices, loadUser: loadUser),
+            cache: .init(loadDevices: config.loadDevices, loadUser: config.loadUser),
+            intentSelection: nil,
             for: context)
         )
     }
     
-    func getTimeline(in context: Context, completion: @escaping (Timeline<Entry>) -> ()) {
+    func getTimeline(in context: Context, completion: @escaping (Timeline<WidgetClient.DataDeviceEntry>) -> Void) {
         let entry = newEntry(
-            cache: .init(loadDevices: loadDevices, loadUser: loadUser),
+            cache: .init(loadDevices: config.loadDevices, loadUser: config.loadUser),
+            intentSelection: nil,
+            for: context
+        )
+        let timeline = Timeline(
+            entries: [entry],
+            policy: .never
+        )
+        completion(timeline)
+    }
+    
+}
+
+struct IntentProvider: IntentTimelineProvider {
+    
+    let config = ProviderConfig()
+    
+    func placeholder(in context: Context) -> DataDeviceEntry {
+        .preview(10)
+    }
+    
+    func getSnapshot(
+        for configuration: SelectDevicesIntent,
+        in context: Context,
+        completion: @escaping (DataDeviceEntry) -> ()) {
+            let selection = (configuration.SelectedDevice ?? []).compactMap { $0.identifier }
+            
+            completion(newEntry(
+                cache: .init(loadDevices: config.loadDevices, loadUser: config.loadUser),
+                intentSelection: selection,
+                for: context)
+            )
+        }
+    
+    func getTimeline(
+        for configuration: SelectDevicesIntent,
+        in context: Context,
+        completion: @escaping (Timeline<Entry>) -> ()
+    ) {
+        let selection = (configuration.SelectedDevice ?? []).compactMap { $0.identifier }
+        let entry = newEntry(
+            cache: .init(loadDevices: config.loadDevices, loadUser: config.loadUser),
+            intentSelection: selection,
             for: context
         )
         let currentDate = Date()
@@ -49,42 +104,75 @@ struct Provider: TimelineProvider {
         )
         completion(timeline)
     }
-    
-    func render(link: AppLink) -> URL {
-        do {
-            return try getURL(link)
-        } catch {
-            return URL(string: "urlWidgetDeepLinkIssue")!
-        }
-    }
 }
 
 struct KasaAppWidgetEntryView : View {
-    var entry: Provider.Entry
+    var entry: DataDeviceEntry
     let getURL: (AppLink) -> URL
+    let staticIntent: Bool
     
     var body: some View {
         WidgetView(
             logged: entry.userIsLogged,
             devices: entry.devices,
-            getURL: getURL
+            getURL: getURL,
+            staticIntent: staticIntent
         )
     }
 }
 
 @main
-struct KasaAppWidget: Widget {
-    let kind: String = "KasaAppWidget"
+struct KasaAppWidgets: WidgetBundle {
+    
+    @WidgetBundleBuilder
+    var body: some Widget {
+        KasaAppWidgetWithItent()
+        KasaAppWidgetStatic()
+    }
+}
+
+struct KasaAppWidgetWithItent: Widget {
+    let kind: String = "KasaAppWidgetWithItent"
     
     var body: some WidgetConfiguration {
-        let provider = Provider()
-        return StaticConfiguration(kind: kind, provider: provider) { entry in
-            KasaAppWidgetEntryView(entry: entry, getURL: provider.render(link:))
+        let provider = IntentProvider()
+        
+        return IntentConfiguration(
+            kind: kind,
+            intent: SelectDevicesIntent.self,
+            provider: provider
+        ) { entry in
+            KasaAppWidgetEntryView(
+                entry: entry,
+                getURL: provider.config.render(link:),
+                staticIntent: false
+            )
         }
-        .supportedFamilies([.accessoryCircular,.accessoryInline,
-                            .accessoryRectangular,.systemExtraLarge,
-                            .systemLarge,.systemMedium,.systemSmall])
-        .configurationDisplayName("Kasa")
+        .supportedFamilies([.systemExtraLarge, .systemLarge,.systemMedium,.systemSmall])
+        .configurationDisplayName("Kasa 1")
+        .description(WidgetFeature.Strings.description_widget.string)
+        
+    }
+}
+
+struct KasaAppWidgetStatic: Widget {
+    let kind: String = "KasaAppWidgetStatic"
+    
+    var body: some WidgetConfiguration {
+        let provider = StaticProvider()
+        
+        return StaticConfiguration(
+            kind: kind,
+            provider: provider
+        ) { entry in
+            KasaAppWidgetEntryView(
+                entry: entry,
+                getURL: provider.config.render(link:),
+                staticIntent: true
+            )
+        }
+        .supportedFamilies([.systemSmall, .accessoryCircular, .accessoryInline, .accessoryRectangular])
+        .configurationDisplayName("Kasa 2")
         .description(WidgetFeature.Strings.description_widget.string)
         
     }
@@ -94,46 +182,56 @@ struct KasaAppWidget_Previews: PreviewProvider {
     static var previews: some View {
         KasaAppWidgetEntryView(
             entry: DataDeviceEntry.preview(10),
-            getURL: Provider().render(link:)
+            getURL: ProviderConfig().render(link:),
+            staticIntent: false
+        ).previewContext(WidgetPreviewContext(family: .systemSmall))
+            .environment(\.colorScheme, .dark)
+        KasaAppWidgetEntryView(
+            entry: DataDeviceEntry.preview(10),
+            getURL: ProviderConfig().render(link:),
+            staticIntent: true
         ).previewContext(WidgetPreviewContext(family: .systemSmall))
             .environment(\.colorScheme, .dark)
         KasaAppWidgetEntryView(
             entry: DataDeviceEntry.preview(0),
-            getURL: Provider().render(link:)
+            getURL: ProviderConfig().render(link:),
+            staticIntent: false
         ).previewContext(WidgetPreviewContext(family: .systemSmall))
         KasaAppWidgetEntryView(
             entry: DataDeviceEntry.preview(10),
-            getURL: Provider().render(link:)
+            getURL: ProviderConfig().render(link:),
+            staticIntent: false
         ).previewContext(WidgetPreviewContext(family: .systemMedium))
         KasaAppWidgetEntryView(
             entry: DataDeviceEntry.preview(3),
-            getURL: Provider().render(link:)
+            getURL: ProviderConfig().render(link:),
+            staticIntent: false
         ).previewContext(WidgetPreviewContext(family: .systemMedium))
             .environment(\.colorScheme, .dark)
         KasaAppWidgetEntryView(
             entry: DataDeviceEntry.preview(1),
-            getURL: Provider().render(link:)
+            getURL: ProviderConfig().render(link:),
+            staticIntent: false
         ).previewContext(WidgetPreviewContext(family: .systemMedium))
         KasaAppWidgetEntryView(
             entry: DataDeviceEntry.preview(0),
-            getURL: Provider().render(link:)
+            getURL: ProviderConfig().render(link:),
+            staticIntent: false
         ).previewContext(WidgetPreviewContext(family: .systemMedium))
         KasaAppWidgetEntryView(
             entry: DataDeviceEntry.preview(10),
-            getURL: Provider().render(link:)
+            getURL: ProviderConfig().render(link:),
+            staticIntent: false
         ).previewContext(WidgetPreviewContext(family: .systemLarge))
         KasaAppWidgetEntryView(
             entry: DataDeviceEntry.preview(3),
-            getURL: Provider().render(link:)
+            getURL: ProviderConfig().render(link:),
+            staticIntent: false
         ).previewContext(WidgetPreviewContext(family: .systemLarge))
         KasaAppWidgetEntryView(
             entry: DataDeviceEntry.previewLogout,
-            getURL: Provider().render(link:)
+            getURL: ProviderConfig().render(link:),
+            staticIntent: false
         ).previewContext(WidgetPreviewContext(family: .systemSmall))
-        KasaAppWidgetEntryView(
-            entry: DataDeviceEntry.previewLogout,
-            getURL: Provider().render(link:)
-        ).previewContext(WidgetPreviewContext(family: .systemMedium))
-            .environment(\.colorScheme, .dark)
     }
 }

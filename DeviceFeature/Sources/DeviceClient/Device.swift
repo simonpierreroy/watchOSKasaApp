@@ -33,8 +33,8 @@ public struct Device: Equatable, Identifiable, Codable {
     public let children: [DeviceChild]
     public var state: RelayIsOn?
     
-    public func deepLink() -> Link {
-        return Link.device(self.id)
+    public func deepLink() -> DeviceLink {
+        return .device(self.id)
     }
 }
 
@@ -53,7 +53,7 @@ public extension Device {
     )
 }
 
-public enum Link: Equatable {
+public enum DeviceLink: Equatable {
     case device(Device.ID)
     case closeAll
 }

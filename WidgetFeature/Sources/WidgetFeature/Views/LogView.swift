@@ -15,6 +15,8 @@ struct LogoutView: View {
         .map { i in Device.init(id: "\(i)", name: "Here is device no \(i)", state: false) }
     
     let getURL: (AppLink) -> URL
+    let staticIntent: Bool
+    
     @Environment(\.widgetFamily) var widgetFamily
     
     static func showBackground(widgetFamily: WidgetFamily) -> Bool {
@@ -42,7 +44,7 @@ struct LogoutView: View {
     var body: some View {
         ZStack {
             if LogoutView.showBackground(widgetFamily: widgetFamily) {
-                StackList(devices: LogoutView.logoutDevicesPreview, getURL: getURL)
+                StackList(devices: LogoutView.logoutDevicesPreview, getURL: getURL, staticIntent: staticIntent)
                     .blur(radius: 4.0)
             }
             VStack {
@@ -60,8 +62,10 @@ struct LogoutView: View {
 struct LogoutView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
-            LogoutView(getURL: { _ in return .mock })
+            LogoutView(getURL: { _ in return .mock }, staticIntent: false)
                 .previewDisplayName("LogoutView")
+            LogoutView(getURL: { _ in return .mock }, staticIntent: true)
+                .previewDisplayName("LogoutView Static")
         }
     }
 }
