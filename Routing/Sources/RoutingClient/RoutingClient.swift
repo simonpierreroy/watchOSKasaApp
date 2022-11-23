@@ -12,7 +12,7 @@ import Dependencies
 import XCTestDynamicOverlay
 
 public enum AppLink {
-    case device(DeviceLink)
+    case devices(DevicesLink)
 }
 
 public struct URLRouter {
@@ -29,11 +29,11 @@ public struct URLRouter {
 
 extension URLRouter: TestDependencyKey {
     public static var testValue = URLRouter(
-        parse:  XCTUnimplemented("\(Self.self).parse", placeholder: .device(.closeAll)),
+        parse:  XCTUnimplemented("\(Self.self).parse", placeholder: .devices(.closeAll)),
         print:  XCTUnimplemented("\(Self.self).print", placeholder: .mock)
     )
     
-    public static let previewValue = URLRouter.mock(link: .device(.closeAll), print: nil)
+    public static let previewValue = URLRouter.mock(link: .devices(.closeAll), print: nil)
 }
 
 public extension DependencyValues {

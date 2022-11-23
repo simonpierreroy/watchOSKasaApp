@@ -14,9 +14,9 @@ import Dependencies
 
 extension AppLink {
     
-    private static let deviceEntryLink = ParsePrint(.case(Self.device)) {
-        StartsWith<Substring>("device/")
-        DeviceLink.deviceLinkParser
+    private static let deviceEntryLink = ParsePrint(.case(Self.devices)) {
+        StartsWith<Substring>("devices/")
+        DevicesLink.devicesLinkParser
     }
     
     public static let appLinkParser = OneOf {

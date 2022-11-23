@@ -25,14 +25,14 @@ public struct DevicesReducer: ReducerProtocol {
         case closeAll
         case doneClosingAll
         case saveDevicesToCache
-        case attempDeepLink(DeviceLink)
+        case attempDeepLink(DevicesLink)
         case logout
     }
     
     public struct State {
         public static let empty = Self(devices: [], isLoading: .nerverLoaded, route: nil, token: nil)
         
-        init(devices: [DeviceReducer.State], isLoading: Loading, route: Route?, token: Token?, link: DeviceLink? = nil) {
+        init(devices: [DeviceReducer.State], isLoading: Loading, route: Route?, token: Token?, link: DevicesLink? = nil) {
             self._devices = .init(uniqueElements: devices)
             self.isLoading = isLoading
             self.route = route
@@ -75,7 +75,7 @@ public struct DevicesReducer: ReducerProtocol {
         public var token: Token?
         public var isLoading: Loading
         public var route: Route?
-        public var linkToComplete: DeviceLink?
+        public var linkToComplete: DevicesLink?
     }
     
     @Dependency(\.devicesCache.save) var saveToCache
@@ -95,9 +95,16 @@ public struct DevicesReducer: ReducerProtocol {
                 
                 switch link {
                 case .closeAll: return Effect(value: .closeAll)
-                case .device(let id):
+                case .device(let id, .toggle):
                     guard state.devices[id: id] != nil else { return .none }
                     return Effect(value: .deviceDetail(index: id, action: .toggle))
+                case .device(let id, .child(let childId, .toggle)):
+                    return Effect(value:
+                            .deviceDetail(
+                                index: id,
+                                action: .deviceChild(index: childId, action: .toggleChild)
+                            )
+                    )
                 }
             case .set(let devices):
                 state.isLoading = .loaded
@@ -186,7 +193,7 @@ extension Device {
 #if DEBUG
 extension DevicesReducer.State {
     static let emptyLogged = Self(devices: [], isLoading: .nerverLoaded, route: nil, token: "logged")
-    static let emptyLoggedLink = Self(devices: [], isLoading: .nerverLoaded, route: nil, token: "logged", link: Device.debugDevice1.deepLink())
+    static let emptyLoggedLink = Self(devices: [], isLoading: .nerverLoaded, route: nil, token: "logged", link: .device(Device.debugDevice1.id, .toggle))
     static let emptyLoading = Self(devices: [], isLoading: .loadingDevices, route: nil, token: "logged")
     static let emptyNeverLoaded = Self(devices: [], isLoading: .nerverLoaded, route: nil, token: "logged")
     static let oneDeviceLoaded = Self(devices: [.init(device: .debugDevice1)], isLoading: .loaded, route: nil, token: "logged")

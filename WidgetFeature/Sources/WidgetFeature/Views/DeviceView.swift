@@ -75,7 +75,7 @@ struct DeviceView : View {
     }
     
     var body: some View {
-        Link(destination: getURL(.device(device.deepLink()))) {
+        Link(destination: getURL(.devices(.device(device.id, .toggle)))) {
             VStack {
                 if device.children.count > 0 {
                     Image(systemName: "rectangle.3.group.fill").font(DeviceView.font(widgetFamily).0)
@@ -97,7 +97,7 @@ struct DeviceView : View {
                 .background(Color.button.opacity(0.2))
                 .cornerRadius(16)
             
-        }.widgetURL(getURL(.device(device.deepLink()))) // widgetURL when is small view
+        }.widgetURL(getURL(.devices(.device(device.id, .toggle)))) // widgetURL when is small view
     }
 }
 
@@ -157,7 +157,7 @@ struct CloseAll : View {
     }
     
     var body: some View {
-        Link(destination: getURL(.device(.closeAll))) {
+        Link(destination: getURL(.devices(.closeAll))) {
             VStack {
                 Image(systemName: "moon.zzz.fill")
                     .font(CloseAll.font(widgetFamily: widgetFamily))
@@ -165,7 +165,7 @@ struct CloseAll : View {
                     Text(Strings.close_all.key, bundle: .module)
                 }
             }
-        }.widgetURL(getURL(.device(.closeAll))) // for small views
+        }.widgetURL(getURL(.devices(.closeAll))) // for small views
     }
 }
 
