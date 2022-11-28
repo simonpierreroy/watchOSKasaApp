@@ -14,7 +14,7 @@ public struct WidgetView: View {
     
     public init (
         logged: Bool,
-        devices: [Device],
+        devices: [FlattenDevice],
         getURL: @escaping (AppLink) -> URL,
         staticIntent: Bool
     ) {
@@ -25,7 +25,7 @@ public struct WidgetView: View {
     }
     
     let logged: Bool
-    let devices: [Device]
+    let devices: [FlattenDevice]
     let getURL: (AppLink) -> URL
     let staticIntent: Bool
     

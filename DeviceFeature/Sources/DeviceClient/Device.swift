@@ -49,6 +49,47 @@ public extension Device {
     )
 }
 
+public struct FlattenDevice: Equatable, Identifiable  {
+    public struct DoubleID: Equatable, Hashable {
+        
+        public init(parent: Device.ID,child: Device.ID?){
+            self.child = child
+            self.parent = parent
+        }
+        
+        public let parent: Device.ID
+        public let child: Device.ID?
+        
+        public func added() -> String {
+            return parent.rawValue + (child?.rawValue ?? "")
+        }
+    }
+    
+    public init(device: Device, child: Device.DeviceChild?) {
+        self.device = device
+        self.child = child
+    }
+    
+    public var id: DoubleID  { .init(parent: self.device.id, child: self.child?.id) }
+    public let device: Device
+    public let child: Device.DeviceChild?
+}
+
+public extension Array<Device> {
+    func flatten() -> Array<FlattenDevice> {
+        var entries: [FlattenDevice] = []
+        entries.reserveCapacity(self.count)
+        for device in self {
+            if device.children.isEmpty {
+                entries.append(FlattenDevice(device: device, child: nil))
+            } else {
+                entries.append(contentsOf: device.children.map { FlattenDevice(device: device, child: $0) })
+            }
+        }
+        return entries
+    }
+}
+
 public enum DevicesLink: Equatable {
     case device(Device.ID, Device.Link)
     case closeAll

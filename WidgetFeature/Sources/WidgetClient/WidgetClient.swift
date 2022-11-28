@@ -23,7 +23,7 @@ public struct DataDeviceEntry {
     public init(
         date: Date,
         userIsLogged: Bool,
-        devices: [Device]
+        devices: [FlattenDevice]
     ) {
         self.date = date
         self.userIsLogged = userIsLogged
@@ -32,7 +32,7 @@ public struct DataDeviceEntry {
     
     public let date: Date
     public let userIsLogged: Bool
-    public let devices: [Device]
+    public let devices: [FlattenDevice]
     
 }
 
@@ -52,7 +52,7 @@ public extension DataDeviceEntry {
                     .init(id: .init(rawValue: "child 2\($0)"), name: "child 1 of \($0)", state: false)
                 ] : [],
                 state: false)
-            }
+            }.flatten()
         )
     }
     

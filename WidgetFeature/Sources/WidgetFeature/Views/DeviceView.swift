@@ -13,6 +13,7 @@ import RoutingClient
 struct NoDevicesView: View {
     
     @Environment(\.widgetFamily) var widgetFamily
+    let staticIntent: Bool
     
     static func showText(widgetFamily: WidgetFamily) -> Bool {
         switch widgetFamily {
@@ -40,10 +41,14 @@ struct NoDevicesView: View {
     
     var body: some View {
         VStack {
-            Image(systemName: "lightbulb.slash.fill")
-                .font(NoDevicesView.font(widgetFamily: widgetFamily))
+            Image(systemName:
+                    staticIntent ? "lightbulb.slash.fill" : "square.and.pencil.circle"
+            ).font(NoDevicesView.font(widgetFamily: widgetFamily))
             if NoDevicesView.showText(widgetFamily: widgetFamily) {
-                Text(Strings.no_device.key, bundle: .module)
+                Text(
+                    staticIntent ? Strings.no_device.key  :  Strings.no_device_selected.key,
+                    bundle: .module
+                )
             }
         }
     }
@@ -53,7 +58,7 @@ struct DeviceView : View {
     
     @Environment(\.widgetFamily) var widgetFamily
     
-    let device: Device
+    let device: FlattenDevice
     let getURL: (AppLink) -> URL
     
     static func font(_ family: WidgetFamily) ->  (Font, Font){
@@ -75,21 +80,13 @@ struct DeviceView : View {
     }
     
     var body: some View {
-        Link(destination: getURL(.devices(.device(device.id, .toggle)))) {
+        Link(destination: getURL(getLink())) {
             VStack {
-                if device.children.count > 0 {
-                    Image(systemName: "rectangle.3.group.fill").font(DeviceView.font(widgetFamily).0)
-                    (Text(Strings.device_group.key, bundle: .module).font(DeviceView.font(widgetFamily).1)
-                     +
-                     Text(" (\(device.children.count))").font(DeviceView.font(widgetFamily).1))
+                Image(systemName: "light.max")
+                    .font(DeviceView.font(widgetFamily).0)
+                Text("\(device.child?.name ?? device.device.name )")
                     .multilineTextAlignment(.center)
-                } else {
-                    Image(systemName: "light.max")
-                        .font(DeviceView.font(widgetFamily).0)
-                    Text("\(device.name)")
-                        .multilineTextAlignment(.center)
-                        .font(DeviceView.font(widgetFamily).1)
-                }
+                    .font(DeviceView.font(widgetFamily).1)
                 
             }.padding()
                 .frame(maxWidth: .infinity,maxHeight: .infinity, alignment: .center)
@@ -97,12 +94,20 @@ struct DeviceView : View {
                 .background(Color.button.opacity(0.2))
                 .cornerRadius(16)
             
-        }.widgetURL(getURL(.devices(.device(device.id, .toggle)))) // widgetURL when is small view
+        }.widgetURL(getURL(getLink())) // widgetURL when is small view
+    }
+    
+    func getLink() -> AppLink {
+        if let child = device.child {
+            return .devices(.device(device.device.id, .child(child.id,.toggle)))
+        } else {
+            return .devices(.device(device.device.id, .toggle))
+        }
     }
 }
 
 struct DeviceRowMaybe : View {
-    let devices: (Device?,Device?)
+    let devices: (FlattenDevice?,FlattenDevice?)
     let getURL: (AppLink) -> URL
     
     var body: some View {
@@ -114,7 +119,7 @@ struct DeviceRowMaybe : View {
 }
 
 struct DeviceViewMaybe : View {
-    let device: Device?
+    let device: FlattenDevice?
     let getURL: (AppLink) -> URL
     
     var body: some View {
@@ -171,7 +176,7 @@ struct CloseAll : View {
 
 struct StackList : View {
     @Environment(\.widgetFamily) var widgetFamily
-    let devices: [Device]
+    let devices: [FlattenDevice]
     let getURL: (AppLink) -> URL
     let staticIntent: Bool
     
@@ -212,7 +217,7 @@ struct StackList : View {
             }.padding()
             
         } else {
-            NoDevicesView()
+            NoDevicesView(staticIntent: staticIntent)
         }
     }
 }
@@ -223,9 +228,9 @@ struct DeviceView_Preview: PreviewProvider {
         .map { i in Device.init(id: "\(i)", name: "Preview no \(i)", state: false) }
     static var previews: some View {
         Group {
-            StackList(devices: DeviceView_Preview.previewDevices, getURL: { _ in return .mock }, staticIntent: false)
+            StackList(devices: DeviceView_Preview.previewDevices.flatten(), getURL: { _ in return .mock }, staticIntent: false)
                 .previewDisplayName("StackList")
-            StackList(devices: DeviceView_Preview.previewDevices, getURL: { _ in return .mock }, staticIntent: true)
+            StackList(devices: DeviceView_Preview.previewDevices.flatten(), getURL: { _ in return .mock }, staticIntent: true)
                 .previewDisplayName("StackList Static")
         }
     }

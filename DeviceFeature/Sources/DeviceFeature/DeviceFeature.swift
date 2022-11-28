@@ -99,6 +99,7 @@ public struct DevicesReducer: ReducerProtocol {
                     guard state.devices[id: id] != nil else { return .none }
                     return Effect(value: .deviceDetail(index: id, action: .toggle))
                 case .device(let id, .child(let childId, .toggle)):
+                    guard let d = state.devices[id: id], d.children[id: childId] != nil else { return .none }
                     return Effect(value:
                             .deviceDetail(
                                 index: id,

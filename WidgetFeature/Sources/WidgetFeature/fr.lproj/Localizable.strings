@@ -3,3 +3,4 @@
 "description_widget" = "Ouvrir les lumières rapidement";
 "close_all" = "Fermer";
 "device_group" = "Groupe";
+"no_device_selected" = "Aucun appareil sélectionné";

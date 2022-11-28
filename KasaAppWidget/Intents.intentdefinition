@@ -158,7 +158,7 @@
 			<key>INTypeDisplayNameID</key>
 			<string>25f5cE</string>
 			<key>INTypeLastPropertyTag</key>
-			<integer>100</integer>
+			<integer>104</integer>
 			<key>INTypeName</key>
 			<string>SelectedDevice</string>
 			<key>INTypeProperties</key>
@@ -212,6 +212,34 @@
 					<integer>4</integer>
 					<key>INTypePropertyType</key>
 					<string>SpeakableString</string>
+				</dict>
+				<dict>
+					<key>INTypePropertyDisplayName</key>
+					<string>Child Id</string>
+					<key>INTypePropertyDisplayNameID</key>
+					<string>5y3H97</string>
+					<key>INTypePropertyDisplayPriority</key>
+					<integer>5</integer>
+					<key>INTypePropertyName</key>
+					<string>childId</string>
+					<key>INTypePropertyTag</key>
+					<integer>101</integer>
+					<key>INTypePropertyType</key>
+					<string>String</string>
+				</dict>
+				<dict>
+					<key>INTypePropertyDisplayName</key>
+					<string>Device Id</string>
+					<key>INTypePropertyDisplayNameID</key>
+					<string>ULb9g3</string>
+					<key>INTypePropertyDisplayPriority</key>
+					<integer>6</integer>
+					<key>INTypePropertyName</key>
+					<string>deviceId</string>
+					<key>INTypePropertyTag</key>
+					<integer>102</integer>
+					<key>INTypePropertyType</key>
+					<string>String</string>
 				</dict>
 			</array>
 		</dict>

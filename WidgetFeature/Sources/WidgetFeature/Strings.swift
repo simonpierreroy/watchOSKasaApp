@@ -11,6 +11,7 @@ import SwiftUI
 
 public enum Strings: String {
     case no_device
+    case no_device_selected
     case not_logged
     case description_widget
     case close_all
@@ -40,6 +41,7 @@ struct Strings_Previews: PreviewProvider {
                 Text(Strings.description_widget.key, bundle: .module)
                 Text(Strings.close_all.key, bundle: .module)
                 Text(Strings.device_group.key, bundle: .module)
+                Text(Strings.no_device_selected.key, bundle: .module)
             }
             .previewDisplayName("English")
             VStack {
@@ -48,6 +50,7 @@ struct Strings_Previews: PreviewProvider {
                 Text(Strings.description_widget.key,  bundle: .module)
                 Text(Strings.close_all.key, bundle: .module)
                 Text(Strings.device_group.key, bundle: .module)
+                Text(Strings.no_device_selected.key, bundle: .module)
             }.environment(\.locale, .init(identifier: "fr"))
             .previewDisplayName("Français")
         }

@@ -3,3 +3,4 @@
 "description_widget" = "Toggle lights superfast";
 "close_all" = "Close all";
 "device_group" = "Device group";
+"no_device_selected" = "No device selected";

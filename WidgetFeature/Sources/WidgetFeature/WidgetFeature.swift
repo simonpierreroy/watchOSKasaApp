@@ -35,7 +35,7 @@ extension DataDeviceEntry: TimelineEntry { }
 
 public func newEntry(
     cache: WidgetDataCache,
-    intentSelection: [String]?,
+    intentSelection: [FlattenDevice.DoubleID]?,
     for context: TimelineProviderContext
 ) -> DataDeviceEntry {
     guard let cache = try? getCacheState(cache: cache) else {
@@ -46,12 +46,11 @@ public func newEntry(
         return DataDeviceEntry(date: Date(), userIsLogged: false, devices: [])
     } else {
         if let intentSelection {
-            let ids = intentSelection.map { Device.ID.init(rawValue: $0) }
-            let devicesWithId = IdentifiedArray(uniqueElements: cache.device)
-            let foundDevices = ids.compactMap { devicesWithId[id: $0] }
+            let devicesWithId = IdentifiedArray(uniqueElements: cache.device.flatten())
+            let foundDevices = intentSelection.compactMap { devicesWithId[id: $0] }
             return DataDeviceEntry(date: Date(), userIsLogged: true, devices: foundDevices)
         } else {
-            return DataDeviceEntry(date: Date(), userIsLogged: true, devices: cache.device)
+            return DataDeviceEntry(date: Date(), userIsLogged: true, devices: cache.device.flatten())
         }
     }
 }

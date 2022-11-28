@@ -64,6 +64,26 @@ struct StaticProvider: TimelineProvider {
     
 }
 
+extension SelectDevicesIntent {
+    func getIds() -> [FlattenDevice.DoubleID] {
+        guard let selections = self.SelectedDevice else {
+            return []
+        }
+        
+        var result: [FlattenDevice.DoubleID] = []
+        
+        for selection in selections {
+            guard let pID = selection.deviceId else { break }
+            let cID = selection.childId.map { id in Device.ID.init(rawValue: id) }
+            result.append(
+                .init(parent: .init(rawValue: pID), child: cID)
+            )
+        }
+        
+        return result
+    }
+}
+
 struct IntentProvider: IntentTimelineProvider {
     
     let config = ProviderConfig()
@@ -75,13 +95,13 @@ struct IntentProvider: IntentTimelineProvider {
     func getSnapshot(
         for configuration: SelectDevicesIntent,
         in context: Context,
-        completion: @escaping (DataDeviceEntry) -> ()) {
-            let selection = (configuration.SelectedDevice ?? []).compactMap { $0.identifier }
-            
-            completion(newEntry(
-                cache: .init(loadDevices: config.loadDevices, loadUser: config.loadUser),
-                intentSelection: selection,
-                for: context)
+        completion: @escaping (DataDeviceEntry) -> ()) {            
+            completion(
+                newEntry(
+                    cache: .init(loadDevices: config.loadDevices, loadUser: config.loadUser),
+                    intentSelection: nil,
+                    for: context
+                )
             )
         }
     
@@ -90,7 +110,8 @@ struct IntentProvider: IntentTimelineProvider {
         in context: Context,
         completion: @escaping (Timeline<Entry>) -> ()
     ) {
-        let selection = (configuration.SelectedDevice ?? []).compactMap { $0.identifier }
+        let selection = configuration.getIds()
+        
         let entry = newEntry(
             cache: .init(loadDevices: config.loadDevices, loadUser: config.loadUser),
             intentSelection: selection,
