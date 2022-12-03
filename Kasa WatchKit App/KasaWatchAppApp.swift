@@ -6,14 +6,14 @@
 //  Copyright © 2020 Simon. All rights reserved.
 //
 
-import WatchKit
 import Foundation
 import SwiftUI
+import WatchKit
 
 @main
 struct KasaWatchAppApp: App {
     @WKApplicationDelegateAdaptor private var extensionDelegate: KasaWatchAppDelegate
-    
+
     var body: some Scene {
         WindowGroup {
             ContentView(store: KasaWatchAppDelegate.store)

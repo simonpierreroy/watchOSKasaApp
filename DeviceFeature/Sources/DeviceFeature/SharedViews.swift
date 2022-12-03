@@ -1,13 +1,13 @@
 //
 //  File.swift
-//  
+//
 //
 //  Created by Simon-Pierre Roy on 8/16/22.
 //
 
 import Foundation
-import SwiftUI
 import KasaCore
+import SwiftUI
 
 func styleForRelayState(relay: RelayIsOn?) -> (image: String, taint: Color) {
     let imageName: String
@@ -23,5 +23,5 @@ func styleForRelayState(relay: RelayIsOn?) -> (image: String, taint: Color) {
         imageName = ""
         color = .gray
     }
-    return (imageName,color)
+    return (imageName, color)
 }

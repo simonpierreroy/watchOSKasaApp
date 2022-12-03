@@ -1,14 +1,14 @@
 //
 //  File.swift
-//  
+//
 //
 //  Created by Simon-Pierre Roy on 8/15/22.
 //
 
-import Foundation
-import DeviceClient
-import KasaCore
 import Dependencies
+import DeviceClient
+import Foundation
+import KasaCore
 import XCTestDynamicOverlay
 
 public enum AppLink {
@@ -29,22 +29,22 @@ public struct URLRouter {
 
 extension URLRouter: TestDependencyKey {
     public static var testValue = URLRouter(
-        parse:  XCTUnimplemented("\(Self.self).parse", placeholder: .devices(.closeAll)),
-        print:  XCTUnimplemented("\(Self.self).print", placeholder: .mock)
+        parse: XCTUnimplemented("\(Self.self).parse", placeholder: .devices(.closeAll)),
+        print: XCTUnimplemented("\(Self.self).print", placeholder: .mock)
     )
-    
+
     public static let previewValue = URLRouter.mock(link: .devices(.closeAll), print: nil)
 }
 
-public extension DependencyValues {
-    var urlRouter: URLRouter {
+extension DependencyValues {
+    public var urlRouter: URLRouter {
         get { self[URLRouter.self] }
         set { self[URLRouter.self] = newValue }
     }
 }
 
-public extension URLRouter {
-    static func mock(link: AppLink, print url: URL?) -> Self  {
+extension URLRouter {
+    public static func mock(link: AppLink, print url: URL?) -> Self {
         Self(
             parse: { _ in link },
             print: { _ in url ?? .mock }

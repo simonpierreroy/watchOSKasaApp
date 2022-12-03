@@ -14,8 +14,7 @@ let package = Package(
         .library(
             name: "KasaNetworking",
             targets: ["KasaNetworking"]
-        )
-        ,
+        ),
         .library(
             name: "BaseUI",
             targets: ["BaseUI"]
@@ -41,14 +40,16 @@ let package = Package(
             dependencies: [
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
                 .product(name: "Tagged", package: "swift-tagged"),
-                .product(name: "Parsing", package: "swift-parsing")
-                
-            ]),
+                .product(name: "Parsing", package: "swift-parsing"),
+
+            ]
+        ),
         .target(
             name: "KasaNetworking",
             dependencies: [
                 "KasaCore"
-            ]),
+            ]
+        ),
         .target(
             name: "BaseUI",
             dependencies: []

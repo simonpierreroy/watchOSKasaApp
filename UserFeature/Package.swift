@@ -29,8 +29,9 @@ let package = Package(
             name: "UserFeature",
             dependencies: [
                 "UserClient",
-                .product(name: "BaseUI", package: "KasaCore")
-            ]),
+                .product(name: "BaseUI", package: "KasaCore"),
+            ]
+        ),
         .target(
             name: "UserClient",
             dependencies: ["KasaCore"]
@@ -39,8 +40,9 @@ let package = Package(
             name: "UserClientLive",
             dependencies: [
                 "UserClient",
-                .product(name: "KasaNetworking", package: "KasaCore")
-            ]),
+                .product(name: "KasaNetworking", package: "KasaCore"),
+            ]
+        ),
         .testTarget(
             name: "UserFeatureTests",
             dependencies: ["UserFeature"]

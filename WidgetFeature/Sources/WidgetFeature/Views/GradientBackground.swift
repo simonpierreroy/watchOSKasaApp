@@ -1,6 +1,6 @@
 //
 //  SwiftUIView.swift
-//  
+//
 //
 //  Created by Simon-Pierre Roy on 2/6/21.
 //
@@ -8,17 +8,18 @@
 import SwiftUI
 
 struct GradientBackgroundWidget: View {
-    
+
     var body: some View {
-        ContainerRelativeShape().fill(
-            LinearGradient(
-                gradient: Gradient(
-                    colors: [.backgroudStart, .backgroudEnd]
-                ),
-                startPoint: .top,
-                endPoint: .bottom
+        ContainerRelativeShape()
+            .fill(
+                LinearGradient(
+                    gradient: Gradient(
+                        colors: [.backgroudStart, .backgroudEnd]
+                    ),
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
             )
-        )
     }
 }
 

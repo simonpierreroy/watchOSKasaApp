@@ -6,29 +6,29 @@
 //  Copyright © 2020 Simon. All rights reserved.
 //
 
-import Foundation
 import Combine
-import UserFeature
-import DeviceFeature
-import DeviceClient
-import UserClient
 import ComposableArchitecture
-import KasaCore
-import UserClientLive
+import DeviceClient
 import DeviceClientLive
+import DeviceFeature
+import Foundation
+import KasaCore
 import RoutingClient
 import RoutingClientLive
+import UserClient
+import UserClientLive
+import UserFeature
 
 public struct AppReducer: ReducerProtocol {
-    
+
     public init() {}
-    
+
     public struct State {
         public static let empty = Self(userState: .empty, _devicesState: .empty)
-        
+
         public var userState: UserReducer.State
         private var _devicesState: DevicesReducer.State
-        
+
         public var devicesState: DevicesReducer.State {
             get {
                 var copy = self._devicesState
@@ -36,14 +36,14 @@ public struct AppReducer: ReducerProtocol {
                 case .logout, .loading:
                     copy.token = nil
                 case .logged(let userState):
-                    copy.token  = userState.user.token
+                    copy.token = userState.user.token
                 }
                 return copy
             }
             set { self._devicesState = newValue }
         }
     }
-    
+
     public enum Action {
         public enum AppDelegate: Equatable {
             case applicationDidFinishLaunching
@@ -55,7 +55,7 @@ public struct AppReducer: ReducerProtocol {
         case userAction(UserReducer.Action)
         case devicesAction(DevicesReducer.Action)
     }
-    
+
     public var body: some ReducerProtocol<State, Action> {
         Scope(state: \State.userState, action: /Action.userAction) {
             UserReducer()

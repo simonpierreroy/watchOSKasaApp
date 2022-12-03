@@ -20,36 +20,36 @@ public enum JSONValue {
     indirect case object([String: JSONValue])
 }
 
-public extension JSONValue {
-    subscript(dynamicMember key: JSONValue) -> JSONValue? {
+extension JSONValue {
+    public subscript(dynamicMember key: JSONValue) -> JSONValue? {
         self[key]
     }
-    
-    subscript(_ key: JSONValue) -> JSONValue? {
-        if case let .number(key) = key {
+
+    public subscript(_ key: JSONValue) -> JSONValue? {
+        if case .number(let key) = key {
             return self[Int(key)]
-        } else if case let .string(key) = key {
+        } else if case .string(let key) = key {
             return self[key]
         }
         return nil
     }
-    
-    subscript(_ index: Int) -> JSONValue? {
-        guard case let .array(array) = self else {
+
+    public subscript(_ index: Int) -> JSONValue? {
+        guard case .array(let array) = self else {
             return nil
         }
         return array[index]
     }
-    
-    subscript(_ key: String) -> JSONValue? {
-        guard case let .object(object) = self else {
+
+    public subscript(_ key: String) -> JSONValue? {
+        guard case .object(let object) = self else {
             return nil
         }
         return object[key]
     }
 }
 
-extension JSONValue: Equatable, Hashable { }
+extension JSONValue: Equatable, Hashable {}
 
 extension JSONValue: Encodable {
     public func encode(to encoder: Encoder) throws {
@@ -72,9 +72,11 @@ extension JSONValue: Encodable {
 }
 
 extension JSONValue: Decodable {
-    public init(from decoder: Decoder) throws {
+    public init(
+        from decoder: Decoder
+    ) throws {
         let singleValueContainer = try decoder.singleValueContainer()
-        
+
         if singleValueContainer.decodeNil() {
             self = .null
         } else if let boolValue = try? singleValueContainer.decode(Bool.self) {
@@ -90,49 +92,64 @@ extension JSONValue: Decodable {
         } else {
             throw DecodingError.dataCorruptedError(
                 in: singleValueContainer,
-                debugDescription: "invalid JSON structure or the input was not JSON")
+                debugDescription: "invalid JSON structure or the input was not JSON"
+            )
         }
     }
 }
 
 extension JSONValue: ExpressibleByNilLiteral {
-    public init(nilLiteral: ()) {
+    public init(
+        nilLiteral: ()
+    ) {
         self = .null
     }
 }
 
 extension JSONValue: ExpressibleByBooleanLiteral {
-    public init(booleanLiteral value: BooleanLiteralType) {
+    public init(
+        booleanLiteral value: BooleanLiteralType
+    ) {
         self = .bool(value)
     }
 }
 
 extension JSONValue: ExpressibleByIntegerLiteral {
-    public init(integerLiteral value: IntegerLiteralType) {
+    public init(
+        integerLiteral value: IntegerLiteralType
+    ) {
         self = .number(Double(value))
     }
 }
 
 extension JSONValue: ExpressibleByFloatLiteral {
-    public init(floatLiteral value: FloatLiteralType) {
+    public init(
+        floatLiteral value: FloatLiteralType
+    ) {
         self = .number(value)
     }
 }
 
 extension JSONValue: ExpressibleByStringLiteral {
-    public init(stringLiteral value: StringLiteralType) {
+    public init(
+        stringLiteral value: StringLiteralType
+    ) {
         self = .string(value)
     }
 }
 
 extension JSONValue: ExpressibleByArrayLiteral {
-    public init(arrayLiteral elements: JSONValue...) {
+    public init(
+        arrayLiteral elements: JSONValue...
+    ) {
         self = .array(elements)
     }
 }
 
 extension JSONValue: ExpressibleByDictionaryLiteral {
-    public init(dictionaryLiteral elements: (String, JSONValue)...) {
+    public init(
+        dictionaryLiteral elements: (String, JSONValue)...
+    ) {
         self = .object(Dictionary(uniqueKeysWithValues: elements))
     }
 }
@@ -142,29 +159,34 @@ let rawEncoder = JSONEncoder()
 let rawDecoder = JSONDecoder()
 
 struct RawStringJSONContainer<Model: Codable>: Codable {
-    
-    init(wrapping: Model) {
+
+    init(
+        wrapping: Model
+    ) {
         self.wrapping = wrapping
     }
-    
+
     let wrapping: Model
-    
-    
+
     func encode(to encoder: Encoder) throws {
         var container = encoder.singleValueContainer()
         let data = try rawEncoder.encode(self.wrapping)
         guard let rawString = String(bytes: data, encoding: .utf8) else {
             throw EncodingError.invalidValue(
-                "", .init(
+                "",
+                .init(
                     codingPath: container.codingPath,
-                    debugDescription: "RawStringJSONContainer: Impossible to convert the encoded JSONValue data to a string."
+                    debugDescription:
+                        "RawStringJSONContainer: Impossible to convert the encoded JSONValue data to a string."
                 )
             )
         }
         try container.encode(rawString)
     }
-    
-    init(from decoder: Decoder) throws {
+
+    init(
+        from decoder: Decoder
+    ) throws {
         let container = try decoder.singleValueContainer()
         let rawJSON = try container.decode(String.self)
         guard let data = rawJSON.data(using: .utf8) else {

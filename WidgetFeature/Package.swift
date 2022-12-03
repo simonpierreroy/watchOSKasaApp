@@ -19,13 +19,13 @@ let package = Package(
         .library(
             name: "WidgetClientLive",
             targets: ["WidgetClientLive"]
-        )
+        ),
     ],
     dependencies: [
         .package(path: "KasaCore"),
         .package(path: "DeviceFeature"),
         .package(path: "UserFeature"),
-        .package(path: "Routing")
+        .package(path: "Routing"),
     ],
     targets: [
         .target(
@@ -33,23 +33,26 @@ let package = Package(
             dependencies: [
                 "KasaCore",
                 "WidgetClient",
-                .product(name: "RoutingClient",package: "Routing"),
-            ]),
+                .product(name: "RoutingClient", package: "Routing"),
+            ]
+        ),
         .target(
             name: "WidgetClient",
             dependencies: [
                 .product(name: "DeviceClient", package: "DeviceFeature"),
                 .product(name: "UserClient", package: "UserFeature"),
-                .product(name: "RoutingClient",package: "Routing"),
-            ]),
+                .product(name: "RoutingClient", package: "Routing"),
+            ]
+        ),
         .target(
             name: "WidgetClientLive",
             dependencies: [
                 "WidgetClient",
                 .product(name: "DeviceClientLive", package: "DeviceFeature"),
                 .product(name: "UserClientLive", package: "UserFeature"),
-                .product(name: "RoutingClientLive",package: "Routing"),
-            ]),
+                .product(name: "RoutingClientLive", package: "Routing"),
+            ]
+        ),
         .testTarget(
             name: "WidgetFeatureTests",
             dependencies: ["WidgetFeature"]

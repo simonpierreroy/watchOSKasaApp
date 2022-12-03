@@ -1,18 +1,18 @@
 //
 //  SwiftUIView.swift
-//  
+//
 //
 //  Created by Simon-Pierre Roy on 2/6/21.
 //
 
-import SwiftUI
 import DeviceClient
 import RoutingClient
+import SwiftUI
 import WidgetKit
 
 public struct WidgetView: View {
-    
-    public init (
+
+    public init(
         logged: Bool,
         devices: [FlattenDevice],
         getURL: @escaping (AppLink) -> URL,
@@ -23,30 +23,30 @@ public struct WidgetView: View {
         self.getURL = getURL
         self.staticIntent = staticIntent
     }
-    
+
     let logged: Bool
     let devices: [FlattenDevice]
     let getURL: (AppLink) -> URL
     let staticIntent: Bool
-    
+
     @Environment(\.widgetFamily) var widgetFamily
-    
+
     @ViewBuilder
     static func getBackground(for widgetFamily: WidgetFamily) -> some View {
         Group {
             switch widgetFamily {
-            case  .accessoryCircular, .accessoryInline:
+            case .accessoryCircular, .accessoryInline:
                 AccessoryWidgetBackground()
-            case  .accessoryRectangular:
+            case .accessoryRectangular:
                 EmptyView()
-            case .systemMedium, .systemSmall, .systemLarge, .systemExtraLarge :
+            case .systemMedium, .systemSmall, .systemLarge, .systemExtraLarge:
                 GradientBackgroundWidget()
             @unknown default:
                 EmptyView()
             }
         }
     }
-    
+
     public var body: some View {
         VStack {
             if logged {
@@ -54,7 +54,8 @@ public struct WidgetView: View {
             } else {
                 LogoutView(getURL: getURL, staticIntent: staticIntent)
             }
-        }.frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background(WidgetView.getBackground(for: widgetFamily))
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(WidgetView.getBackground(for: widgetFamily))
     }
 }

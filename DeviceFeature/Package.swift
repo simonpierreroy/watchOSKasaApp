@@ -19,7 +19,7 @@ let package = Package(
         .library(
             name: "DeviceFeature",
             targets: ["DeviceFeature"]
-        )
+        ),
     ],
     dependencies: [
         .package(path: "KasaCore")
@@ -29,8 +29,9 @@ let package = Package(
             name: "DeviceFeature",
             dependencies: [
                 "DeviceClient",
-                .product(name: "BaseUI", package: "KasaCore")
-            ]),
+                .product(name: "BaseUI", package: "KasaCore"),
+            ]
+        ),
         .target(
             name: "DeviceClient",
             dependencies: ["KasaCore"]
@@ -39,8 +40,9 @@ let package = Package(
             name: "DeviceClientLive",
             dependencies: [
                 "DeviceClient",
-                .product(name: "KasaNetworking", package: "KasaCore")
-            ]),
+                .product(name: "KasaNetworking", package: "KasaCore"),
+            ]
+        ),
         .testTarget(
             name: "DeviceFeatureTests",
             dependencies: ["DeviceFeature"]

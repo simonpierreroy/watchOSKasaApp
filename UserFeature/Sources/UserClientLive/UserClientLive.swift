@@ -1,9 +1,9 @@
+import Combine
+import ComposableArchitecture
+import Foundation
+import KasaCore
 import KasaNetworking
 import UserClient
-import ComposableArchitecture
-import Combine
-import KasaCore
-import Foundation
 
 extension User.Credential {
     func networkCredential() -> Networking.App.Credential {

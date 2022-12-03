@@ -1,29 +1,31 @@
 //
 //  SwiftUIView.swift
-//  
+//
 //
 //  Created by Simon-Pierre Roy on 10/1/20.
 //
 
-import SwiftUI
+import BaseUI
 import Combine
 import ComposableArchitecture
 import DeviceClient
-import BaseUI
-import KasaCore
 import Foundation
+import KasaCore
+import SwiftUI
 
 #if os(iOS)
 
 public struct DeviceListViewiOS: View {
-    
+
     @Environment(\.horizontalSizeClass) var horizontalSizeClass: UserInterfaceSizeClass?
-    
+
     private let store: Store<StateView, Action>
-    public init(store: Store<StateView, Action>) {
+    public init(
+        store: Store<StateView, Action>
+    ) {
         self.store = store
     }
-    
+
     public var body: some View {
         WithViewStore(self.store) { viewStore in
             Group {
@@ -46,47 +48,49 @@ public struct DeviceListViewiOS: View {
                         DeviceListViewBase(store: store)
                     }
                 }
-            }.alert(
+            }
+            .alert(
                 item: viewStore.binding(
                     get: { $0.errorMessageToDisplayText.map(DeviceListViewiOS.AlertInfo.init(title:)) },
                     send: .tappedErrorAlert
                 ),
                 content: { Alert(title: Text($0.title)) }
             )
-            
+
         }
     }
 }
 
 private struct DeviceListViewSideBar: View {
-    
+
     private enum ListSideBar: CaseIterable, Hashable, Identifiable {
         case refresh
         case closeAll
         case logout
-        
-        
+
         var id: Int {
             self.hashValue
         }
     }
-    
+
     private let store: Store<DeviceListViewiOS.StateView, DeviceListViewiOS.Action>
-    init(store: Store<DeviceListViewiOS.StateView, DeviceListViewiOS.Action>) {
+    init(
+        store: Store<DeviceListViewiOS.StateView, DeviceListViewiOS.Action>
+    ) {
         self.store = store
     }
-    
+
     private func imageColor(_ loading: Bool) -> Color {
-        loading ? Color.gray :Color.logout
+        loading ? Color.gray : Color.logout
     }
-    
+
     public var body: some View {
         WithViewStore(self.store) { viewStore in
             List(ListSideBar.allCases) { tab in
                 switch tab {
                 case .refresh:
-                    Button(action: { viewStore.send(.tappedRefreshButton, animation: .default)}) {
-                        LoadingView(.constant(viewStore.isRefreshingDevices == .loadingDevices)){
+                    Button(action: { viewStore.send(.tappedRefreshButton, animation: .default) }) {
+                        LoadingView(.constant(viewStore.isRefreshingDevices == .loadingDevices)) {
                             HStack {
                                 Image(systemName: "arrow.clockwise.circle.fill")
                                     .foregroundColor(imageColor(viewStore.isRefreshingDevices.isInFlight))
@@ -105,7 +109,7 @@ private struct DeviceListViewSideBar: View {
                         }
                     }
                 case .closeAll:
-                    Button(action: { viewStore.send(.tappedCloseAll, animation: .default)}) {
+                    Button(action: { viewStore.send(.tappedCloseAll, animation: .default) }) {
                         LoadingView(.constant(viewStore.isRefreshingDevices == .closingAll)) {
                             HStack {
                                 Image(systemName: "moon.fill")
@@ -124,18 +128,20 @@ private struct DeviceListViewSideBar: View {
 }
 
 private struct DeviceListViewBase: View {
-    
+
     @Environment(\.horizontalSizeClass) var horizontalSizeClass: UserInterfaceSizeClass?
-    
+
     private let store: Store<DeviceListViewiOS.StateView, DeviceListViewiOS.Action>
-    
-    public init(store: Store<DeviceListViewiOS.StateView, DeviceListViewiOS.Action>) {
+
+    public init(
+        store: Store<DeviceListViewiOS.StateView, DeviceListViewiOS.Action>
+    ) {
         self.store = store
     }
-    
+
     let columns = [
         GridItem(.flexible()),
-        GridItem(.flexible())
+        GridItem(.flexible()),
     ]
     public var body: some View {
         WithViewStore(self.store) { viewStore in
@@ -151,40 +157,44 @@ private struct DeviceListViewBase: View {
                                 .modifier(
                                     ContentStyle(isLoading: viewStore.isRefreshingDevices.isInFlight)
                                 )
-                            
+
                         }
                     )
-                    
+
                     if horizontalSizeClass == .compact {
-                        Button(action: { viewStore.send(.tappedCloseAll, animation: .default)}) {
+                        Button(action: { viewStore.send(.tappedCloseAll, animation: .default) }) {
                             LoadingView(.constant(viewStore.isRefreshingDevices == .closingAll)) {
                                 Image(systemName: "moon.fill")
                                 Text(Strings.close_all.key, bundle: .module)
                             }
                         }
                         .modifier(ContentStyle(isLoading: viewStore.isRefreshingDevices.isInFlight))
-                        
-                        Button(action: { viewStore.send(.tappedRefreshButton, animation: .default)}) {
-                            LoadingView(.constant(viewStore.isRefreshingDevices == .loadingDevices)){ Image(systemName: "arrow.clockwise.circle.fill")
+
+                        Button(action: { viewStore.send(.tappedRefreshButton, animation: .default) }) {
+                            LoadingView(.constant(viewStore.isRefreshingDevices == .loadingDevices)) {
+                                Image(systemName: "arrow.clockwise.circle.fill")
                                 Text(Strings.refresh_list.key, bundle: .module)
                             }
                         }
                         .modifier(ContentStyle(isLoading: viewStore.isRefreshingDevices.isInFlight))
                     }
-                    
-                }.disabled(viewStore.isRefreshingDevices.isInFlight).padding()
-            }.onAppear{
+
+                }
+                .disabled(viewStore.isRefreshingDevices.isInFlight).padding()
+            }
+            .onAppear {
                 if case .nerverLoaded = viewStore.isRefreshingDevices {
                     viewStore.send(.viewAppearReload)
                 }
             }
-        }.navigationBarTitle("Kasa")
+        }
+        .navigationBarTitle("Kasa")
     }
 }
 
-public extension DeviceListViewiOS {
-    
-    struct StateView: Equatable {
+extension DeviceListViewiOS {
+
+    public struct StateView: Equatable {
         public init(
             errorMessageToDisplayText: String?,
             isRefreshingDevices: DevicesReducer.State.Loading,
@@ -194,20 +204,20 @@ public extension DeviceListViewiOS {
             self.isRefreshingDevices = isRefreshingDevices
             self.devicesToDisplay = devicesToDisplay
         }
-        
+
         let errorMessageToDisplayText: String?
         let isRefreshingDevices: DevicesReducer.State.Loading
         let devicesToDisplay: IdentifiedArrayOf<DeviceReducer.State>
     }
-    
-    enum Action {
-        
+
+    public enum Action {
+
         public enum DeviceAction {
             case tapped
             case tappedErrorAlert
             case tappedDeviceChild(index: DeviceChildReducer.State.ID, action: DeviceChildReducer.Action)
         }
-        
+
         case tappedCloseAll
         case tappedErrorAlert
         case tappedLogout
@@ -221,14 +231,14 @@ extension DeviceListViewiOS {
     struct AlertInfo: Identifiable {
         var title: String
         var id: String { self.title }
-        
+
     }
 }
 
 public struct DeviceDetailViewiOS: View {
-    
+
     let store: Store<DeviceReducer.State, DeviceListViewiOS.Action.DeviceAction>
-    
+
     public var body: some View {
         WithViewStore(self.store) { viewStore in
             VStack {
@@ -247,10 +257,13 @@ public struct DeviceDetailViewiOS: View {
                             self.store.scope(
                                 state: \DeviceReducer.State.children,
                                 action: DeviceListViewiOS.Action.DeviceAction.tappedDeviceChild(index:action:)
-                            ) , content: { store in
+                            ),
+                            content: { store in
                                 DeviceChildViewiOS(store: store)
-                            })
-                    }.padding()
+                            }
+                        )
+                    }
+                    .padding()
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -260,7 +273,7 @@ public struct DeviceDetailViewiOS: View {
                     get: {
                         CasePath(DeviceReducer.State.Route.error)
                             .extract(from: $0.route)
-                            .map{ AlertInfo(title: $0) }
+                            .map { AlertInfo(title: $0) }
                     },
                     send: .tappedErrorAlert
                 ),
@@ -271,9 +284,9 @@ public struct DeviceDetailViewiOS: View {
 }
 
 public struct DeviceNoChildViewiOS: View {
-    
+
     let store: Store<DeviceReducer.State, DeviceListViewiOS.Action.DeviceAction>
-    
+
     public var body: some View {
         WithViewStore(self.store) { viewStore in
             Button(action: { viewStore.send(.tapped, animation: .default) }) {
@@ -282,16 +295,17 @@ public struct DeviceNoChildViewiOS: View {
                     Image(systemName: style.image).font(.title3).tint(style.taint)
                     Text(viewStore.name).multilineTextAlignment(.center)
                     if viewStore.isLoading { ProgressView() }
-                }.padding()
+                }
+                .padding()
             }
         }
     }
 }
 
 public struct DeviceChildViewiOS: View {
-    
+
     let store: Store<DeviceChildReducer.State, DeviceChildReducer.Action>
-    
+
     public var body: some View {
         WithViewStore(self.store) { viewStore in
             Button(action: { viewStore.send(.toggleChild, animation: .default) }) {
@@ -323,38 +337,43 @@ struct ContentStyle: ViewModifier {
     }
 }
 
-public extension DeviceReducer.Action {
-    init(viewDetailAction: DeviceListViewiOS.Action.DeviceAction) {
+extension DeviceReducer.Action {
+    public init(
+        viewDetailAction: DeviceListViewiOS.Action.DeviceAction
+    ) {
         switch viewDetailAction {
         case .tapped:
             self = .toggle
         case .tappedErrorAlert:
             self = .errorHandled
-        case .tappedDeviceChild(index: let id, action: let action):
+        case .tappedDeviceChild(index: let id, let action):
             self = .deviceChild(index: id, action: action)
         }
     }
 }
 
-
-public extension DeviceListViewiOS.StateView {
-    init(devices: DevicesReducer.State) {
+extension DeviceListViewiOS.StateView {
+    public init(
+        devices: DevicesReducer.State
+    ) {
         switch devices.route {
         case nil:
             self.errorMessageToDisplayText = nil
         case .some(.error(let error)):
             self.errorMessageToDisplayText = error.localizedDescription
         }
-        
+
         self.devicesToDisplay = devices.devices
         self.isRefreshingDevices = devices.isLoading
     }
 }
 
-public extension DevicesReducer.Action {
-    init(deviceAction: DeviceListViewiOS.Action) {
+extension DevicesReducer.Action {
+    public init(
+        deviceAction: DeviceListViewiOS.Action
+    ) {
         switch deviceAction {
-        case .tappedDevice(index: let idx, action: let action):
+        case .tappedDevice(index: let idx, let action):
             let deviceDetailAction = DeviceReducer.Action.init(viewDetailAction: action)
             self = .deviceDetail(index: idx, action: deviceDetailAction)
         case .tappedErrorAlert:
@@ -377,22 +396,26 @@ struct DeviceListViewiOS_Previews: PreviewProvider {
                 store: Store(
                     initialState: .emptyNeverLoaded,
                     reducer: DevicesReducer()
-                ).scope(
+                )
+                .scope(
                     state: DeviceListViewiOS.StateView.init(devices:),
                     action: DevicesReducer.Action.init(deviceAction:)
                 )
-            ).previewDisplayName("empty")
-            
+            )
+            .previewDisplayName("empty")
+
             DeviceListViewiOS(
                 store: Store(
                     initialState: .emptyLoggedLink,
                     reducer: DevicesReducer()
-                ).scope(
+                )
+                .scope(
                     state: DeviceListViewiOS.StateView.init(devices:),
                     action: DevicesReducer.Action.init(deviceAction:)
                 )
-            ).previewDisplayName("Link")
-            
+            )
+            .previewDisplayName("Link")
+
             DeviceListViewiOS(
                 store: Store(
                     initialState: .multiRoutes(
@@ -400,54 +423,61 @@ struct DeviceListViewiOS_Previews: PreviewProvider {
                         childError: "Error child"
                     ),
                     reducer: DevicesReducer()
-                ).scope(
+                )
+                .scope(
                     state: DeviceListViewiOS.StateView.init(devices:),
                     action: DevicesReducer.Action.init(deviceAction:)
                 )
-            ).previewDisplayName("Routes")
-            
+            )
+            .previewDisplayName("Routes")
+
             DeviceListViewiOS(
                 store: Store(
                     initialState: .nDeviceLoaded(n: 5),
                     reducer: DevicesReducer()
-                ).scope(
+                )
+                .scope(
                     state: DeviceListViewiOS.StateView.init(devices:),
                     action: DevicesReducer.Action.init(deviceAction:)
                 )
-            ).previewDisplayName("5 item")
-            
+            )
+            .previewDisplayName("5 item")
+
             DeviceListViewiOS(
                 store: Store(
                     initialState: .nDeviceLoaded(n: 5, childrenCount: 4),
                     reducer: DevicesReducer()
-                ).scope(
+                )
+                .scope(
                     state: DeviceListViewiOS.StateView.init(devices:),
                     action: DevicesReducer.Action.init(deviceAction:)
                 )
-            ).previewDisplayName("Group")
-            
+            )
+            .previewDisplayName("Group")
+
             DeviceListViewiOS(
                 store: Store(
                     initialState: .nDeviceLoaded(n: 4),
                     reducer: DevicesReducer()
                         .dependency(
                             \.devicesClient,
-                             .devicesEnvError(
+                            .devicesEnvError(
                                 loadError: "loadError",
                                 toggleError: "toggleError",
                                 getDevicesError: "getDevicesError",
                                 changeDevicesError: "changeDevicesError"
-                             )
+                            )
                         )
-                ).scope(
+                )
+                .scope(
                     state: DeviceListViewiOS.StateView.init(devices:),
                     action: DevicesReducer.Action.init(deviceAction:)
                 )
-            ).preferredColorScheme(.dark)
-                .previewDisplayName("Error on item")
+            )
+            .preferredColorScheme(.dark)
+            .previewDisplayName("Error on item")
         }
     }
 }
 #endif
 #endif
-

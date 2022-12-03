@@ -1,9 +1,9 @@
-import KasaNetworking
-import DeviceClient
-import ComposableArchitecture
 import Combine
-import KasaCore
+import ComposableArchitecture
+import DeviceClient
 import Foundation
+import KasaCore
+import KasaNetworking
 
 extension DevicesClient: DependencyKey {
     public static let liveValue = DevicesClient(
@@ -14,24 +14,28 @@ extension DevicesClient: DependencyKey {
     )
 }
 
-private extension Device.ID {
-    func networkDeviceID() -> Networking.App.DeviceID {
+extension Device.ID {
+    fileprivate func networkDeviceID() -> Networking.App.DeviceID {
         return .init(rawValue: self.rawValue)
     }
 }
 
-private extension Device {
-    init(kasa: Networking.App.KasaDeviceAndSystemInfo) throws {
+extension Device {
+    fileprivate init(
+        kasa: Networking.App.KasaDeviceAndSystemInfo
+    ) throws {
         let infoState: RelayIsOn?
         if let relay_state = kasa.info.relay_state {
             infoState = try Networking.App.getRelayState(from: relay_state)
-        } else { infoState = nil }
-        
+        } else {
+            infoState = nil
+        }
+
         self.init(
             id: .init(rawValue: kasa.device.deviceId.rawValue),
             name: kasa.device.alias.rawValue,
             children: try (kasa.info.children ?? [])
-                .map{
+                .map {
                     Device.DeviceChild(
                         id: .init(rawValue: $0.id.rawValue),
                         name: $0.alias.rawValue,
@@ -44,7 +48,7 @@ private extension Device {
 }
 
 @Sendable
-private func toggleDeviceRelayState(token : Token, id: Device.ID, childId: Device.ID?) async throws -> RelayIsOn {
+private func toggleDeviceRelayState(token: Token, id: Device.ID, childId: Device.ID?) async throws -> RelayIsOn {
     return try await Networking.App
         .toggleDeviceRelayState(
             token: token,
@@ -54,13 +58,18 @@ private func toggleDeviceRelayState(token : Token, id: Device.ID, childId: Devic
 }
 
 @Sendable
-private func getDevicesCall(token: Token) async throws-> [Device] {
+private func getDevicesCall(token: Token) async throws -> [Device] {
     let devicesData = try await Networking.App.getDevicesAndSysInfo(token: token)
     return try devicesData.map(Device.init(kasa:))
 }
 
 @Sendable
-private func changeDeviceRelayState(token:Token, id: Device.ID, childId: Device.ID?, newState: RelayIsOn) async throws-> RelayIsOn {
+private func changeDeviceRelayState(
+    token: Token,
+    id: Device.ID,
+    childId: Device.ID?,
+    newState: RelayIsOn
+) async throws -> RelayIsOn {
     return try await Networking.App.changeDeviceRelayState(
         token: token,
         id: id.networkDeviceID(),

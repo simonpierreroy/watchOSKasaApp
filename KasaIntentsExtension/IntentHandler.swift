@@ -6,22 +6,22 @@
 //  Copyright © 2022 Simon. All rights reserved.
 //
 
-import Intents
-import WidgetFeature
-import WidgetClientLive
-import WidgetClient
-import DeviceClient
 import Dependencies
+import DeviceClient
+import Intents
+import WidgetClient
+import WidgetClientLive
+import WidgetFeature
 
 class IntentHandler: INExtension {
-    
+
     @Dependency(\.userCache.loadBlocking) var loadUser
     @Dependency(\.devicesCache.loadBlocking) var loadDevices
-    
+
     override func handler(for intent: INIntent) -> Any {
         return self
     }
-    
+
 }
 
 extension IntentHandler: SelectDevicesIntentHandling {
@@ -30,14 +30,15 @@ extension IntentHandler: SelectDevicesIntentHandling {
     ) async throws -> INObjectCollection<SelectedDevice> {
         guard
             let cache = try? getCacheState(cache: .init(loadDevices: loadDevices, loadUser: loadUser)),
-            cache.user != nil else {
-            return  INObjectCollection(items: [])
+            cache.user != nil
+        else {
+            return INObjectCollection(items: [])
         }
-        
+
         let cachedDevices = cache.device.flatten()
         let options = cachedDevices.map {
             let seledted = SelectedDevice(
-                identifier:  $0.id.added(),
+                identifier: $0.id.added(),
                 display: $0.child?.name ?? $0.device.name
             )
             seledted.childId = $0.child?.id.rawValue

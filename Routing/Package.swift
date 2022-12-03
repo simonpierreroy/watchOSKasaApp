@@ -18,22 +18,24 @@ let package = Package(
     ],
     dependencies: [
         .package(path: "DeviceFeature"),
-        .package(path: "KasaCore")
+        .package(path: "KasaCore"),
     ],
     targets: [
         .target(
             name: "RoutingClient",
             dependencies: [
-                .product(name: "DeviceClient",package: "DeviceFeature"),
-                "KasaCore"
-            ]),
+                .product(name: "DeviceClient", package: "DeviceFeature"),
+                "KasaCore",
+            ]
+        ),
         .target(
             name: "RoutingClientLive",
             dependencies: [
-                .product(name: "DeviceClientLive",package: "DeviceFeature"),
+                .product(name: "DeviceClientLive", package: "DeviceFeature"),
                 "RoutingClient",
-                "KasaCore"
-            ]),
+                "KasaCore",
+            ]
+        ),
         .testTarget(
             name: "RoutingClientTests",
             dependencies: ["RoutingClient"]

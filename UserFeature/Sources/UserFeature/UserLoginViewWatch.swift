@@ -6,23 +6,25 @@
 //  Copyright © 2020 Simon. All rights reserved.
 //
 
+import BaseUI
+import ComposableArchitecture
 import Foundation
 import SwiftUI
-import ComposableArchitecture
 import UserClient
-import BaseUI
 
 #if os(watchOS)
 public struct UserLoginViewWatch: View {
-    
-    public init(store: Store<StateView, Action>) {
+
+    public init(
+        store: Store<StateView, Action>
+    ) {
         self.store = store
     }
-    
+
     @State var email: String = ""
     @State var password: String = ""
     private let store: Store<StateView, Action>
-    
+
     public var body: some View {
         WithViewStore(self.store) { viewStore in
             ScrollView {
@@ -30,7 +32,7 @@ public struct UserLoginViewWatch: View {
                     .font(.title)
                     .foregroundColor(Color.orange)
                     .padding()
-                
+
                 TextField(
                     Strings.log_email.string,
                     text: self.$email
@@ -38,7 +40,7 @@ public struct UserLoginViewWatch: View {
                 .textContentType(.emailAddress)
                 SecureField(Strings.log_password.string, text: self.$password)
                     .textContentType(.password)
-                
+
                 Button(action: {
                     viewStore.send(.tappedLogingButton(email: self.email, password: self.password))
                 }) {
@@ -51,12 +53,12 @@ public struct UserLoginViewWatch: View {
             .disabled(viewStore.isLoadingUser)
             .alert(
                 item: viewStore.binding(
-                    get: { $0.errorMessageToDisplayText.map(AlertInfo.init(title:))},
+                    get: { $0.errorMessageToDisplayText.map(AlertInfo.init(title:)) },
                     send: .tappedErrorAlert
                 ),
                 content: { Alert(title: Text($0.title)) }
             )
-            
+
         }
     }
 }
@@ -68,28 +70,30 @@ extension UserLoginViewWatch {
     }
 }
 
-public extension UserLoginViewWatch {
-    
-    struct StateView: Equatable {
+extension UserLoginViewWatch {
+
+    public struct StateView: Equatable {
         let errorMessageToDisplayText: String?
         let isLoadingUser: Bool
     }
-    
-    enum Action {
+
+    public enum Action {
         case tappedErrorAlert
         case tappedLogingButton(email: String, password: String)
     }
 }
 
-public extension UserLoginViewWatch.StateView {
-    init(userState: UserReducer.State) {
+extension UserLoginViewWatch.StateView {
+    public init(
+        userState: UserReducer.State
+    ) {
         switch userState.status {
         case .loading:
             self.isLoadingUser = true
         case .logout, .logged:
             self.isLoadingUser = false
         }
-        
+
         switch userState.route {
         case nil:
             self.errorMessageToDisplayText = nil
@@ -99,8 +103,10 @@ public extension UserLoginViewWatch.StateView {
     }
 }
 
-public extension UserReducer.Action {
-    init(userViewAction: UserLoginViewWatch.Action) {
+extension UserReducer.Action {
+    public init(
+        userViewAction: UserLoginViewWatch.Action
+    ) {
         switch userViewAction {
         case .tappedErrorAlert:
             self = .errorHandled
@@ -114,37 +120,45 @@ public extension UserReducer.Action {
 struct UserLoginView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
-            UserLoginViewWatch(store:
-                                Store(
-                                    initialState: .empty,
-                                    reducer: UserReducer()
-                                ).scope(
-                                    state: UserLoginViewWatch.StateView.init(userState:),
-                                    action: UserReducer.Action.init(userViewAction:)
-                                )
-            ).previewDisplayName("Login")
-            
-            UserLoginViewWatch(store:
-                                Store(
-                                    initialState: .empty,
-                                    reducer: UserReducer()
-                                ).scope(
-                                    state: UserLoginViewWatch.StateView.init(userState:),
-                                    action: UserReducer.Action.init(userViewAction:)
-                                )
+            UserLoginViewWatch(
+                store:
+                    Store(
+                        initialState: .empty,
+                        reducer: UserReducer()
+                    )
+                    .scope(
+                        state: UserLoginViewWatch.StateView.init(userState:),
+                        action: UserReducer.Action.init(userViewAction:)
+                    )
+            )
+            .previewDisplayName("Login")
+
+            UserLoginViewWatch(
+                store:
+                    Store(
+                        initialState: .empty,
+                        reducer: UserReducer()
+                    )
+                    .scope(
+                        state: UserLoginViewWatch.StateView.init(userState:),
+                        action: UserReducer.Action.init(userViewAction:)
+                    )
             )
             .environment(\.locale, .init(identifier: "fr"))
             .previewDisplayName("Login French")
-            
-            UserLoginViewWatch(store:
-                                Store(
-                                    initialState: .init(status: .loading, route: nil),
-                                    reducer: UserReducer()
-                                ).scope(
-                                    state: UserLoginViewWatch.StateView.init(userState:),
-                                    action: UserReducer.Action.init(userViewAction:)
-                                )
-            ).previewDisplayName("Loading")
+
+            UserLoginViewWatch(
+                store:
+                    Store(
+                        initialState: .init(status: .loading, route: nil),
+                        reducer: UserReducer()
+                    )
+                    .scope(
+                        state: UserLoginViewWatch.StateView.init(userState:),
+                        action: UserReducer.Action.init(userViewAction:)
+                    )
+            )
+            .previewDisplayName("Loading")
         }
     }
 }

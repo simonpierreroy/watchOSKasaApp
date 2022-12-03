@@ -1,6 +1,6 @@
 //
 //  String.swift
-//  
+//
 //
 //  Created by Simon-Pierre Roy on 9/19/20.
 //
@@ -14,12 +14,11 @@ enum Strings: String {
     case log_password
 }
 
-
 extension Strings {
     var key: LocalizedStringKey {
         .init(self.rawValue)
     }
-    
+
     var string: String {
         NSLocalizedString(self.rawValue, bundle: .module, comment: "")
     }
@@ -28,17 +27,19 @@ extension Strings {
 #if DEBUG
 struct Strings_Previews: PreviewProvider {
     static var previews: some View {
-        Group{
+        Group {
             VStack {
                 Text(Strings.login_app.key, bundle: .module)
                 Text(Strings.log_email.key, bundle: .module)
                 Text(Strings.log_password.key, bundle: .module)
-            }.previewDisplayName("English")
+            }
+            .previewDisplayName("English")
             VStack {
                 Text(Strings.login_app.key, bundle: .module)
                 Text(Strings.log_email.key, bundle: .module)
                 Text(Strings.log_password.key, bundle: .module)
-            }.environment(\.locale, .init(identifier: "fr"))
+            }
+            .environment(\.locale, .init(identifier: "fr"))
             .previewDisplayName("Français")
         }
     }

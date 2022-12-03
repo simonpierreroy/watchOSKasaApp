@@ -1,5 +1,4 @@
 # Xcode
-#
 node_modules/
 build/
 *.pbxuser
@@ -20,18 +19,10 @@ DerivedData
 *.xcscmblueprint
 *.playgrounddata
 
-# Bundler
-#
-vendor/
+# Results
+xcresults/
 
-# CocoaPods
-#
-Pods/
-
-# Carthage
-#
-Carthage/
+swift-format/
 
 # Swift Package Manager
-#
 .build

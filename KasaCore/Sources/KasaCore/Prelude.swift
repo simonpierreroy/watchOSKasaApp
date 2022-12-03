@@ -6,6 +6,7 @@
 //  Copyright © 2019 Wayfair. All rights reserved.
 //
 
+import Combine
 import Foundation
 
 /// Applies a value transformation to an immutable setter function.
@@ -18,8 +19,9 @@ public func over<S, T, A, B>(
     _ setter: (@escaping (A) -> B) -> (S) -> T,
     _ f: @escaping (A) -> B
 )
--> (S) -> T {
-    
+    -> (S) -> T
+{
+
     return setter(f)
 }
 
@@ -33,8 +35,9 @@ public func set<S, T, A, B>(
     _ setter: (@escaping (A) -> B) -> (S) -> T,
     _ value: B
 )
--> (S) -> T {
-    
+    -> (S) -> T
+{
+
     return over(setter) { _ in value }
 }
 
@@ -49,8 +52,9 @@ public func mver<S, A>(
     _ setter: (@escaping (inout A) -> Void) -> (inout S) -> Void,
     _ f: @escaping (inout A) -> Void
 )
--> (inout S) -> Void {
-    
+    -> (inout S) -> Void
+{
+
     return setter(f)
 }
 
@@ -64,9 +68,9 @@ public func mver<S, A>(
     _ setter: (@escaping (inout A) -> Void) -> (S) -> Void,
     _ f: @escaping (inout A) -> Void
 )
--> (S) -> Void
+    -> (S) -> Void
 where S: AnyObject {
-    
+
     return setter(f)
 }
 
@@ -80,9 +84,9 @@ public func mver<S, A>(
     _ setter: (@escaping (A) -> Void) -> (S) -> Void,
     _ f: @escaping (A) -> Void
 )
--> (S) -> Void
+    -> (S) -> Void
 where S: AnyObject, A: AnyObject {
-    
+
     return setter(f)
 }
 
@@ -96,8 +100,9 @@ public func mut<S, A>(
     _ setter: (@escaping (inout A) -> Void) -> (inout S) -> Void,
     _ value: A
 )
--> (inout S) -> Void {
-    
+    -> (inout S) -> Void
+{
+
     return mver(setter) { $0 = value }
 }
 
@@ -111,9 +116,9 @@ public func mut<S, A>(
     _ setter: (@escaping (inout A) -> Void) -> (S) -> Void,
     _ value: A
 )
--> (S) -> Void
+    -> (S) -> Void
 where S: AnyObject {
-    
+
     return mver(setter) { $0 = value }
 }
 
@@ -135,9 +140,10 @@ public func get<Root, Value>(_ keyPath: KeyPath<Root, Value>) -> (Root) -> Value
 public func prop<Root, Value>(
     _ keyPath: WritableKeyPath<Root, Value>
 )
--> (@escaping (Value) -> Value)
--> (Root) -> Root {
-    
+    -> (@escaping (Value) -> Value)
+    -> (Root) -> Root
+{
+
     return { update in
         { root in
             var copy = root
@@ -146,7 +152,6 @@ public func prop<Root, Value>(
         }
     }
 }
-
 
 precedencegroup ForwardApplication {
     associativity: left
@@ -178,7 +183,7 @@ public func <> <A>(f: @escaping (A) -> A, g: @escaping (A) -> A) -> ((A) -> A) {
     return f >>> g
 }
 
-public func <> <A>( f: @escaping (inout A) -> Void, g: @escaping (inout A) -> Void) -> ((inout A) -> Void) {
+public func <> <A>(f: @escaping (inout A) -> Void, g: @escaping (inout A) -> Void) -> ((inout A) -> Void) {
     return { a in
         f(&a)
         g(&a)
@@ -195,7 +200,6 @@ public func <> <A: AnyObject>(f: @escaping (A) -> Void, g: @escaping (A) -> Void
 public func |> <A, B>(a: A, f: (A) -> B) -> B {
     return f(a)
 }
-
 
 public func |> <A>(_ a: A, _ f: (inout A) -> Void) -> A {
     var a = a
@@ -225,18 +229,22 @@ public prefix func ^ <Root, Value>(kp: KeyPath<Root, Value>) -> (Root) -> Value 
     return get(kp)
 }
 
-public prefix func ^ <Root, Value>(kp: WritableKeyPath<Root, Value>)
--> (@escaping (Value) -> Value)
--> (Root) -> Root {
-    
+public prefix func ^ <Root, Value>(
+    kp: WritableKeyPath<Root, Value>
+)
+    -> (@escaping (Value) -> Value)
+    -> (Root) -> Root
+{
+
     return prop(kp)
 }
 public prefix func ^ <Root, Value>(
     _ kp: WritableKeyPath<Root, Value>
 )
--> (@escaping (inout Value) -> Void)
--> (inout Root) -> Void {
-    
+    -> (@escaping (inout Value) -> Void)
+    -> (inout Root) -> Void
+{
+
     return { update in
         { root in
             update(&root[keyPath: kp])
@@ -244,13 +252,11 @@ public prefix func ^ <Root, Value>(
     }
 }
 
-public func absurd<A>(_ :Never) -> A {}
-public func always<A>(_ :A) -> Void {}
+public func absurd<A>(_: Never) -> A {}
+public func always<A>(_: A) {}
 
-import Combine
-
-public extension Empty {
-    static func completeImmediately() -> Empty {
+extension Empty {
+    public static func completeImmediately() -> Empty {
         return Empty(completeImmediately: true)
     }
 }

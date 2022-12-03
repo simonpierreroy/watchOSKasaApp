@@ -1,6 +1,6 @@
 //
 //  String.swift
-//  
+//
 //
 //  Created by Simon-Pierre Roy on 9/19/20.
 //
@@ -15,37 +15,37 @@ enum Strings: String {
     case device_group
 }
 
-
 extension Strings {
     var key: LocalizedStringKey {
         .init(self.rawValue)
     }
-    
+
     var string: String {
-        NSLocalizedString( self.rawValue, bundle: .module, comment: "")
+        NSLocalizedString(self.rawValue, bundle: .module, comment: "")
     }
 }
 
-#if DEBUG 
+#if DEBUG
 
 struct Strings_Previews: PreviewProvider {
     static var previews: some View {
-        Group{
+        Group {
             VStack {
                 Text(Strings.logout_app.key, bundle: .module)
                 Text(Strings.refresh_list.key, bundle: .module)
                 Text(Strings.close_all.key, bundle: .module)
                 Text(Strings.device_group.key, bundle: .module)
-            }.previewDisplayName("English")
+            }
+            .previewDisplayName("English")
             VStack {
                 Text(Strings.logout_app.key, bundle: .module)
                 Text(Strings.refresh_list.key, bundle: .module)
                 Text(Strings.close_all.key, bundle: .module)
                 Text(Strings.device_group.key, bundle: .module)
-            }.environment(\.locale, .init(identifier: "fr"))
+            }
+            .environment(\.locale, .init(identifier: "fr"))
             .previewDisplayName("Français")
         }
     }
 }
 #endif
-

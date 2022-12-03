@@ -1,52 +1,54 @@
 //
 //  SwiftUIView.swift
-//  
+//
 //
 //  Created by Simon-Pierre Roy on 2/6/21.
 //
 
-import SwiftUI
-import WidgetKit
 import DeviceClient
 import RoutingClient
+import SwiftUI
+import WidgetKit
 
 struct NoDevicesView: View {
-    
+
     @Environment(\.widgetFamily) var widgetFamily
     let staticIntent: Bool
-    
+
     static func showText(widgetFamily: WidgetFamily) -> Bool {
         switch widgetFamily {
         case .accessoryInline, .systemMedium, .systemSmall,
-                .systemLarge, .systemExtraLarge, .accessoryRectangular:
+            .systemLarge, .systemExtraLarge, .accessoryRectangular:
             return true
-        case .accessoryCircular :
+        case .accessoryCircular:
             return false
         @unknown default:
             return false
         }
     }
-    
+
     static func font(widgetFamily: WidgetFamily) -> Font {
         switch widgetFamily {
         case .accessoryRectangular:
             return .callout
-        case .systemMedium,.systemSmall,.systemLarge,
-                .systemExtraLarge,.accessoryInline,.accessoryCircular:
+        case .systemMedium, .systemSmall, .systemLarge,
+            .systemExtraLarge, .accessoryInline, .accessoryCircular:
             return .largeTitle
         @unknown default:
             return .largeTitle
         }
     }
-    
+
     var body: some View {
         VStack {
-            Image(systemName:
+            Image(
+                systemName:
                     staticIntent ? "lightbulb.slash.fill" : "square.and.pencil.circle"
-            ).font(NoDevicesView.font(widgetFamily: widgetFamily))
+            )
+            .font(NoDevicesView.font(widgetFamily: widgetFamily))
             if NoDevicesView.showText(widgetFamily: widgetFamily) {
                 Text(
-                    staticIntent ? Strings.no_device.key  :  Strings.no_device_selected.key,
+                    staticIntent ? Strings.no_device.key : Strings.no_device_selected.key,
                     bundle: .module
                 )
             }
@@ -54,15 +56,15 @@ struct NoDevicesView: View {
     }
 }
 
-struct DeviceView : View {
-    
+struct DeviceView: View {
+
     @Environment(\.widgetFamily) var widgetFamily
-    
+
     let device: FlattenDevice
     let getURL: (AppLink) -> URL
-    
-    static func font(_ family: WidgetFamily) ->  (Font, Font){
-        
+
+    static func font(_ family: WidgetFamily) -> (Font, Font) {
+
         switch family {
         case .systemLarge:
             return (.title, .body)
@@ -78,7 +80,7 @@ struct DeviceView : View {
             return (.title, .body)
         }
     }
-    
+
     var body: some View {
         Link(destination: getURL(getLink())) {
             VStack {
@@ -87,29 +89,30 @@ struct DeviceView : View {
                 Text("\(device.child?.name ?? device.device.name )")
                     .multilineTextAlignment(.center)
                     .font(DeviceView.font(widgetFamily).1)
-                
-            }.padding()
-                .frame(maxWidth: .infinity,maxHeight: .infinity, alignment: .center)
-                .frame(maxWidth: .infinity)
-                .background(Color.button.opacity(0.2))
-                .cornerRadius(16)
-            
-        }.widgetURL(getURL(getLink())) // widgetURL when is small view
+
+            }
+            .padding()
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
+            .frame(maxWidth: .infinity)
+            .background(Color.button.opacity(0.2))
+            .cornerRadius(16)
+
+        }
+        .widgetURL(getURL(getLink()))  // widgetURL when is small view
     }
-    
+
     func getLink() -> AppLink {
-        if let child = device.child {
-            return .devices(.device(device.device.id, .child(child.id,.toggle)))
-        } else {
+        guard let child = device.child else {
             return .devices(.device(device.device.id, .toggle))
         }
+        return .devices(.device(device.device.id, .child(child.id, .toggle)))
     }
 }
 
-struct DeviceRowMaybe : View {
-    let devices: (FlattenDevice?,FlattenDevice?)
+struct DeviceRowMaybe: View {
+    let devices: (FlattenDevice?, FlattenDevice?)
     let getURL: (AppLink) -> URL
-    
+
     var body: some View {
         HStack {
             DeviceViewMaybe(device: devices.0, getURL: getURL)
@@ -118,10 +121,10 @@ struct DeviceRowMaybe : View {
     }
 }
 
-struct DeviceViewMaybe : View {
+struct DeviceViewMaybe: View {
     let device: FlattenDevice?
     let getURL: (AppLink) -> URL
-    
+
     var body: some View {
         if let device = device {
             DeviceView(device: device, getURL: getURL)
@@ -131,36 +134,35 @@ struct DeviceViewMaybe : View {
     }
 }
 
-struct CloseAll : View {
+struct CloseAll: View {
     let getURL: (AppLink) -> URL
     let toltalNumberDevices: Int
     @Environment(\.widgetFamily) var widgetFamily
-    
-    
+
     static func showText(widgetFamily: WidgetFamily) -> Bool {
         switch widgetFamily {
         case .accessoryInline, .systemMedium, .systemSmall,
-                .systemLarge, .systemExtraLarge, .accessoryRectangular:
+            .systemLarge, .systemExtraLarge, .accessoryRectangular:
             return true
-        case .accessoryCircular :
+        case .accessoryCircular:
             return false
         @unknown default:
             return false
         }
     }
-    
+
     static func font(widgetFamily: WidgetFamily) -> Font {
         switch widgetFamily {
         case .accessoryRectangular:
             return .callout
-        case .systemMedium,.systemSmall,.systemLarge,
-                .systemExtraLarge,.accessoryInline,.accessoryCircular:
+        case .systemMedium, .systemSmall, .systemLarge,
+            .systemExtraLarge, .accessoryInline, .accessoryCircular:
             return .largeTitle
         @unknown default:
             return .largeTitle
         }
     }
-    
+
     var body: some View {
         Link(destination: getURL(.devices(.closeAll))) {
             VStack {
@@ -170,18 +172,19 @@ struct CloseAll : View {
                     Text(Strings.close_all.key, bundle: .module)
                 }
             }
-        }.widgetURL(getURL(.devices(.closeAll))) // for small views
+        }
+        .widgetURL(getURL(.devices(.closeAll)))  // for small views
     }
 }
 
-struct StackList : View {
+struct StackList: View {
     @Environment(\.widgetFamily) var widgetFamily
     let devices: [FlattenDevice]
     let getURL: (AppLink) -> URL
     let staticIntent: Bool
-    
+
     var body: some View {
-        if  devices.count > 0 {
+        if devices.count > 0 {
             VStack {
                 switch widgetFamily {
                 case .systemSmall, .accessoryCircular, .accessoryInline, .accessoryRectangular:
@@ -193,19 +196,19 @@ struct StackList : View {
                     } else {
                         DeviceViewMaybe(device: devices[safeIndex: 0], getURL: getURL)
                     }
-                case .systemMedium :
-                    VStack{
+                case .systemMedium:
+                    VStack {
                         DeviceRowMaybe(devices: (devices[safeIndex: 0], devices[safeIndex: 1]), getURL: getURL)
                         DeviceRowMaybe(devices: (devices[safeIndex: 2], devices[safeIndex: 3]), getURL: getURL)
                     }
                 case .systemLarge:
-                    VStack{
+                    VStack {
                         DeviceRowMaybe(devices: (devices[safeIndex: 0], devices[safeIndex: 1]), getURL: getURL)
                         DeviceRowMaybe(devices: (devices[safeIndex: 2], devices[safeIndex: 3]), getURL: getURL)
                         DeviceRowMaybe(devices: (devices[safeIndex: 4], devices[safeIndex: 5]), getURL: getURL)
                     }
                 case .systemExtraLarge:
-                    VStack{
+                    VStack {
                         DeviceRowMaybe(devices: (devices[safeIndex: 0], devices[safeIndex: 1]), getURL: getURL)
                         DeviceRowMaybe(devices: (devices[safeIndex: 2], devices[safeIndex: 3]), getURL: getURL)
                         DeviceRowMaybe(devices: (devices[safeIndex: 4], devices[safeIndex: 5]), getURL: getURL)
@@ -214,8 +217,9 @@ struct StackList : View {
                 @unknown default:
                     EmptyView()
                 }
-            }.padding()
-            
+            }
+            .padding()
+
         } else {
             NoDevicesView(staticIntent: staticIntent)
         }
@@ -228,12 +232,19 @@ struct DeviceView_Preview: PreviewProvider {
         .map { i in Device.init(id: "\(i)", name: "Preview no \(i)", state: false) }
     static var previews: some View {
         Group {
-            StackList(devices: DeviceView_Preview.previewDevices.flatten(), getURL: { _ in return .mock }, staticIntent: false)
-                .previewDisplayName("StackList")
-            StackList(devices: DeviceView_Preview.previewDevices.flatten(), getURL: { _ in return .mock }, staticIntent: true)
-                .previewDisplayName("StackList Static")
+            StackList(
+                devices: DeviceView_Preview.previewDevices.flatten(),
+                getURL: { _ in return .mock },
+                staticIntent: false
+            )
+            .previewDisplayName("StackList")
+            StackList(
+                devices: DeviceView_Preview.previewDevices.flatten(),
+                getURL: { _ in return .mock },
+                staticIntent: true
+            )
+            .previewDisplayName("StackList Static")
         }
     }
 }
 #endif
-

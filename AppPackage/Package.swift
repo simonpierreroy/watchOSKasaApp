@@ -20,7 +20,7 @@ let package = Package(
         .package(path: "DeviceFeature"),
         .package(path: "UserFeature"),
         .package(path: "Routing"),
-        .package(path: "WidgetFeature")
+        .package(path: "WidgetFeature"),
     ],
     targets: [
         .target(
@@ -31,17 +31,19 @@ let package = Package(
                 .product(name: "UserClientLive", package: "UserFeature"),
                 .product(name: "DeviceClientLive", package: "DeviceFeature"),
                 .product(name: "RoutingClientLive", package: "Routing"),
-                .product(name: "RoutingClient",package: "Routing")
-            ]),
+                .product(name: "RoutingClient", package: "Routing"),
+            ]
+        ),
         .target(
             name: "WidgetPackage",
             dependencies: [
-                .product(name: "DeviceClientLive",package: "DeviceFeature"),
-                .product(name: "RoutingClientLive",package: "Routing"),
-                .product(name: "RoutingClient",package: "Routing"),
+                .product(name: "DeviceClientLive", package: "DeviceFeature"),
+                .product(name: "RoutingClientLive", package: "Routing"),
+                .product(name: "RoutingClient", package: "Routing"),
                 "WidgetFeature",
-                .product(name: "WidgetClientLive",package: "WidgetFeature"),
-            ]),
+                .product(name: "WidgetClientLive", package: "WidgetFeature"),
+            ]
+        ),
         .testTarget(
             name: "AppPackageTests",
             dependencies: ["AppPackage"]

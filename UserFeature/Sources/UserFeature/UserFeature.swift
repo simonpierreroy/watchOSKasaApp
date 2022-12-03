@@ -1,14 +1,14 @@
-import Foundation
-import ComposableArchitecture
 import Combine
+import ComposableArchitecture
+import Foundation
+import KasaCore
 import Tagged
 import UserClient
-import KasaCore
 
 public struct UserReducer: ReducerProtocol {
-    
-    public init() { }
-    
+
+    public init() {}
+
     public enum Action {
         case logout
         case set(User)
@@ -18,34 +18,34 @@ public struct UserReducer: ReducerProtocol {
         case send(Error)
         case errorHandled
     }
-    
+
     public struct State {
         public static let empty = Self(status: .logout, route: nil)
-        
+
         public struct LoggedUserState {
             public var user: User
         }
-        
+
         public enum UserStatus {
             case logged(LoggedUserState)
             case loading
             case logout
         }
-        
+
         public enum Route {
             case error(Error)
         }
-        
+
         public var status: UserStatus
         public var route: Route?
     }
-    
+
     @Dependency(\.userCache) var userCache
     @Dependency(\.userClient) var client
     @Dependency(\.reloadAppExtensions) var reloadAppExtensions
-    
+
     public func reduce(into state: inout State, action: Action) -> Effect<Action, Never> {
-        
+
         switch action {
         case .logout:
             state.status = .logout
@@ -62,20 +62,21 @@ public struct UserReducer: ReducerProtocol {
         case .loadSavedUser:
             state.status = .loading
             return .task {
-                if let user = await userCache.load() {
-                    return .set(user)
-                } else {
+                guard let user = await userCache.load() else {
                     return .logout
                 }
+                return .set(user)
             }
         case .login(let credential):
             state.status = .loading
-            return Effect.task {
-                let token = try await client.login(credential).token
-                return .set(.init(token: token))
-            } catch : { error in
-                return .send(error)
-            }.animation()
+            return
+                Effect.task {
+                    let token = try await client.login(credential).token
+                    return .set(.init(token: token))
+                } catch: { error in
+                    return .send(error)
+                }
+                .animation()
         case .send(let error):
             state.status = .logout
             state.route = .error(error)
