@@ -5,10 +5,16 @@
 
 A simple WatchOS, iOS, iPadOS App to control Kasa devices.
 
-![Logging](log.png)
-![list](devices.png)
-![ios dark](ios_dark.png)
-![ios](ios.png)
-![widget](widget.png)
-![ipad](ipad.png)
-![ipad widget](ipad_widget.png)
+To build the iOS and watchOS apps in the terminal, run the following.
+
+```
+make test-all-clean
+```
+<img src="readme_images/log.png" alt="drawing" width="00"/>
+<img src="readme_images/devices.png" alt="drawing" width="200"/>
+<img src="readme_images/ios_dark.png" alt="drawing" width="200"/>
+<img src="readme_images/ios.png" alt="drawing" width="200"/>
+<img src="readme_images/widget.png" alt="drawing" width="200"/>
+<img src="readme_images/ipad.png" alt="drawing" width="200"/>
+<img src="readme_images/macos.png" alt="drawing" width="200"/>
+
