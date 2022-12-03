@@ -2,8 +2,8 @@
 GIT_REPO_TOPLEVEL := $(shell git rev-parse --show-toplevel)
 
 # Apple Platform Destinations
-DESTINATION_PLATFORM_IOS_SIMULATOR = platform=iOS Simulator,name=iPhone 14 Pro Max
-DESTINATION_PLATFORM_WATCHOS_SIMULATOR = platform=watchOS Simulator,name=Apple Watch Series 8 (45mm)
+DESTINATION_PLATFORM_IOS_SIMULATOR = "platform=iOS Simulator,name=iPhone 14 Pro Max"
+DESTINATION_PLATFORM_WATCHOS_SIMULATOR = "platform=watchOS Simulator,name=Apple Watch Series 8 (45mm)"
 
 # Run Results
 IOS_RUN_RESULT_BUNDLE_PATH="$(GIT_REPO_TOPLEVEL)/xcresults/latest_ios_result.xcresult"
@@ -12,7 +12,6 @@ WATCHOS_RUN_RESULT_BUNDLE_PATH="$(GIT_REPO_TOPLEVEL)/xcresults/latest_watchos_re
 # Formatting
 SWIFT_FORMAT_VERSION=0.50700.1
 SWIFT_FORMAT_FOLDER="$(GIT_REPO_TOPLEVEL)/swift-format"
-SWIFT_FORMAT_BIN := "$(shell swift build -c release --show-bin-path --package-path $(SWIFT_FORMAT_FOLDER))/swift-format"
 SWIFT_FORMAT_CONFIG_FILE := "$(GIT_REPO_TOPLEVEL)/.swift-format.json"
 FORMAT_PATHS := "$(GIT_REPO_TOPLEVEL)/Kasa WatchKit App" "$(GIT_REPO_TOPLEVEL)/KasaApp" \
 "$(GIT_REPO_TOPLEVEL)/KasaAppWidget" "$(GIT_REPO_TOPLEVEL)/KasaIntentsExtension" \
@@ -29,7 +28,10 @@ FORMAT_PATHS := "$(GIT_REPO_TOPLEVEL)/Kasa WatchKit App" "$(GIT_REPO_TOPLEVEL)/K
 default: test-all-clean
 
 .PHONY: test-all-clean
-test-all-clean: xcode-result-clean xcode-clean test-xcode
+test-all-clean: clean-all test-xcode
+
+.PHONY: clean-all
+clean-all: xcode-result-clean xcode-clean
 
 .PHONY: xcode-result-clean
 xcode-result-clean: 
@@ -52,8 +54,8 @@ test-xcode-ios:
 	xcodebuild \
 		-project Kasa.xcodeproj \
 		-scheme 'KasaApp' \
-		-destination "$(DESTINATION_PLATFORM_IOS_SIMULATOR)" \
-		-resultBundlePath "$(IOS_RUN_RESULT_BUNDLE_PATH)" \
+		-destination $(DESTINATION_PLATFORM_IOS_SIMULATOR) \
+		-resultBundlePath $(IOS_RUN_RESULT_BUNDLE_PATH) \
 		-quiet
 
 .PHONY: test-xcode-watchos
@@ -61,18 +63,18 @@ test-xcode-watchos:
 	xcodebuild \
 		-project Kasa.xcodeproj \
 		-scheme 'Kasa WatchKit App' \
-		-destination "$(DESTINATION_PLATFORM_WATCHOS_SIMULATOR)" \
-		-resultBundlePath "$(WATCHOS_RUN_RESULT_BUNDLE_PATH)" \
+		-destination $(DESTINATION_PLATFORM_WATCHOS_SIMULATOR) \
+		-resultBundlePath $(WATCHOS_RUN_RESULT_BUNDLE_PATH) \
 		-quiet
-
-.PHONY: install-swift-format
-install-swift-format:
-	git clone -b "$(SWIFT_FORMAT_VERSION)" https://github.com/apple/swift-format.git "$(SWIFT_FORMAT_FOLDER)"
-	swift build -c release --package-path "$(SWIFT_FORMAT_FOLDER)"
+swift-format/swift-format: 
+	rm -rf $(SWIFT_FORMAT_FOLDER)
+	git clone -b $(SWIFT_FORMAT_VERSION) https://github.com/apple/swift-format.git $(SWIFT_FORMAT_FOLDER)
+	swift build -c release --package-path $(SWIFT_FORMAT_FOLDER)
+	touch $(SWIFT_FORMAT_FOLDER)/swift-format
 
 .PHONY: format
-format:
-	$(SWIFT_FORMAT_BIN) \
+format: swift-format/swift-format
+	swift run -c release --skip-build --package-path $(SWIFT_FORMAT_FOLDER) swift-format \
 		--configuration $(SWIFT_FORMAT_CONFIG_FILE) \
 		--ignore-unparsable-files \
 		--in-place \
@@ -80,8 +82,9 @@ format:
 		$(FORMAT_PATHS)
 
 .PHONY: lint
-lint:
-	$(SWIFT_FORMAT_BIN) lint \
+lint: swift-format/swift-format
+	swift run -c release --skip-build --package-path $(SWIFT_FORMAT_FOLDER) swift-format \
+		lint \
 		--configuration $(SWIFT_FORMAT_CONFIG_FILE) \
 		--ignore-unparsable-files \
 		--recursive \
