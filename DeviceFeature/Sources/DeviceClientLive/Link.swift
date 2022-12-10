@@ -12,49 +12,49 @@ import Parsing
 
 extension Device.DeviceChild.Link {
 
-    private static let validChildToggleLink = ParsePrint {
+    private static let validChildToggle = ParsePrint {
         StartsWith<Substring>("toggle")
         End()
     }
     .map(.case(Self.toggle))
 
-    fileprivate static let childLinkParser = OneOf {
-        validChildToggleLink
+    fileprivate static let child = OneOf {
+        validChildToggle
     }
 }
 
 extension Device.Link {
 
-    private static let validDeviceToggleLink = ParsePrint {
+    private static let validDeviceToggle = ParsePrint {
         StartsWith<Substring>("toggle")
         End()
     }
     .map(.case(Self.toggle))
 
-    private static let childLink = ParsePrint {
+    private static let child = ParsePrint {
         StartsWith<Substring>("child/")
         Prefix(1...) { $0.isNumber || $0.isLetter }
             .map(.string).map(.memberwise(Device.ID.init(rawValue:)))
         Skip { "/" }
-        Device.DeviceChild.Link.childLinkParser
+        Device.DeviceChild.Link.child
         End()
     }
     .map(.case(Self.child))
 
-    fileprivate static let deviceLinkParser = OneOf {
-        validDeviceToggleLink
-        childLink
+    fileprivate static let device = OneOf {
+        validDeviceToggle
+        child
     }
 }
 
 extension DevicesLink {
 
-    private static let validDevicesToggleLink = ParsePrint {
+    private static let validDevicesToggle = ParsePrint {
         StartsWith<Substring>("device/")
         Prefix(1...) { $0.isNumber || $0.isLetter }
             .map(.string).map(.memberwise(Device.ID.init(rawValue:)))
         Skip { "/" }
-        Device.Link.deviceLinkParser
+        Device.Link.device
     }
     .map(.case(Self.device))
 
@@ -63,8 +63,8 @@ extension DevicesLink {
         End()
     }
 
-    public static let devicesLinkParser = OneOf {
-        validDevicesToggleLink
+    public static let devices = OneOf {
+        validDevicesToggle
         closeAllLink
     }
 }

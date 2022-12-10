@@ -20,8 +20,13 @@ extension Networking {
         static let session = URLSession(configuration: .default)
 
         struct Response<Model: Decodable>: Decodable {
-            let error_code: Int
-            let msg: String?
+            enum CodingKeys: String, CodingKey {
+                case errorCode = "error_code"
+                case message = "msg"
+                case result
+            }
+            let errorCode: Int
+            let message: String?
             let result: Model?
         }
 
@@ -45,7 +50,7 @@ extension Networking {
 
         static func responseToModel<Model: Decodable>(_ response: Response<Model>) throws -> Model {
             guard let result = response.result else {
-                throw Networking.CodeError(statusCode: response.error_code)
+                throw Networking.CodeError(statusCode: response.errorCode)
             }
             return result
         }

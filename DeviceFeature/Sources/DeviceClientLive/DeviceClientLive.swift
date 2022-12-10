@@ -25,8 +25,8 @@ extension Device {
         kasa: Networking.App.KasaDeviceAndSystemInfo
     ) throws {
         let infoState: RelayIsOn?
-        if let relay_state = kasa.info.relay_state {
-            infoState = try Networking.App.getRelayState(from: relay_state)
+        if let relayState = kasa.info.relayState {
+            infoState = try Networking.App.getRelayState(from: relayState)
         } else {
             infoState = nil
         }

@@ -44,7 +44,7 @@ public struct DeviceListViewWatch: View {
                         LoadingView(.constant(viewStore.isRefreshingDevices == .closingAll)) {
                             HStack {
                                 Image(systemName: "moon.fill")
-                                Text(Strings.close_all.key, bundle: .module)
+                                Text(Strings.closeAll.key, bundle: .module)
                             }
                         }
                     }
@@ -54,7 +54,7 @@ public struct DeviceListViewWatch: View {
                         HStack {
                             LoadingView(.constant(viewStore.isRefreshingDevices == .loadingDevices)) {
                                 Image(systemName: "arrow.clockwise.circle.fill")
-                                Text(Strings.refresh_list.key, bundle: .module)
+                                Text(Strings.refreshList.key, bundle: .module)
                             }
                         }
                     }
@@ -65,7 +65,7 @@ public struct DeviceListViewWatch: View {
                 Button {
                     viewStore.send(.tappedLogoutButton, animation: .default)
                 } label: {
-                    Text(Strings.logout_app.key, bundle: .module)
+                    Text(Strings.logoutApp.key, bundle: .module)
                         .foregroundColor(Color.logout)
                 }
                 .listRowPlatterColor(Color.logout.opacity(0.17))

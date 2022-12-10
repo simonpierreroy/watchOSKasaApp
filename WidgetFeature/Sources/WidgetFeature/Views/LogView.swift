@@ -51,7 +51,7 @@ struct LogoutView: View {
                 Image(systemName: "keyboard")
                     .font(.largeTitle)
                 if LogoutView.showText(widgetFamily: widgetFamily) {
-                    Text(Strings.not_logged.key, bundle: .module)
+                    Text(Strings.notLogged.key, bundle: .module)
                 }
             }
         }

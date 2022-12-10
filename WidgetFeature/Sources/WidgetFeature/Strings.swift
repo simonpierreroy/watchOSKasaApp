@@ -10,12 +10,12 @@ import Foundation
 import SwiftUI
 
 public enum Strings: String {
-    case no_device
-    case no_device_selected
-    case not_logged
-    case description_widget
-    case close_all
-    case device_group
+    case noDevice = "no_device"
+    case noDeviceSelected = "no_device_selected"
+    case notLogged = "not_logged"
+    case descriptionWidget = "description_widget"
+    case closeAll = "close_all"
+    case deviceGroup = "device_group"
 }
 
 extension Strings {
@@ -35,21 +35,21 @@ struct Strings_Previews: PreviewProvider {
     static var previews: some View {
         Group {
             VStack {
-                Text(Strings.not_logged.key, bundle: .module)
-                Text(Strings.no_device.key, bundle: .module)
-                Text(Strings.description_widget.key, bundle: .module)
-                Text(Strings.close_all.key, bundle: .module)
-                Text(Strings.device_group.key, bundle: .module)
-                Text(Strings.no_device_selected.key, bundle: .module)
+                Text(Strings.notLogged.key, bundle: .module)
+                Text(Strings.noDevice.key, bundle: .module)
+                Text(Strings.descriptionWidget.key, bundle: .module)
+                Text(Strings.closeAll.key, bundle: .module)
+                Text(Strings.deviceGroup.key, bundle: .module)
+                Text(Strings.noDeviceSelected.key, bundle: .module)
             }
             .previewDisplayName("English")
             VStack {
-                Text(Strings.not_logged.key, bundle: .module)
-                Text(Strings.no_device.key, bundle: .module)
-                Text(Strings.description_widget.key, bundle: .module)
-                Text(Strings.close_all.key, bundle: .module)
-                Text(Strings.device_group.key, bundle: .module)
-                Text(Strings.no_device_selected.key, bundle: .module)
+                Text(Strings.notLogged.key, bundle: .module)
+                Text(Strings.noDevice.key, bundle: .module)
+                Text(Strings.descriptionWidget.key, bundle: .module)
+                Text(Strings.closeAll.key, bundle: .module)
+                Text(Strings.deviceGroup.key, bundle: .module)
+                Text(Strings.noDeviceSelected.key, bundle: .module)
             }
             .environment(\.locale, .init(identifier: "fr"))
             .previewDisplayName("Français")

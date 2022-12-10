@@ -56,15 +56,28 @@ extension Networking.App {
     }
 
     public struct KasaDeviceSystemInfo: Codable {
+
+        enum CodingKeys: String, CodingKey {
+            case alias
+            case deviceId
+            case children
+            case relayState = "relay_state"
+            case softwareVersion = "sw_ver"
+            case hardwareVersion = "hw_ver"
+            case model
+            case mac
+            case errorCode = "err_code"
+        }
+
         public let alias: Alias
         public let deviceId: DeviceID
         public let children: [KasaChildrenDevice]?
-        public let relay_state: RawState?
-        public let sw_ver: String
-        public let hw_ver: String
+        public let relayState: RawState?
+        public let softwareVersion: String
+        public let hardwareVersion: String
         public let model: String
         public let mac: String
-        let err_code: Int
+        public let errorCode: Int
     }
 
     public static func getDevices(token: Token) async throws -> KasaDeviceList {

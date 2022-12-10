@@ -14,7 +14,12 @@ extension Networking.App {
 
     private struct System<SubSystem: Codable>: Codable {
         struct Context: Codable {
-            let child_ids: [String]
+
+            enum CodingKeys: String, CodingKey {
+                case childIDs = "child_ids"
+            }
+
+            let childIDs: [String]
         }
 
         init(
@@ -32,7 +37,7 @@ extension Networking.App {
             var container = encoder.container(keyedBy: CodingKeys.self)
             try container.encode(system, forKey: .system)
             // Only Encode none empty context
-            if let context = context, context.child_ids.count > 0 {
+            if let context = context, context.childIDs.count > 0 {
                 try container.encode(context, forKey: .context)
             }
         }
@@ -41,11 +46,16 @@ extension Networking.App {
     private struct SystemInfoDiscover: Codable {}
 
     private struct GetSysInfo<State: Codable>: Codable {
-        let get_sysinfo: State
+
+        enum CodingKeys: String, CodingKey {
+            case info = "get_sysinfo"
+        }
+
+        let info: State
         // encode when nill value
         func encode(to encoder: Encoder) throws {
             var container = encoder.container(keyedBy: CodingKeys.self)
-            try container.encode(get_sysinfo, forKey: .get_sysinfo)
+            try container.encode(info, forKey: .info)
         }
     }
 
@@ -54,11 +64,17 @@ extension Networking.App {
     }
 
     private struct RelayStateGet: Codable {
-        let err_code: Int
+        enum CodingKeys: String, CodingKey {
+            case errorCode = "err_code"
+        }
+        let errorCode: Int
     }
 
     private struct SetRelayState<State: Codable>: Codable {
-        let set_relay_state: State
+        enum CodingKeys: String, CodingKey {
+            case state = "set_relay_state"
+        }
+        let state: State
     }
 
     private struct DeviceStateParam: Encodable {
@@ -67,7 +83,7 @@ extension Networking.App {
         //Pass to API: "{\"system\":{\"get_sysinfo\":null}}"
         let requestData = RawStringJSONContainer(
             wrapping: System(
-                system: GetSysInfo<SystemInfoDiscover?>(get_sysinfo: nil)
+                system: GetSysInfo<SystemInfoDiscover?>(info: nil)
             )
         )
     }
@@ -87,8 +103,8 @@ extension Networking.App {
 
             self.requestData = .init(
                 wrapping: .init(
-                    system: .init(set_relay_state: .init(state: relayIsOnToRelayState(state))),
-                    context: .init(child_ids: .init(children.map(\.rawValue)))
+                    system: .init(state: .init(state: relayIsOnToRelayState(state))),
+                    context: .init(childIDs: .init(children.map(\.rawValue)))
                 )
             )
         }
@@ -121,7 +137,7 @@ extension Networking.App {
             queryItems: ["token": token.rawValue]
         )
 
-        return deviceStateResponse.responseData.wrapping.system.get_sysinfo
+        return deviceStateResponse.responseData.wrapping.system.info
     }
 
     public static func tryToGetDeviceRelayState(
@@ -138,7 +154,7 @@ extension Networking.App {
             }
             rawRelayState = child.state
         } else {
-            rawRelayState = info.relay_state
+            rawRelayState = info.relayState
         }
 
         guard let rawRelayState = rawRelayState else {
@@ -172,7 +188,7 @@ extension Networking.App {
             queryItems: ["token": token.rawValue]
         )
 
-        guard deviceStateResponse.responseData.wrapping.system.set_relay_state.err_code == 0 else {
+        guard deviceStateResponse.responseData.wrapping.system.state.errorCode == 0 else {
             throw Networking.ResquestError(errorDescription: "Invalid JSON for set_relay_state")
         }
 

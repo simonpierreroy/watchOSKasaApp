@@ -223,12 +223,12 @@ extension DevicesReducer.State {
         isLoading: .nerverLoaded,
         route: nil,
         token: "logged",
-        link: .device(Device.debugDevice1.id, .toggle)
+        link: .device(Device.debug1.id, .toggle)
     )
     static let emptyLoading = Self(devices: [], isLoading: .loadingDevices, route: nil, token: "logged")
     static let emptyNeverLoaded = Self(devices: [], isLoading: .nerverLoaded, route: nil, token: "logged")
     static let oneDeviceLoaded = Self(
-        devices: [.init(device: .debugDevice1)],
+        devices: [.init(device: .debug1)],
         isLoading: .loaded,
         route: nil,
         token: "logged"

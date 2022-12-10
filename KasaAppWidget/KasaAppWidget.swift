@@ -174,7 +174,7 @@ struct KasaAppWidgetWithItent: Widget {
         }
         .supportedFamilies([.systemExtraLarge, .systemLarge, .systemMedium, .systemSmall])
         .configurationDisplayName("Kasa 1")
-        .description(WidgetFeature.Strings.description_widget.string)
+        .description(WidgetFeature.Strings.descriptionWidget.string)
 
     }
 }
@@ -197,7 +197,7 @@ struct KasaAppWidgetStatic: Widget {
         }
         .supportedFamilies([.systemSmall, .accessoryCircular, .accessoryInline, .accessoryRectangular])
         .configurationDisplayName("Kasa 2")
-        .description(WidgetFeature.Strings.description_widget.string)
+        .description(WidgetFeature.Strings.descriptionWidget.string)
 
     }
 }

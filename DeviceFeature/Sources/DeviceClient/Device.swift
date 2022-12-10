@@ -44,9 +44,9 @@ public struct Device: Equatable, Identifiable, Codable {
 
 extension Device {
 
-    public static let debugDevice1 = Self(id: "1", name: "Test device 1", state: false)
-    public static let debugDevice2 = Self(id: "2", name: "Test device 2", state: true)
-    public static let debugDevice3 = Self(
+    public static let debug1 = Self(id: "1", name: "Test device 1", state: false)
+    public static let debug2 = Self(id: "2", name: "Test device 2", state: true)
+    public static let debug3 = Self(
         id: "3",
         name: "Test device 3",
         children: [

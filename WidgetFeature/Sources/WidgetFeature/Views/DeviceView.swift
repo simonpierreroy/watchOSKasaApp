@@ -48,7 +48,7 @@ struct NoDevicesView: View {
             .font(NoDevicesView.font(widgetFamily: widgetFamily))
             if NoDevicesView.showText(widgetFamily: widgetFamily) {
                 Text(
-                    staticIntent ? Strings.no_device.key : Strings.no_device_selected.key,
+                    staticIntent ? Strings.noDevice.key : Strings.noDeviceSelected.key,
                     bundle: .module
                 )
             }
@@ -169,7 +169,7 @@ struct CloseAll: View {
                 Image(systemName: "moon.zzz.fill")
                     .font(CloseAll.font(widgetFamily: widgetFamily))
                 if CloseAll.showText(widgetFamily: widgetFamily) {
-                    Text(Strings.close_all.key, bundle: .module)
+                    Text(Strings.closeAll.key, bundle: .module)
                 }
             }
         }

@@ -37,7 +37,7 @@ public struct DeviceListViewiOS: View {
                                     Button {
                                         viewStore.send(.tappedLogout, animation: .default)
                                     } label: {
-                                        Text(Strings.logout_app.key, bundle: .module)
+                                        Text(Strings.logoutApp.key, bundle: .module)
                                             .foregroundColor(Color.logout)
                                     }
                             )
@@ -94,7 +94,7 @@ private struct DeviceListViewSideBar: View {
                             HStack {
                                 Image(systemName: "arrow.clockwise.circle.fill")
                                     .foregroundColor(imageColor(viewStore.isRefreshingDevices.isInFlight))
-                                Text(Strings.refresh_list.key, bundle: .module)
+                                Text(Strings.refreshList.key, bundle: .module)
                             }
                         }
                     }
@@ -105,7 +105,7 @@ private struct DeviceListViewSideBar: View {
                         HStack {
                             Image(systemName: "book.closed.fill")
                                 .foregroundColor(imageColor(viewStore.isRefreshingDevices.isInFlight))
-                            Text(Strings.logout_app.key, bundle: .module)
+                            Text(Strings.logoutApp.key, bundle: .module)
                         }
                     }
                 case .closeAll:
@@ -114,7 +114,7 @@ private struct DeviceListViewSideBar: View {
                             HStack {
                                 Image(systemName: "moon.fill")
                                     .foregroundColor(imageColor(viewStore.isRefreshingDevices.isInFlight))
-                                Text(Strings.close_all.key, bundle: .module)
+                                Text(Strings.closeAll.key, bundle: .module)
                             }
                         }
                     }
@@ -165,7 +165,7 @@ private struct DeviceListViewBase: View {
                         Button(action: { viewStore.send(.tappedCloseAll, animation: .default) }) {
                             LoadingView(.constant(viewStore.isRefreshingDevices == .closingAll)) {
                                 Image(systemName: "moon.fill")
-                                Text(Strings.close_all.key, bundle: .module)
+                                Text(Strings.closeAll.key, bundle: .module)
                             }
                         }
                         .modifier(ContentStyle(isLoading: viewStore.isRefreshingDevices.isInFlight))
@@ -173,7 +173,7 @@ private struct DeviceListViewBase: View {
                         Button(action: { viewStore.send(.tappedRefreshButton, animation: .default) }) {
                             LoadingView(.constant(viewStore.isRefreshingDevices == .loadingDevices)) {
                                 Image(systemName: "arrow.clockwise.circle.fill")
-                                Text(Strings.refresh_list.key, bundle: .module)
+                                Text(Strings.refreshList.key, bundle: .module)
                             }
                         }
                         .modifier(ContentStyle(isLoading: viewStore.isRefreshingDevices.isInFlight))
@@ -249,7 +249,7 @@ public struct DeviceDetailViewiOS: View {
                     VStack(alignment: .center) {
                         HStack {
                             Image(systemName: "rectangle.3.group.fill")
-                            Text(Strings.device_group.key, bundle: .module)
+                            Text(Strings.deviceGroup.key, bundle: .module)
                         }
                         if viewStore.isLoading { ProgressView() }
                         Spacer()

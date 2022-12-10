@@ -9,10 +9,10 @@ import Foundation
 import SwiftUI
 
 enum Strings: String {
-    case logout_app
-    case refresh_list
-    case close_all
-    case device_group
+    case logoutApp = "logout_app"
+    case refreshList = "refresh_list"
+    case closeAll = "close_all"
+    case deviceGroup = "device_group"
 }
 
 extension Strings {
@@ -31,17 +31,17 @@ struct Strings_Previews: PreviewProvider {
     static var previews: some View {
         Group {
             VStack {
-                Text(Strings.logout_app.key, bundle: .module)
-                Text(Strings.refresh_list.key, bundle: .module)
-                Text(Strings.close_all.key, bundle: .module)
-                Text(Strings.device_group.key, bundle: .module)
+                Text(Strings.logoutApp.key, bundle: .module)
+                Text(Strings.refreshList.key, bundle: .module)
+                Text(Strings.closeAll.key, bundle: .module)
+                Text(Strings.deviceGroup.key, bundle: .module)
             }
             .previewDisplayName("English")
             VStack {
-                Text(Strings.logout_app.key, bundle: .module)
-                Text(Strings.refresh_list.key, bundle: .module)
-                Text(Strings.close_all.key, bundle: .module)
-                Text(Strings.device_group.key, bundle: .module)
+                Text(Strings.logoutApp.key, bundle: .module)
+                Text(Strings.refreshList.key, bundle: .module)
+                Text(Strings.closeAll.key, bundle: .module)
+                Text(Strings.deviceGroup.key, bundle: .module)
             }
             .environment(\.locale, .init(identifier: "fr"))
             .previewDisplayName("Français")

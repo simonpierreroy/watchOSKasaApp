@@ -30,8 +30,8 @@ extension DevicesCache: TestDependencyKey {
     public static let previewValue = DevicesCache.mock
     public static let testValue = DevicesCache(
         save: XCTUnimplemented("\(Self.self).save"),
-        load: XCTUnimplemented("\(Self.self).load", placeholder: [.debugDevice1]),
-        loadBlocking: XCTUnimplemented("\(Self.self).loadBlocking", placeholder: [.debugDevice1])
+        load: XCTUnimplemented("\(Self.self).load", placeholder: [.debug1]),
+        loadBlocking: XCTUnimplemented("\(Self.self).loadBlocking", placeholder: [.debug1])
     )
 }
 
@@ -47,11 +47,11 @@ extension DevicesCache {
         save: { _ in return },
         load: {
             [
-                .debugDevice1,
-                .debugDevice2,
-                .debugDevice3,
+                .debug1,
+                .debug2,
+                .debug3,
             ]
         },
-        loadBlocking: { [.debugDevice1, .debugDevice2, .debugDevice3] }
+        loadBlocking: { [.debug1, .debug2, .debug3] }
     )
 }

@@ -9,9 +9,9 @@ import Foundation
 import SwiftUI
 
 enum Strings: String {
-    case login_app
-    case log_email
-    case log_password
+    case loginApp = "login_app"
+    case logEmail = "log_email"
+    case logPassword = "log_password"
 }
 
 extension Strings {
@@ -29,15 +29,15 @@ struct Strings_Previews: PreviewProvider {
     static var previews: some View {
         Group {
             VStack {
-                Text(Strings.login_app.key, bundle: .module)
-                Text(Strings.log_email.key, bundle: .module)
-                Text(Strings.log_password.key, bundle: .module)
+                Text(Strings.loginApp.key, bundle: .module)
+                Text(Strings.logEmail.key, bundle: .module)
+                Text(Strings.logPassword.key, bundle: .module)
             }
             .previewDisplayName("English")
             VStack {
-                Text(Strings.login_app.key, bundle: .module)
-                Text(Strings.log_email.key, bundle: .module)
-                Text(Strings.log_password.key, bundle: .module)
+                Text(Strings.loginApp.key, bundle: .module)
+                Text(Strings.logEmail.key, bundle: .module)
+                Text(Strings.logPassword.key, bundle: .module)
             }
             .environment(\.locale, .init(identifier: "fr"))
             .previewDisplayName("Français")

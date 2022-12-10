@@ -38,7 +38,7 @@ public struct UserLoginViewiOS: View {
                         Image(systemName: "person.icloud")
                             .font(.title2)
                         TextField(
-                            Strings.log_email.string,
+                            Strings.logEmail.string,
                             text: self.$email
                         )
                         .textContentType(.emailAddress)
@@ -52,7 +52,7 @@ public struct UserLoginViewiOS: View {
                         Image(systemName: "key.icloud")
                             .font(.title2)
 
-                        SecureField(Strings.log_password.string, text: self.$password)
+                        SecureField(Strings.logPassword.string, text: self.$password)
                             .textContentType(.password)
                     }
                     .padding()
@@ -65,7 +65,7 @@ public struct UserLoginViewiOS: View {
                         viewStore.send(.tappedLogingButton(email: self.email, password: self.password))
                     }) {
                         LoadingView(.constant(viewStore.isLoadingUser)) {
-                            Text(Strings.login_app.key, bundle: .module)
+                            Text(Strings.loginApp.key, bundle: .module)
                                 .foregroundColor(Color.green)
                         }
                         .frame(maxWidth: .infinity)

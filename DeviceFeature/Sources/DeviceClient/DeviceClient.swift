@@ -31,7 +31,7 @@ public struct DevicesClient {
 
 extension DevicesClient: TestDependencyKey {
     public static let testValue = DevicesClient(
-        loadDevices: XCTUnimplemented("\(Self.self).loadDevices", placeholder: [.debugDevice1]),
+        loadDevices: XCTUnimplemented("\(Self.self).loadDevices", placeholder: [.debug1]),
         toggleDeviceRelayState: XCTUnimplemented("\(Self.self).toggleDeviceRelayState", placeholder: true),
         getDeviceRelayState: XCTUnimplemented("\(Self.self).getDeviceRelayState", placeholder: true),
         changeDeviceRelayState: XCTUnimplemented("\(Self.self).changeDeviceRelayState", placeholder: true)
@@ -53,9 +53,9 @@ extension DevicesClient {
             loadDevices: { _ in
                 try await taskSleep(for: delay)
                 return [
-                    .debugDevice1,
-                    .debugDevice2,
-                    .debugDevice3,
+                    .debug1,
+                    .debug2,
+                    .debug3,
                 ]
             },
             toggleDeviceRelayState: { (_, _, _) in
