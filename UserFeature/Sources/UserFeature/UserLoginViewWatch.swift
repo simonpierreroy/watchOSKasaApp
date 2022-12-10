@@ -41,9 +41,9 @@ public struct UserLoginViewWatch: View {
                 SecureField(Strings.logPassword.string, text: self.$password)
                     .textContentType(.password)
 
-                Button(action: {
+                Button {
                     viewStore.send(.tappedLogingButton(email: self.email, password: self.password))
-                }) {
+                } label: {
                     LoadingView(.constant(viewStore.isLoadingUser)) {
                         Image(systemName: "terminal")
                         Text(Strings.loginApp.key, bundle: .module)

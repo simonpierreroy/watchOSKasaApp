@@ -61,9 +61,9 @@ public struct UserLoginViewiOS: View {
 
                     Spacer(minLength: 16)
 
-                    Button(action: {
+                    Button {
                         viewStore.send(.tappedLogingButton(email: self.email, password: self.password))
-                    }) {
+                    } label: {
                         LoadingView(.constant(viewStore.isLoadingUser)) {
                             Text(Strings.loginApp.key, bundle: .module)
                                 .foregroundColor(Color.green)

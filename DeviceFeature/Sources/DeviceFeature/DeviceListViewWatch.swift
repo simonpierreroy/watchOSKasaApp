@@ -40,7 +40,9 @@ public struct DeviceListViewWatch: View {
                         content: DeviceDetailViewWatch.init(store:)
                     )
 
-                    Button(action: { viewStore.send(.tappedCloseAll, animation: .default) }) {
+                    Button {
+                        viewStore.send(.tappedCloseAll, animation: .default)
+                    } label: {
                         LoadingView(.constant(viewStore.isRefreshingDevices == .closingAll)) {
                             HStack {
                                 Image(systemName: "moon.fill")
@@ -50,7 +52,9 @@ public struct DeviceListViewWatch: View {
                     }
                     .foregroundColor(Color.moon).listRowPlatterColor(Color.moon.opacity(0.17))
 
-                    Button(action: { viewStore.send(.tappedRefreshButton, animation: .default) }) {
+                    Button {
+                        viewStore.send(.tappedRefreshButton, animation: .default)
+                    } label: {
                         HStack {
                             LoadingView(.constant(viewStore.isRefreshingDevices == .loadingDevices)) {
                                 Image(systemName: "arrow.clockwise.circle.fill")
@@ -98,13 +102,13 @@ struct DeviceDetailViewWatch: View {
 
     var body: some View {
         WithViewStore(self.store) { viewStore in
-            Button(action: {
+            Button {
                 if let child = viewStore.child {
                     viewStore.send(.tappedDeviceChild(index: child.id, action: .toggleChild), animation: .default)
                 } else {
                     viewStore.send(.tapped, animation: .default)
                 }
-            }) {
+            } label: {
                 HStack {
                     let style = styleForRelayState(relay: viewStore.child?.relay ?? viewStore.device.relay)
                     Image(systemName: style.image).font(.title3)

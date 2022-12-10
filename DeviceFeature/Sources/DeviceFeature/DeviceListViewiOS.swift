@@ -89,7 +89,9 @@ private struct DeviceListViewSideBar: View {
             List(ListSideBar.allCases) { tab in
                 switch tab {
                 case .refresh:
-                    Button(action: { viewStore.send(.tappedRefreshButton, animation: .default) }) {
+                    Button {
+                        viewStore.send(.tappedRefreshButton, animation: .default)
+                    } label: {
                         LoadingView(.constant(viewStore.isRefreshingDevices == .loadingDevices)) {
                             HStack {
                                 Image(systemName: "arrow.clockwise.circle.fill")
@@ -109,7 +111,9 @@ private struct DeviceListViewSideBar: View {
                         }
                     }
                 case .closeAll:
-                    Button(action: { viewStore.send(.tappedCloseAll, animation: .default) }) {
+                    Button {
+                        viewStore.send(.tappedCloseAll, animation: .default)
+                    } label: {
                         LoadingView(.constant(viewStore.isRefreshingDevices == .closingAll)) {
                             HStack {
                                 Image(systemName: "moon.fill")
@@ -162,7 +166,9 @@ private struct DeviceListViewBase: View {
                     )
 
                     if horizontalSizeClass == .compact {
-                        Button(action: { viewStore.send(.tappedCloseAll, animation: .default) }) {
+                        Button {
+                            viewStore.send(.tappedCloseAll, animation: .default)
+                        } label: {
                             LoadingView(.constant(viewStore.isRefreshingDevices == .closingAll)) {
                                 Image(systemName: "moon.fill")
                                 Text(Strings.closeAll.key, bundle: .module)
@@ -170,7 +176,9 @@ private struct DeviceListViewBase: View {
                         }
                         .modifier(ContentStyle(isLoading: viewStore.isRefreshingDevices.isInFlight))
 
-                        Button(action: { viewStore.send(.tappedRefreshButton, animation: .default) }) {
+                        Button {
+                            viewStore.send(.tappedRefreshButton, animation: .default)
+                        } label: {
                             LoadingView(.constant(viewStore.isRefreshingDevices == .loadingDevices)) {
                                 Image(systemName: "arrow.clockwise.circle.fill")
                                 Text(Strings.refreshList.key, bundle: .module)
@@ -289,7 +297,9 @@ public struct DeviceNoChildViewiOS: View {
 
     public var body: some View {
         WithViewStore(self.store) { viewStore in
-            Button(action: { viewStore.send(.tapped, animation: .default) }) {
+            Button {
+                viewStore.send(.tapped, animation: .default)
+            } label: {
                 VStack {
                     let style = styleForRelayState(relay: viewStore.relay)
                     Image(systemName: style.image).font(.title3).tint(style.taint)
@@ -308,7 +318,9 @@ public struct DeviceChildViewiOS: View {
 
     public var body: some View {
         WithViewStore(self.store) { viewStore in
-            Button(action: { viewStore.send(.toggleChild, animation: .default) }) {
+            Button {
+                viewStore.send(.toggleChild, animation: .default)
+            } label: {
                 HStack {
                     let style = styleForRelayState(relay: viewStore.relay)
                     Image(systemName: style.image).font(.title3).tint(style.taint)
