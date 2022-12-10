@@ -34,11 +34,11 @@ public struct UserLoginViewWatch: View {
                     .padding()
 
                 TextField(
-                    Strings.log_email.string,
+                    Strings.logEmail.string,
                     text: self.$email
                 )
                 .textContentType(.emailAddress)
-                SecureField(Strings.log_password.string, text: self.$password)
+                SecureField(Strings.logPassword.string, text: self.$password)
                     .textContentType(.password)
 
                 Button(action: {
@@ -46,7 +46,7 @@ public struct UserLoginViewWatch: View {
                 }) {
                     LoadingView(.constant(viewStore.isLoadingUser)) {
                         Image(systemName: "terminal")
-                        Text(Strings.login_app.key, bundle: .module)
+                        Text(Strings.loginApp.key, bundle: .module)
                     }
                 }
             }
