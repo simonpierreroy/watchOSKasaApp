@@ -15,7 +15,7 @@ struct GlueFeatures: ReducerProtocol {
     func reduce(into state: inout State, action: Action) -> Effect<Action, Never> {
         switch action {
         case .devicesAction(.logout):
-            return Effect(value: .userAction(.logout))
+            return .run { send in await send(.userAction(.loginUser(.logout)), animation: .default) }
         default: return .none
         }
     }

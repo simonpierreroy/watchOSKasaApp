@@ -20,14 +20,14 @@ struct AppDelegateReducer: ReducerProtocol {
     func reduce(into state: inout State, action: Action) -> Effect<Action, Never> {
         switch action {
         case .delegate(.applicationDidFinishLaunching):
-            return Effect(value: .userAction(.loadSavedUser))
-        case .delegate(.applicationWillResignActive), .delegate(.applicationWillTerminate):
-            return Effect(value: .userAction(.save))
+            return .task { .userAction(.logoutUser(.loadSavedUser)) }
+        case .delegate(.applicationWillTerminate), .delegate(.applicationWillResignActive):
+            return .task { .userAction(.loginUser(.save)) }
         case .delegate(.openURLContexts(let urls)):
             for url in urls {
                 if let link = try? parse(url) {
                     switch link {
-                    case .devices(let deviceLink): return Effect(value: .devicesAction(.attempDeepLink(deviceLink)))
+                    case .devices(let deviceLink): return .task { .devicesAction(.attempDeepLink(deviceLink)) }
                     }
                 }
             }

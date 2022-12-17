@@ -19,7 +19,7 @@ public struct DevicesReducer: ReducerProtocol {
     public enum Action {
         case set(to: IdentifiedArrayOf<DeviceReducer.State>)
         case fetchFromRemote
-        case send(Error)
+        case setError(Error)
         case errorHandled
         case deviceDetail(index: DeviceReducer.State.ID, action: DeviceReducer.Action)
         case closeAll
@@ -102,19 +102,18 @@ public struct DevicesReducer: ReducerProtocol {
                 defer { state.linkToComplete = nil }
 
                 switch link {
-                case .closeAll: return Effect(value: .closeAll)
+                case .closeAll: return .task { .closeAll }
                 case .device(let id, .toggle):
                     guard state.devices[id: id] != nil else { return .none }
-                    return Effect(value: .deviceDetail(index: id, action: .toggle))
+                    return .task { .deviceDetail(index: id, action: .toggle) }
                 case .device(let id, .child(let childId, .toggle)):
                     guard let d = state.devices[id: id], d.children[id: childId] != nil else { return .none }
-                    return Effect(
-                        value:
-                            .deviceDetail(
-                                index: id,
-                                action: .deviceChild(index: childId, action: .toggleChild)
-                            )
-                    )
+                    return .task {
+                        return .deviceDetail(
+                            index: id,
+                            action: .deviceChild(index: childId, action: .toggleChild)
+                        )
+                    }
                 }
             case .set(let devices):
                 state.isLoading = .loaded
@@ -135,15 +134,14 @@ public struct DevicesReducer: ReducerProtocol {
                 guard let token = state.token else { return .none }
                 state.isLoading = .loadingDevices
                 return
-                    .task {
+                    .run { send in
                         let devices = try await loadDevices(token).map(DeviceReducer.State.init(device:))
                         let states = IdentifiedArrayOf<DeviceReducer.State>(uniqueElements: devices)
-                        return .set(to: states)
-                    } catch: {
-                        return .send($0)
+                        await send(.set(to: states), animation: .default)
+                    } catch: { error, send in
+                        await send(.setError(error), animation: .default)
                     }
-                    .animation()
-            case .send(let error):
+            case .setError(let error):
                 state.isLoading = .loaded
                 state.route = .error(error)
                 return .none
@@ -157,7 +155,7 @@ public struct DevicesReducer: ReducerProtocol {
                     .task { [devices = state.devices] in
                         return try await withThrowingTaskGroup(of: Void.self) { group in
                             for device in devices {
-                                if let _ = device.relay {
+                                if case .relay = device.relay {
                                     group.addTask { _ = try await changeDeviceRelayState(token, device.id, nil, false) }
                                 }
                                 for child in device.children {
@@ -170,12 +168,11 @@ public struct DevicesReducer: ReducerProtocol {
                             return .doneClosingAll
                         }
                     } catch: {
-                        return .send($0)
+                        return .setError($0)
                     }
-                    .animation()
             case .doneClosingAll:
                 state.isLoading = .loaded
-                return Effect(value: Action.fetchFromRemote)
+                return .task { Action.fetchFromRemote }
             case .deviceDetail: return .none
             case .logout: return .none  // Will be provide by an other feature
             }
@@ -241,7 +238,8 @@ extension DevicesReducer.State {
                     route: childError.map { .error($0) },
                     id: .init(rawValue: "1"),
                     name: "1",
-                    children: .init()
+                    children: .init(),
+                    relay: .none
                 )
             ],
             isLoading: .loaded,
@@ -251,14 +249,14 @@ extension DevicesReducer.State {
         )
     }
 
-    static func nDeviceLoaded(n: Int, childrenCount: Int = 0) -> Self {
+    static func nDeviceLoaded(n: Int, childrenCount: Int = 0, indexFailed: [Int] = []) -> Self {
         var children: [Device.DeviceChild] = []
-        var state: RelayIsOn? = false
+        var state: Device.State = .relay(false)
 
         if childrenCount >= 1 {
             children = (1...childrenCount)
                 .map { Device.DeviceChild(id: "child \($0)", name: "child \($0)", state: true) }
-            state = nil
+            state = .none
         }
 
         return Self(
@@ -269,7 +267,7 @@ extension DevicesReducer.State {
                             id: "\($0)",
                             name: "Test device number \($0)",
                             children: children,
-                            state: state
+                            state: indexFailed.contains($0) ? .failed(.init(code: -1, message: "Error")) : state
                         )
                     )
                 },

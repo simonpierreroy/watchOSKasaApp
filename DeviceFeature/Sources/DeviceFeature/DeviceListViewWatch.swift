@@ -100,6 +100,23 @@ struct DeviceDetailViewWatch: View {
 
     let store: Store<ListEntry, DeviceListViewWatch.Action.DeviceAction>
 
+    func style(child: DeviceChildReducer.State?, device: DeviceReducer.State) -> (image: String, tint: Color) {
+        let style: (image: String, tint: Color)
+        if let child {
+            style = styleFor(relay: child.relay)
+        } else {
+            style = styleFor(state: device.relay)
+        }
+        return style
+    }
+
+    func disabled(child: DeviceChildReducer.State?, device: DeviceReducer.State) -> Bool {
+        switch device.relay {
+        case .failed: return true
+        case .none, .relay: return false
+        }
+    }
+
     var body: some View {
         WithViewStore(self.store) { viewStore in
             Button {
@@ -110,9 +127,9 @@ struct DeviceDetailViewWatch: View {
                 }
             } label: {
                 HStack {
-                    let style = styleForRelayState(relay: viewStore.child?.relay ?? viewStore.device.relay)
+                    let style = style(child: viewStore.child, device: viewStore.device)
                     Image(systemName: style.image).font(.title3)
-                        .foregroundColor(style.taint)
+                        .foregroundColor(style.tint)
                     Text(viewStore.child?.name ?? viewStore.device.name)
                         .multilineTextAlignment(.center)
                     Spacer()
@@ -124,6 +141,7 @@ struct DeviceDetailViewWatch: View {
                     if viewStore.device.isLoading { ProgressView() }
                 }
             }
+            .disabled(disabled(child: viewStore.child, device: viewStore.device))
             .alert(
                 item: viewStore.binding(
                     get: {
@@ -308,7 +326,7 @@ struct DeviceListView_Previews: PreviewProvider {
 
             DeviceListViewWatch(
                 store: Store(
-                    initialState: .nDeviceLoaded(n: 5),
+                    initialState: .nDeviceLoaded(n: 5, indexFailed: [2, 4]),
                     reducer: DevicesReducer()
                 )
                 .scope(
@@ -321,7 +339,7 @@ struct DeviceListView_Previews: PreviewProvider {
 
             DeviceListViewWatch(
                 store: Store(
-                    initialState: .nDeviceLoaded(n: 5, childrenCount: 3),
+                    initialState: .nDeviceLoaded(n: 5, childrenCount: 3, indexFailed: [2]),
                     reducer: DevicesReducer()
                 )
                 .scope(

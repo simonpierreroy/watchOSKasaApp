@@ -5,23 +5,25 @@
 //  Created by Simon-Pierre Roy on 8/16/22.
 //
 
+import DeviceClient
 import Foundation
 import KasaCore
 import SwiftUI
 
-func styleForRelayState(relay: RelayIsOn?) -> (image: String, taint: Color) {
-    let imageName: String
-    let color: Color
-    switch relay {
-    case .some(true):
-        imageName = "lightbulb.fill"
-        color = .yellow
-    case .some(false):
-        imageName = "lightbulb.slash.fill"
-        color = .blue
-    default:
-        imageName = ""
-        color = .gray
+func styleFor(relay: RelayIsOn) -> (image: String, tint: Color) {
+    guard relay.rawValue else {
+        return ("lightbulb.slash.fill", .blue)
     }
-    return (imageName, color)
+    return ("lightbulb.fill", .yellow)
+}
+
+func styleFor(state: Device.State) -> (image: String, tint: Color) {
+    switch state {
+    case .relay(let relay):
+        return styleFor(relay: relay)
+    case .none:
+        return ("", .gray)
+    case .failed:
+        return ("wifi.slash", .gray)
+    }
 }

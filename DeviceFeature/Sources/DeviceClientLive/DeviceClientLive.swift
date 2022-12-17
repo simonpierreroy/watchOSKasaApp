@@ -24,17 +24,28 @@ extension Device {
     fileprivate init(
         kasa: Networking.App.KasaDeviceAndSystemInfo
     ) throws {
-        let infoState: RelayIsOn?
-        if let relayState = kasa.info.relayState {
-            infoState = try Networking.App.getRelayState(from: relayState)
-        } else {
-            infoState = nil
+
+        let infoState: Device.State
+        let children: [Networking.App.KasaChildrenDevice]
+        switch kasa.info {
+        case .success(let data):
+            if let relayState = data.relayState {
+                let relay = try Networking.App.getRelayState(from: relayState)
+                infoState = .relay(relay)
+            } else {
+                infoState = .none
+            }
+            children = data.children ?? []
+        case .failure(let error):
+            infoState = .failed(.init(code: error.code, message: error.message))
+            children = []
         }
 
         self.init(
             id: .init(rawValue: kasa.device.deviceId.rawValue),
             name: kasa.device.alias.rawValue,
-            children: try (kasa.info.children ?? [])
+            children:
+                try children
                 .map {
                     Device.DeviceChild(
                         id: .init(rawValue: $0.id.rawValue),

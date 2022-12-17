@@ -132,12 +132,31 @@ extension Networking.App {
                 params: .init(deviceId: id.rawValue)
             )
 
-        let deviceStateResponse: DeviceStateResponse = try await performResquest(
+        let deviceStateResponse: DeviceStateResponse = try await performResquestToModel(
             request: request,
             queryItems: ["token": token.rawValue]
         )
 
         return deviceStateResponse.responseData.wrapping.system.info
+    }
+
+    static func getDeviceStateAPIResponse(
+        token: Token,
+        id: DeviceID
+    ) async throws -> APIResponse<KasaDeviceSystemInfo> {
+
+        let request = Request<DeviceStateParam>
+            .init(
+                method: .passthrough,
+                params: .init(deviceId: id.rawValue)
+            )
+
+        let deviceStateResponse: APIResponse<DeviceStateResponse> = try await performResquestToAPIResponse(
+            request: request,
+            queryItems: ["token": token.rawValue]
+        )
+
+        return deviceStateResponse.map(\.responseData.wrapping.system.info)
     }
 
     public static func tryToGetDeviceRelayState(
@@ -183,7 +202,7 @@ extension Networking.App {
             )
         )
 
-        let deviceStateResponse: ChangeDeviceStateResponse = try await performResquest(
+        let deviceStateResponse: ChangeDeviceStateResponse = try await performResquestToModel(
             request: request,
             queryItems: ["token": token.rawValue]
         )

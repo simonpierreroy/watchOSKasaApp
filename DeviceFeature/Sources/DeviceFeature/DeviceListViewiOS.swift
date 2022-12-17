@@ -243,6 +243,20 @@ extension DeviceListViewiOS {
     }
 }
 
+public struct DeviceRelayFailedViewiOS: View {
+    let store: Store<DeviceReducer.State, DeviceListViewiOS.Action.DeviceAction>
+
+    public var body: some View {
+        WithViewStore(self.store) { viewStore in
+            let style = styleFor(state: viewStore.relay)
+            VStack {
+                Image(systemName: style.image).font(.title3)
+                Text(viewStore.name).multilineTextAlignment(.center).foregroundColor(style.tint)
+            }
+        }
+    }
+}
+
 public struct DeviceDetailViewiOS: View {
 
     let store: Store<DeviceReducer.State, DeviceListViewiOS.Action.DeviceAction>
@@ -250,8 +264,8 @@ public struct DeviceDetailViewiOS: View {
     public var body: some View {
         WithViewStore(self.store) { viewStore in
             VStack {
-                switch viewStore.relay?.rawValue {
-                case .some(true), .some(false):
+                switch viewStore.relay {
+                case .relay:
                     DeviceNoChildViewiOS(store: self.store)
                 case .none:
                     VStack(alignment: .center) {
@@ -272,6 +286,8 @@ public struct DeviceDetailViewiOS: View {
                         )
                     }
                     .padding()
+                case .failed:
+                    DeviceRelayFailedViewiOS(store: self.store)
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -301,8 +317,8 @@ public struct DeviceNoChildViewiOS: View {
                 viewStore.send(.tapped, animation: .default)
             } label: {
                 VStack {
-                    let style = styleForRelayState(relay: viewStore.relay)
-                    Image(systemName: style.image).font(.title3).tint(style.taint)
+                    let style = styleFor(state: viewStore.relay)
+                    Image(systemName: style.image).font(.title3).tint(style.tint)
                     Text(viewStore.name).multilineTextAlignment(.center)
                     if viewStore.isLoading { ProgressView() }
                 }
@@ -322,8 +338,8 @@ public struct DeviceChildViewiOS: View {
                 viewStore.send(.toggleChild, animation: .default)
             } label: {
                 HStack {
-                    let style = styleForRelayState(relay: viewStore.relay)
-                    Image(systemName: style.image).font(.title3).tint(style.taint)
+                    let style = styleFor(relay: viewStore.relay)
+                    Image(systemName: style.image).font(.title3).tint(style.tint)
                     Text(viewStore.name)
                 }
             }
@@ -445,7 +461,7 @@ struct DeviceListViewiOS_Previews: PreviewProvider {
 
             DeviceListViewiOS(
                 store: Store(
-                    initialState: .nDeviceLoaded(n: 5),
+                    initialState: .nDeviceLoaded(n: 5, indexFailed: [1, 4]),
                     reducer: DevicesReducer()
                 )
                 .scope(
@@ -457,7 +473,7 @@ struct DeviceListViewiOS_Previews: PreviewProvider {
 
             DeviceListViewiOS(
                 store: Store(
-                    initialState: .nDeviceLoaded(n: 5, childrenCount: 4),
+                    initialState: .nDeviceLoaded(n: 5, childrenCount: 4, indexFailed: [3]),
                     reducer: DevicesReducer()
                 )
                 .scope(

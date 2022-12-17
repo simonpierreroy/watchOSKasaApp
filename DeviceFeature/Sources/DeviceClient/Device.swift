@@ -26,7 +26,7 @@ public struct Device: Equatable, Identifiable, Codable {
         id: Id,
         name: String,
         children: [DeviceChild] = [],
-        state: RelayIsOn?
+        state: State
     ) {
         self.id = id
         self.name = name
@@ -36,16 +36,35 @@ public struct Device: Equatable, Identifiable, Codable {
 
     public typealias Id = Tagged<Device, String>
 
+    public enum State: Equatable, Codable {
+
+        public struct Failed: Equatable, Codable {
+            public init(
+                code: Int,
+                message: String
+            ) {
+                self.code = code
+                self.message = message
+            }
+            public let code: Int
+            public let message: String
+        }
+
+        case relay(RelayIsOn)
+        case none
+        case failed(Failed)
+    }
+
     public let id: Id
     public let name: String
     public let children: [DeviceChild]
-    public var state: RelayIsOn?
+    public var state: State
 }
 
 extension Device {
 
-    public static let debug1 = Self(id: "1", name: "Test device 1", state: false)
-    public static let debug2 = Self(id: "2", name: "Test device 2", state: true)
+    public static let debug1 = Self(id: "1", name: "Test device 1", state: .relay(false))
+    public static let debug2 = Self(id: "2", name: "Test device 2", state: .relay(true))
     public static let debug3 = Self(
         id: "3",
         name: "Test device 3",
@@ -53,7 +72,7 @@ extension Device {
             .init(id: "Child 1-3", name: "Child 1 of device 3", state: true),
             .init(id: "Child 2-3", name: "Child 2 of device 3", state: false),
         ],
-        state: false
+        state: .relay(false)
     )
 }
 

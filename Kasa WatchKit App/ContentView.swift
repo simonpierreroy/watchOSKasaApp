@@ -77,7 +77,7 @@ extension ContentView.StateView {
         appState: AppReducer.State
     ) {
         switch appState.userState.status {
-        case .loading, .logout:
+        case .logout:
             self.isUserLogged = false
         case .logged:
             self.isUserLogged = true

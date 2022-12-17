@@ -20,13 +20,13 @@ public struct DeviceReducer: ReducerProtocol {
         public let id: Device.Id
         public let name: String
         public var children: IdentifiedArrayOf<DeviceChildReducer.State>
-        public var relay: RelayIsOn?
+        public var relay: Device.State
     }
 
     public enum Action {
         case toggle
         case didToggleChild(childId: State.ID, state: RelayIsOn)
-        case send(Error)
+        case setError(Error)
         case errorHandled
         case didToggle(state: RelayIsOn)
         case deviceChild(index: DeviceChildReducer.State.ID, action: DeviceChildReducer.Action)
@@ -44,18 +44,18 @@ public struct DeviceReducer: ReducerProtocol {
                     let newState = try await toggleDeviceRelayState(token, state.id, nil)
                     await send(.didToggle(state: newState), animation: .default)
                 } catch: { error, send in
-                    await send(.send(error))
+                    await send(.setError(error))
                 }
             case .didToggle(let status):
                 state.isLoading = false
-                state.relay = status
+                state.relay = .relay(status)
                 return .none
             case .didToggleChild(let id, let status):
                 state.isLoading = false
                 return .run { send in
                     await send(.deviceChild(index: id, action: .didToggleChild(state: status)), animation: .default)
                 }
-            case .send(let error):
+            case .setError(let error):
                 state.isLoading = false
                 state.route = .error(error.localizedDescription)
                 return .none
@@ -71,7 +71,7 @@ public struct DeviceReducer: ReducerProtocol {
                     let tog = try await toggleDeviceRelayState(token, stateId, childId)
                     await send(.didToggleChild(childId: childId, state: tog), animation: .default)
                 } catch: { error, send in
-                    await send(.send(error))
+                    await send(.setError(error))
                 }
             case .deviceChild(_, .didToggleChild):  // Child is taking care of it
                 return .none

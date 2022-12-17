@@ -12,7 +12,7 @@ import WidgetKit
 
 struct LogoutView: View {
     static let logoutDevicesPreview = (1...10)
-        .map { i in Device.init(id: "\(i)", name: "Here is device no \(i)", state: false) }.flatten()
+        .map { i in Device.init(id: "\(i)", name: "Here is device no \(i)", state: .relay(false)) }.flatten()
 
     let getURL: (AppLink) -> URL
     let staticIntent: Bool

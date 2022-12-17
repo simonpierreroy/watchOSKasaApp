@@ -46,6 +46,6 @@ extension Networking.App {
             )
         )
 
-        return try await performResquest(request: params, queryItems: [:])
+        return try await performResquestToModel(request: params, queryItems: [:])
     }
 }

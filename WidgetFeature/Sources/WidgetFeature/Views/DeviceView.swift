@@ -229,7 +229,7 @@ struct StackList: View {
 #if DEBUG
 struct DeviceView_Preview: PreviewProvider {
     static let previewDevices = (1...10)
-        .map { i in Device.init(id: "\(i)", name: "Preview no \(i)", state: false) }
+        .map { i in Device.init(id: "\(i)", name: "Preview no \(i)", state: .relay(false)) }
     static var previews: some View {
         Group {
             StackList(

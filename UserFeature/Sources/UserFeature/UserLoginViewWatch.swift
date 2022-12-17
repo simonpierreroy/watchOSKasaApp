@@ -21,8 +21,6 @@ public struct UserLoginViewWatch: View {
         self.store = store
     }
 
-    @State var email: String = ""
-    @State var password: String = ""
     private let store: Store<StateView, Action>
 
     public var body: some View {
@@ -35,14 +33,17 @@ public struct UserLoginViewWatch: View {
 
                 TextField(
                     Strings.logEmail.string,
-                    text: self.$email
+                    text: viewStore.binding(get: { $0.email }, send: Action.typedEmail)
                 )
                 .textContentType(.emailAddress)
-                SecureField(Strings.logPassword.string, text: self.$password)
-                    .textContentType(.password)
+                SecureField(
+                    Strings.logPassword.string,
+                    text: viewStore.binding(get: { $0.password }, send: Action.typedPassword)
+                )
+                .textContentType(.password)
 
                 Button {
-                    viewStore.send(.tappedLogingButton(email: self.email, password: self.password))
+                    viewStore.send(.tappedLogingButton)
                 } label: {
                     LoadingView(.constant(viewStore.isLoadingUser)) {
                         Image(systemName: "terminal")
@@ -75,11 +76,15 @@ extension UserLoginViewWatch {
     public struct StateView: Equatable {
         let errorMessageToDisplayText: String?
         let isLoadingUser: Bool
+        let email: String
+        let password: String
     }
 
     public enum Action {
         case tappedErrorAlert
-        case tappedLogingButton(email: String, password: String)
+        case tappedLogingButton
+        case typedEmail(String)
+        case typedPassword(String)
     }
 }
 
@@ -88,9 +93,9 @@ extension UserLoginViewWatch.StateView {
         userState: UserReducer.State
     ) {
         switch userState.status {
-        case .loading:
-            self.isLoadingUser = true
-        case .logout, .logged:
+        case .logout(let state):
+            self.isLoadingUser = state.isLoading
+        case .logged:
             self.isLoadingUser = false
         }
 
@@ -99,6 +104,14 @@ extension UserLoginViewWatch.StateView {
             self.errorMessageToDisplayText = nil
         case .some(.error(let error)):
             self.errorMessageToDisplayText = error.localizedDescription
+        }
+
+        if let logData = (/UserReducer.State.UserStatus.logout).extract(from: userState.status) {
+            self.password = logData.password
+            self.email = logData.email
+        } else {
+            self.password = ""
+            self.email = ""
         }
     }
 }
@@ -110,8 +123,12 @@ extension UserReducer.Action {
         switch userViewAction {
         case .tappedErrorAlert:
             self = .errorHandled
-        case .tappedLogingButton(let email, let password):
-            self = .login(.init(email: email, password: password))
+        case .tappedLogingButton:
+            self = .logoutUser(.login)
+        case .typedEmail(let email):
+            self = .logoutUser(.setEmail(email))
+        case .typedPassword(let password):
+            self = .logoutUser(.setPassword(password))
         }
     }
 }
@@ -150,7 +167,10 @@ struct UserLoginView_Previews: PreviewProvider {
             UserLoginViewWatch(
                 store:
                     Store(
-                        initialState: .init(status: .loading, route: nil),
+                        initialState: .init(
+                            status: .logout(.init(email: "", password: "", isLoading: true)),
+                            route: nil
+                        ),
                         reducer: UserReducer()
                     )
                     .scope(

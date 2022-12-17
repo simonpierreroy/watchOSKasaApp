@@ -56,7 +56,7 @@ extension DataDeviceEntry {
                                 .init(id: .init(rawValue: "child 1\($0)"), name: "child 1 of \($0)", state: false),
                                 .init(id: .init(rawValue: "child 2\($0)"), name: "child 1 of \($0)", state: false),
                             ] : [],
-                        state: false
+                        state: .relay(false)
                     )
                 }
                 .flatten()

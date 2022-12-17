@@ -42,7 +42,7 @@ extension Networking.App {
 
     public struct KasaDeviceAndSystemInfo {
         public let device: KasaDevice
-        public let info: KasaDeviceSystemInfo
+        public let info: APIResponse<KasaDeviceSystemInfo>
     }
 
     public struct KasaDeviceList: Codable {
@@ -82,12 +82,12 @@ extension Networking.App {
 
     public static func getDevices(token: Token) async throws -> KasaDeviceList {
         let request = Request<[String: String]>(method: .getDeviceList, params: [:])
-        return try await performResquest(request: request, queryItems: ["token": token.rawValue])
+        return try await performResquestToModel(request: request, queryItems: ["token": token.rawValue])
     }
 
     public static func getDevicesAndInfo(token: Token) async throws -> KasaDeviceList {
         let request = Request<[String: String]>(method: .getDeviceList, params: [:])
-        return try await performResquest(request: request, queryItems: ["token": token.rawValue])
+        return try await performResquestToModel(request: request, queryItems: ["token": token.rawValue])
     }
 
     public static func getDevicesAndSysInfo(token: Token) async throws -> [KasaDeviceAndSystemInfo] {
@@ -98,8 +98,8 @@ extension Networking.App {
 
             for device in mainDeviceList {
                 group.addTask {
-                    let info = try await getDeviceState(token: token, id: device.deviceId)
-                    return KasaDeviceAndSystemInfo.init(device: device, info: info)
+                    let info = try await getDeviceStateAPIResponse(token: token, id: device.deviceId)
+                    return KasaDeviceAndSystemInfo(device: device, info: info)
                 }
             }
 

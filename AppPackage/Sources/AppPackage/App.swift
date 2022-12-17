@@ -33,7 +33,7 @@ public struct AppReducer: ReducerProtocol {
             get {
                 var copy = self._devicesState
                 switch userState.status {
-                case .logout, .loading:
+                case .logout:
                     copy.token = nil
                 case .logged(let userState):
                     copy.token = userState.user.token

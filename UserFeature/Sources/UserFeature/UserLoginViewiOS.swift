@@ -21,8 +21,6 @@ public struct UserLoginViewiOS: View {
         self.store = store
     }
 
-    @State var email: String = ""
-    @State var password: String = ""
     private let store: Store<StateView, Action>
 
     public var body: some View {
@@ -32,14 +30,13 @@ public struct UserLoginViewiOS: View {
                 Text("Kasa").font(.largeTitle)
                 Image(systemName: "light.max").font(.largeTitle)
                 Spacer(minLength: 32)
-
                 VStack {
                     HStack {
                         Image(systemName: "person.icloud")
                             .font(.title2)
                         TextField(
                             Strings.logEmail.string,
-                            text: self.$email
+                            text: viewStore.binding(get: { $0.email }, send: Action.typedEmail)
                         )
                         .textContentType(.emailAddress)
 
@@ -52,8 +49,11 @@ public struct UserLoginViewiOS: View {
                         Image(systemName: "key.icloud")
                             .font(.title2)
 
-                        SecureField(Strings.logPassword.string, text: self.$password)
-                            .textContentType(.password)
+                        SecureField(
+                            Strings.logPassword.string,
+                            text: viewStore.binding(get: { $0.password }, send: Action.typedPassword)
+                        )
+                        .textContentType(.password)
                     }
                     .padding()
                     .background(Color.orange.opacity(0.2))
@@ -62,7 +62,7 @@ public struct UserLoginViewiOS: View {
                     Spacer(minLength: 16)
 
                     Button {
-                        viewStore.send(.tappedLogingButton(email: self.email, password: self.password))
+                        viewStore.send(.tappedLogingButton)
                     } label: {
                         LoadingView(.constant(viewStore.isLoadingUser)) {
                             Text(Strings.loginApp.key, bundle: .module)
@@ -103,11 +103,15 @@ extension UserLoginViewiOS {
     public struct StateView: Equatable {
         let errorMessageToDisplayText: String?
         let isLoadingUser: Bool
+        let email: String
+        let password: String
     }
 
-    public enum Action {
+    public enum Action: Equatable {
         case tappedErrorAlert
-        case tappedLogingButton(email: String, password: String)
+        case tappedLogingButton
+        case typedEmail(String)
+        case typedPassword(String)
     }
 }
 
@@ -116,9 +120,9 @@ extension UserLoginViewiOS.StateView {
         userState: UserReducer.State
     ) {
         switch userState.status {
-        case .loading:
-            self.isLoadingUser = true
-        case .logout, .logged:
+        case .logout(let state):
+            self.isLoadingUser = state.isLoading
+        case .logged:
             self.isLoadingUser = false
         }
 
@@ -127,6 +131,14 @@ extension UserLoginViewiOS.StateView {
             self.errorMessageToDisplayText = nil
         case .some(.error(let error)):
             self.errorMessageToDisplayText = error.localizedDescription
+        }
+
+        if let logData = (/UserReducer.State.UserStatus.logout).extract(from: userState.status) {
+            self.password = logData.password
+            self.email = logData.email
+        } else {
+            self.password = ""
+            self.email = ""
         }
     }
 }
@@ -138,8 +150,12 @@ extension UserReducer.Action {
         switch userViewAction {
         case .tappedErrorAlert:
             self = .errorHandled
-        case .tappedLogingButton(let email, let password):
-            self = .login(.init(email: email, password: password))
+        case .tappedLogingButton:
+            self = .logoutUser(.login)
+        case .typedEmail(let email):
+            self = .logoutUser(.setEmail(email))
+        case .typedPassword(let password):
+            self = .logoutUser(.setPassword(password))
         }
     }
 }
@@ -179,7 +195,10 @@ struct UserLoginView_Previews: PreviewProvider {
             UserLoginViewiOS(
                 store:
                     Store(
-                        initialState: .init(status: .loading, route: nil),
+                        initialState: .init(
+                            status: .logout(.init(email: "", password: "", isLoading: true)),
+                            route: nil
+                        ),
                         reducer: UserReducer()
                     )
                     .scope(
