@@ -169,7 +169,7 @@ public struct DevicesReducer: ReducerProtocol {
                         }
                     } catch: {
                         return .setError($0)
-                    }
+                    }.animation()
             case .doneClosingAll:
                 state.isLoading = .loaded
                 return .task { Action.fetchFromRemote }
