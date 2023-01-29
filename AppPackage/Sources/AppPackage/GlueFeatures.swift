@@ -12,7 +12,7 @@ struct GlueFeatures: ReducerProtocol {
     typealias State = AppReducer.State
     typealias Action = AppReducer.Action
 
-    func reduce(into state: inout State, action: Action) -> Effect<Action, Never> {
+    func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
         switch action {
         case .devicesAction(.logout):
             return .run { send in await send(.userAction(.loginUser(.logout)), animation: .default) }

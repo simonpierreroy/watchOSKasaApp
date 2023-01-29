@@ -96,7 +96,7 @@ public struct DeviceChildReducer: ReducerProtocol {
         public let name: String
     }
 
-    public func reduce(into state: inout State, action: Action) -> Effect<Action, Never> {
+    public func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
         switch action {
         case .toggleChild:
             // parent will take care of it
