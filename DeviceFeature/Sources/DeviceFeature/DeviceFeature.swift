@@ -26,7 +26,11 @@ public struct DevicesReducer: ReducerProtocol {
         case doneClosingAll
         case saveDevicesToCache
         case attempDeepLink(DevicesLink)
-        case logout
+        case delegate(Delegate)
+
+        public enum Delegate {
+            case logout
+        }
     }
 
     public struct State {
@@ -111,7 +115,7 @@ public struct DevicesReducer: ReducerProtocol {
                     return .task {
                         return .deviceDetail(
                             index: id,
-                            action: .deviceChild(index: childId, action: .toggleChild)
+                            action: .deviceChild(index: childId, action: .delegate(.toggleChild))
                         )
                     }
                 }
@@ -169,12 +173,13 @@ public struct DevicesReducer: ReducerProtocol {
                         }
                     } catch: {
                         return .setError($0)
-                    }.animation()
+                    }
+                    .animation()
             case .doneClosingAll:
                 state.isLoading = .loaded
                 return .task { Action.fetchFromRemote }
             case .deviceDetail: return .none
-            case .logout: return .none  // Will be provide by an other feature
+            case .delegate: return .none  // Will be provide by an other feature
             }
         }
         .forEach(\.devices, action: /Action.deviceDetail(index:action:)) {

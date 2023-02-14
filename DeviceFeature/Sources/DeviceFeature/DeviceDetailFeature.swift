@@ -62,7 +62,7 @@ public struct DeviceReducer: ReducerProtocol {
             case .errorHandled:
                 state.route = nil
                 return .none
-            case .deviceChild(let childId, .toggleChild):
+            case .deviceChild(let childId, .delegate(.toggleChild)):
                 guard let token = state.token, let child = state.children[id: childId], state.isLoading == false else {
                     return .none
                 }
@@ -86,8 +86,12 @@ public struct DeviceReducer: ReducerProtocol {
 public struct DeviceChildReducer: ReducerProtocol {
 
     public enum Action {
-        case toggleChild
         case didToggleChild(state: RelayIsOn)
+        case delegate(Delegate)
+
+        public enum Delegate {
+            case toggleChild
+        }
     }
 
     public struct State: Equatable, Identifiable {
@@ -98,8 +102,7 @@ public struct DeviceChildReducer: ReducerProtocol {
 
     public func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
         switch action {
-        case .toggleChild:
-            // parent will take care of it
+        case .delegate:
             return .none
         case .didToggleChild(let status):
             state.relay = status

@@ -14,9 +14,12 @@ struct GlueFeatures: ReducerProtocol {
 
     func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
         switch action {
-        case .devicesAction(.logout):
-            return .run { send in await send(.userAction(.loginUser(.logout)), animation: .default) }
-        default: return .none
+        case .devicesAction(.delegate(let delegated)):
+            switch delegated {
+            case .logout:
+                return .run { send in await send(.userAction(.loginUser(.logout)), animation: .default) }
+            }
+        case .delegate, .userAction, .devicesAction: return .none
         }
     }
 }

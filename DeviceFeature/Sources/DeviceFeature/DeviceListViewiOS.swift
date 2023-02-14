@@ -335,7 +335,7 @@ public struct DeviceChildViewiOS: View {
     public var body: some View {
         WithViewStore(self.store) { viewStore in
             Button {
-                viewStore.send(.toggleChild, animation: .default)
+                viewStore.send(.delegate(.toggleChild), animation: .default)
             } label: {
                 HStack {
                     let style = styleFor(relay: viewStore.relay)
@@ -411,7 +411,7 @@ extension DevicesReducer.Action {
         case .tappedCloseAll:
             self = .closeAll
         case .tappedLogout:
-            self = .logout
+            self = .delegate(.logout)
         }
     }
 }

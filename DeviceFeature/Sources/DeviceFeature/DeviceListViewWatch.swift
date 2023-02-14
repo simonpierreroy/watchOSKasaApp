@@ -121,7 +121,10 @@ struct DeviceDetailViewWatch: View {
         WithViewStore(self.store) { viewStore in
             Button {
                 if let child = viewStore.child {
-                    viewStore.send(.tappedDeviceChild(index: child.id, action: .toggleChild), animation: .default)
+                    viewStore.send(
+                        .tappedDeviceChild(index: child.id, action: .delegate(.toggleChild)),
+                        animation: .default
+                    )
                 } else {
                     viewStore.send(.tapped, animation: .default)
                 }
@@ -262,7 +265,7 @@ extension DevicesReducer.Action {
         case .tappedErrorAlert:
             self = .errorHandled
         case .tappedLogoutButton:
-            self = .logout
+            self = .delegate(.logout)
         case .tappedRefreshButton, .viewAppearReload:
             self = .fetchFromRemote
         case .tappedCloseAll:
