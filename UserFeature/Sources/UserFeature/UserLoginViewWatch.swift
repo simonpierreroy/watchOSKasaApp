@@ -33,12 +33,12 @@ public struct UserLoginViewWatch: View {
 
                 TextField(
                     Strings.logEmail.string,
-                    text: viewStore.binding(get: { $0.email }, send: Action.typedEmail)
+                    text: viewStore.binding(\.$email)
                 )
                 .textContentType(.emailAddress)
                 SecureField(
                     Strings.logPassword.string,
-                    text: viewStore.binding(get: { $0.password }, send: Action.typedPassword)
+                    text: viewStore.binding(\.$password)
                 )
                 .textContentType(.password)
 
@@ -46,8 +46,10 @@ public struct UserLoginViewWatch: View {
                     viewStore.send(.tappedLogingButton)
                 } label: {
                     LoadingView(.constant(viewStore.isLoadingUser)) {
-                        Image(systemName: "terminal")
-                        Text(Strings.loginApp.key, bundle: .module)
+                        HStack {
+                            Image(systemName: "arrow.right.square")
+                            Text(Strings.loginApp.key, bundle: .module)
+                        }
                     }
                 }
             }
@@ -76,47 +78,47 @@ extension UserLoginViewWatch {
     public struct StateView: Equatable {
         let errorMessageToDisplayText: String?
         let isLoadingUser: Bool
-        let email: String
-        let password: String
+        @BindingState var email: String
+        @BindingState var password: String
     }
 
-    public enum Action {
+    public enum Action: Equatable, BindableAction {
         case tappedErrorAlert
         case tappedLogingButton
-        case typedEmail(String)
-        case typedPassword(String)
+        case binding(BindingAction<StateView>)
     }
 }
 
 extension UserLoginViewWatch.StateView {
     public init(
-        userState: UserReducer.State
+        userLogoutState: UserLogoutReducer.State
     ) {
-        switch userState.status {
-        case .logout(let state):
-            self.isLoadingUser = state.isLoading
-        case .logged:
-            self.isLoadingUser = false
-        }
 
-        switch userState.route {
+        self.isLoadingUser = userLogoutState.isLoading
+        switch userLogoutState.route {
         case nil:
             self.errorMessageToDisplayText = nil
         case .some(.error(let error)):
             self.errorMessageToDisplayText = error.localizedDescription
         }
 
-        if let logData = (/UserReducer.State.UserStatus.logout).extract(from: userState.status) {
-            self.password = logData.password
-            self.email = logData.email
-        } else {
-            self.password = ""
-            self.email = ""
+        self.password = userLogoutState.password
+        self.email = userLogoutState.email
+    }
+}
+
+extension UserLogoutReducer.State {
+    // How to map binding state
+    fileprivate var viewBindingActionKey: UserLoginViewWatch.StateView {
+        get { .init(errorMessageToDisplayText: nil, isLoadingUser: false, email: self.email, password: self.password) }
+        set {
+            self.password = newValue.password
+            self.email = newValue.email
         }
     }
 }
 
-extension UserReducer.Action {
+extension UserLogoutReducer.Action {
     public init(
         userViewAction: UserLoginViewWatch.Action
     ) {
@@ -124,11 +126,9 @@ extension UserReducer.Action {
         case .tappedErrorAlert:
             self = .errorHandled
         case .tappedLogingButton:
-            self = .logoutUser(.login)
-        case .typedEmail(let email):
-            self = .logoutUser(.setEmail(email))
-        case .typedPassword(let password):
-            self = .logoutUser(.setPassword(password))
+            self = .login
+        case .binding(let action):
+            self = .binding(action.pullback(\.viewBindingActionKey))
         }
     }
 }
@@ -141,11 +141,11 @@ struct UserLoginView_Previews: PreviewProvider {
                 store:
                     Store(
                         initialState: .empty,
-                        reducer: UserReducer()
+                        reducer: UserLogoutReducer()
                     )
                     .scope(
-                        state: UserLoginViewWatch.StateView.init(userState:),
-                        action: UserReducer.Action.init(userViewAction:)
+                        state: UserLoginViewWatch.StateView.init(userLogoutState:),
+                        action: UserLogoutReducer.Action.init(userViewAction:)
                     )
             )
             .previewDisplayName("Login")
@@ -154,11 +154,11 @@ struct UserLoginView_Previews: PreviewProvider {
                 store:
                     Store(
                         initialState: .empty,
-                        reducer: UserReducer()
+                        reducer: UserLogoutReducer()
                     )
                     .scope(
-                        state: UserLoginViewWatch.StateView.init(userState:),
-                        action: UserReducer.Action.init(userViewAction:)
+                        state: UserLoginViewWatch.StateView.init(userLogoutState:),
+                        action: UserLogoutReducer.Action.init(userViewAction:)
                     )
             )
             .environment(\.locale, .init(identifier: "fr"))
@@ -167,15 +167,12 @@ struct UserLoginView_Previews: PreviewProvider {
             UserLoginViewWatch(
                 store:
                     Store(
-                        initialState: .init(
-                            status: .logout(.init(email: "", password: "", isLoading: true)),
-                            route: nil
-                        ),
-                        reducer: UserReducer()
+                        initialState: .init(email: "", password: "", isLoading: true),
+                        reducer: UserLogoutReducer()
                     )
                     .scope(
-                        state: UserLoginViewWatch.StateView.init(userState:),
-                        action: UserReducer.Action.init(userViewAction:)
+                        state: UserLoginViewWatch.StateView.init(userLogoutState:),
+                        action: UserLogoutReducer.Action.init(userViewAction:)
                     )
             )
             .previewDisplayName("Loading")

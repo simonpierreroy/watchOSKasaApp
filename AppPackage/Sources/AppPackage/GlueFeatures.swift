@@ -17,7 +17,7 @@ struct GlueFeatures: ReducerProtocol {
         case .devicesAction(.delegate(let delegated)):
             switch delegated {
             case .logout:
-                return .run { send in await send(.userAction(.loginUser(.logout)), animation: .default) }
+                return .run { send in await send(.userAction(.loggedUser(.delegate(.logout))), animation: .default) }
             }
         case .delegate, .userAction, .devicesAction: return .none
         }

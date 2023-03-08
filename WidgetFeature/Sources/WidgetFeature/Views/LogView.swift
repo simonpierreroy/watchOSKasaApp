@@ -41,6 +41,17 @@ struct LogoutView: View {
         }
     }
 
+    static func imageFont(widgetFamily: WidgetFamily) -> Font {
+        switch widgetFamily {
+        case .accessoryRectangular:
+            return .body
+        case .systemMedium, .systemSmall, .systemLarge, .systemExtraLarge, .accessoryInline, .accessoryCircular:
+            return .largeTitle
+        @unknown default:
+            return .largeTitle
+        }
+    }
+
     var body: some View {
         ZStack {
             if LogoutView.showBackground(widgetFamily: widgetFamily) {
@@ -48,8 +59,8 @@ struct LogoutView: View {
                     .blur(radius: 4.0)
             }
             VStack {
-                Image(systemName: "keyboard")
-                    .font(.largeTitle)
+                Image(systemName: "person.crop.circle.badge.exclamationmark")
+                    .font(LogoutView.imageFont(widgetFamily: widgetFamily))
                 if LogoutView.showText(widgetFamily: widgetFamily) {
                     Text(Strings.notLogged.key, bundle: .module)
                 }

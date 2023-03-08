@@ -10,69 +10,50 @@ public struct UserReducer: ReducerProtocol {
     public init() {}
 
     public enum Action {
-        case errorHandled
-        case loginUser(UserLoginReducer.Action)
+        case loggedUser(UserLoggedReducer.Action)
         case logoutUser(UserLogoutReducer.Action)
     }
 
-    public struct State {
-        public static let empty = Self(
-            status: .logout(.empty),
-            route: nil
-        )
-
-        public enum UserStatus {
-            case logged(UserLoginReducer.State)
-            case logout(UserLogoutReducer.State)
-        }
-
-        public enum Route {
-            case error(Error)
-        }
-
-        public var status: UserStatus
-        public var route: Route?
+    public enum State {
+        public static let empty = Self.logout(.empty)
+        case logged(UserLoggedReducer.State)
+        case logout(UserLogoutReducer.State)
     }
 
     public var body: some ReducerProtocol<State, Action> {
-        Scope(state: \.status, action: .self) {
-            EmptyReducer()
-                .ifCaseLet(/State.UserStatus.logout, action: /Action.logoutUser) {
-                    UserLogoutReducer()
-                }
-                .ifCaseLet(/State.UserStatus.logged, action: /Action.loginUser) {
-                    UserLoginReducer()
-                }
-        }
         Reduce { state, action in
             switch action {
-            case .errorHandled:
-                state.route = nil
+            case .loggedUser(.delegate(.logout)):
+                state = .logout(.empty)
                 return .none
-            case .logoutUser(.setError(let error)):
-                state.route = .error(error)
-                return .none
-            case .loginUser(.logout):
-                state.status = .logout(.empty)
-                return .none
-            case .logoutUser(.setUser(let user)):
-                state.status = .logged(.init(user: user))
-                return .task { .loginUser(.save) }
-            case .logoutUser, .loginUser:
+            case .logoutUser(.delegate(.setUser(let user))):
+                state = .logged(.init(user: user))
+                return .task { .loggedUser(.save) }
+            case .logoutUser, .loggedUser:
                 return .none
             }
+        }
+        .ifCaseLet(/State.logout, action: /Action.logoutUser) {
+            UserLogoutReducer()
+        }
+        .ifCaseLet(/State.logged, action: /Action.loggedUser) {
+            UserLoggedReducer()
         }
     }
 }
 
-public struct UserLoginReducer: ReducerProtocol {
+public struct UserLoggedReducer: ReducerProtocol {
     public struct State: Equatable {
         public var user: User
     }
 
     public enum Action {
+        public enum Delegate {
+            case logout
+        }
+
         case save
-        case logout
+        case delegate(Delegate)
     }
 
     @Dependency(\.userCache) var userCache
@@ -85,7 +66,7 @@ public struct UserLoginReducer: ReducerProtocol {
                 await userCache.save(user)
                 await reloadAppExtensions()
             }
-        case .logout:
+        case .delegate(.logout):
             return .run { send in
                 await userCache.save(nil)
                 await reloadAppExtensions()
@@ -97,61 +78,76 @@ public struct UserLoginReducer: ReducerProtocol {
 public struct UserLogoutReducer: ReducerProtocol {
 
     public struct State {
-        public static let empty = State(email: "", password: "", isLoading: false)
-        public var email: String
-        public var password: String
+        public static let empty = State(email: "", password: "", isLoading: false, route: nil)
+        public enum Route {
+            case error(Error)
+        }
+
+        @BindingState public var email: String
+        @BindingState public var password: String
         public var isLoading: Bool
+        public var route: Route?
+
     }
 
-    public enum Action {
-        case setEmail(String)
-        case setPassword(String)
-        case resetEmailPassword
+    public enum Action: BindableAction {
+
+        public enum Delegate {
+            case setUser(User)
+        }
+
         case login
-        case setError(Error)
-        case setUser(User)
+        case noUserInCacheFound
         case loadSavedUser
+        case setError(Error)
+        case errorHandled
+        case delegate(Delegate)
+        case binding(BindingAction<State>)
     }
 
     @Dependency(\.userClient) var client
     @Dependency(\.userCache) var userCache
     @Dependency(\.reloadAppExtensions) var reloadAppExtensions
 
-    public func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
-        switch action {
-        case .setEmail(let email):
-            guard email != state.email else { return .none }
-            state.email = email
-            return .none
-        case .setPassword(let password):
-            guard password != state.password else { return .none }
-            state.password = password
-            return .none
-        case .resetEmailPassword:
-            state.email = ""
-            state.password = ""
-            return .none
-        case .login:
-            state.isLoading = true
-            let credential = User.Credential(email: state.email, password: state.password)
-            return
-                .run { send in
-                    let token = try await client.login(credential).token
-                    await send(.setUser(.init(token: token)), animation: .default)
-                } catch: { error, send in
-                    await send(.setError(error))
+    public var body: some ReducerProtocol<State, Action> {
+        BindingReducer()
+        Reduce { state, action in
+            switch action {
+            case .login:
+                state.isLoading = true
+                let credential = User.Credential(email: state.email, password: state.password)
+                return
+                    .run { send in
+                        let token = try await client.login(credential).token
+                        await send(.delegate(.setUser(.init(token: token))), animation: .default)
+                    } catch: { error, send in
+                        await send(.setError(error))
+                    }
+            case .loadSavedUser:
+                state.isLoading = true
+                return .run { send in
+                    guard let user = await userCache.load() else {
+                        await send(.noUserInCacheFound)
+                        return
+                    }
+                    await send(.delegate(.setUser(user)))
                 }
-        case .loadSavedUser:
-            return .run { send in
-                guard let user = await userCache.load() else { return }
-                await send(.setUser(user))
+            case .noUserInCacheFound:
+                state.isLoading = false
+                return .none
+            case .delegate(.setUser):
+                state.isLoading = false
+                return .none
+            case .setError(let error):
+                state.isLoading = false
+                state.route = .error(error)
+                return .none
+            case .errorHandled:
+                state.route = nil
+                return .none
+            case .binding:
+                return .none
             }
-        case .setUser:
-            state.isLoading = false
-            return .run { _ in await reloadAppExtensions() }
-        case .setError:
-            state.isLoading = false
-            return .none
         }
     }
 }

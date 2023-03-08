@@ -22,7 +22,7 @@ struct AppDelegateReducer: ReducerProtocol {
         case .delegate(.applicationDidFinishLaunching):
             return .task { .userAction(.logoutUser(.loadSavedUser)) }
         case .delegate(.applicationWillTerminate), .delegate(.applicationWillResignActive):
-            return .task { .userAction(.loginUser(.save)) }
+            return .task { .userAction(.loggedUser(.save)) }
         case .delegate(.openURLContexts(let urls)):
             for url in urls {
                 if let link = try? parse(url) {

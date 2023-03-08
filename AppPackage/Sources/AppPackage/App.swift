@@ -32,7 +32,7 @@ public struct AppReducer: ReducerProtocol {
         public var devicesState: DevicesReducer.State {
             get {
                 var copy = self._devicesState
-                switch userState.status {
+                switch userState {
                 case .logout:
                     copy.token = nil
                 case .logged(let userState):

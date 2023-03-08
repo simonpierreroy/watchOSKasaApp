@@ -179,7 +179,10 @@ public struct DevicesReducer: ReducerProtocol {
                 state.isLoading = .loaded
                 return .task { Action.fetchFromRemote }
             case .deviceDetail: return .none
-            case .delegate: return .none  // Will be provide by an other feature
+            case .delegate(.logout):
+                state.devices = []
+                state.token = nil
+                return .task { .saveDevicesToCache }  // Will be provide by an other feature
             }
         }
         .forEach(\.devices, action: /Action.deviceDetail(index:action:)) {
