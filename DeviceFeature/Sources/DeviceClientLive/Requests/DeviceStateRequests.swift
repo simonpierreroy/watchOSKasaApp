@@ -12,12 +12,6 @@ import Foundation
 import KasaCore
 import KasaNetworking
 
-extension Token {
-    func queryItem() -> [String: String] {
-        return ["token": self.rawValue]
-    }
-}
-
 extension Networking.App.Method {
     fileprivate static let passthrough = Self(endpoint: "passthrough")
 }

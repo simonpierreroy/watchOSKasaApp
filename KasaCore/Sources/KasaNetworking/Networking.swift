@@ -16,13 +16,13 @@ public enum Networking {
         case get = "GET"
     }
 
-    static let defaultWorkQueue = DispatchQueue(
+    private static let defaultWorkQueue = DispatchQueue(
         label: "Networking.defaultWorkQueue",
         qos: .userInitiated,
         attributes: .concurrent
     )
 
-    static func fetcher(
+    private static func fetcher(
         urlSession: URLSession,
         urlResquest: URLRequest,
         workQueue: DispatchQueue = defaultWorkQueue
@@ -65,6 +65,12 @@ public enum Networking {
                 }
                 .flatMap(^\URLComponents.url)
         }
+    }
+}
+
+extension URLComponents {
+    fileprivate static func from(url: URL) -> URLComponents? {
+        URLComponents.init(url: url, resolvingAgainstBaseURL: true)
     }
 }
 

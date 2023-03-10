@@ -10,14 +10,20 @@ import ComposableArchitecture
 import Foundation
 import KasaCore
 
+extension Token {
+    public func queryItem() -> [String: String] {
+        return ["token": self.rawValue]
+    }
+}
+
 extension Networking {
 
     public enum App {
 
-        static let baseUrl = URL(string: "https://use1-wap.tplinkcloud.com")!
-        static let decoder = JSONDecoder()
-        static let encoder = JSONEncoder()
-        static let session = URLSession(configuration: .default)
+        private static let baseUrl = URL(string: "https://use1-wap.tplinkcloud.com")!
+        private static let decoder = JSONDecoder()
+        private static let encoder = JSONEncoder()
+        private static let session = URLSession(configuration: .default)
 
         public struct ResponseError: Error {
             public let code: Int
@@ -26,7 +32,7 @@ extension Networking {
 
         public typealias APIResponse<Model> = Result<Model, ResponseError>
 
-        struct Response<Model: Decodable>: Decodable {
+        private struct Response<Model: Decodable>: Decodable {
             enum CodingKeys: String, CodingKey {
                 case errorCode = "error_code"
                 case message = "msg"
@@ -81,25 +87,25 @@ extension Networking {
             public let params: Param
         }
 
-        static func responseToModel<Model: Decodable>(_ response: Response<Model>) throws -> Model {
+        private static func responseToModel<Model: Decodable>(_ response: Response<Model>) throws -> Model {
             guard let result = response.result else {
                 throw Networking.CodeError(statusCode: response.errorCode)
             }
             return result
         }
 
-        static func responseToAPIResponse<Model: Decodable>(_ response: Response<Model>) -> APIResponse<Model> {
+        private static func responseToAPIResponse<Model: Decodable>(_ response: Response<Model>) -> APIResponse<Model> {
             guard let result = response.result else {
                 return .failure(.init(code: response.errorCode, message: response.message ?? ""))
             }
             return .success(result)
         }
 
-        static let baseRequest =
+        private static let baseRequest =
             guaranteeHeaders
             <> setHeader("Content-Type", "application/json")
 
-        static func performResquest<ModelRequest: Encodable, ModelForResponse: Decodable>(
+        private static func performResquest<ModelRequest: Encodable, ModelForResponse: Decodable>(
             requestInfo: RequestInfo<ModelRequest>
         ) async throws -> Response<ModelForResponse> {
 
@@ -142,11 +148,5 @@ extension Networking {
             )
             return responseToAPIResponse(response)
         }
-    }
-}
-
-extension URLComponents {
-    static func from(url: URL) -> URLComponents? {
-        URLComponents.init(url: url, resolvingAgainstBaseURL: true)
     }
 }
