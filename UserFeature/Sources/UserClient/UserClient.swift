@@ -38,3 +38,16 @@ extension UserClient {
         }
     }
 }
+
+#if DEBUG
+private struct MockUserClientError: Error {}
+
+extension UserClient {
+    public static func mockFailed(waitFor delay: Duration = .seconds(2)) -> Self {
+        Self { _ in
+            try await taskSleep(for: delay)
+            throw MockUserClientError()
+        }
+    }
+}
+#endif

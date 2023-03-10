@@ -72,6 +72,10 @@ extension DevicesClient {
             }
         )
     }
+}
+
+#if DEBUG
+extension DevicesClient {
 
     public static func devicesEnvError(
         waitFor delay: Duration = .seconds(2),
@@ -100,3 +104,4 @@ extension DevicesClient {
         )
     }
 }
+#endif

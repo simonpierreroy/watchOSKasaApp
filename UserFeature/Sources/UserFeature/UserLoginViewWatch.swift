@@ -31,29 +31,32 @@ public struct UserLoginViewWatch: View {
                     .foregroundColor(Color.orange)
                     .padding()
 
-                TextField(
-                    Strings.logEmail.string,
-                    text: viewStore.binding(\.$email)
-                )
-                .textContentType(.emailAddress)
-                SecureField(
-                    Strings.logPassword.string,
-                    text: viewStore.binding(\.$password)
-                )
-                .textContentType(.password)
+                Group {
+                    TextField(
+                        Strings.logEmail.string,
+                        text: viewStore.binding(\.$email)
+                    )
+                    .textContentType(.emailAddress)
+                    SecureField(
+                        Strings.logPassword.string,
+                        text: viewStore.binding(\.$password)
+                    )
+                    .textContentType(.password)
 
-                Button {
-                    viewStore.send(.tappedLogingButton)
-                } label: {
-                    LoadingView(.constant(viewStore.isLoadingUser)) {
-                        HStack {
-                            Image(systemName: "arrow.right.square")
-                            Text(Strings.loginApp.key, bundle: .module)
+                    Button {
+                        viewStore.send(.tappedLogingButton)
+                    } label: {
+                        LoadingView(.constant(viewStore.isLoadingUser)) {
+                            HStack {
+                                Image(systemName: "arrow.right.square")
+                                Text(Strings.loginApp.key, bundle: .module)
+                            }
                         }
                     }
                 }
+                .disabled(viewStore.isLoadingUser)
             }
-            .disabled(viewStore.isLoadingUser)
+
             .alert(
                 item: viewStore.binding(
                     get: { $0.errorMessageToDisplayText.map(AlertInfo.init(title:)) },
@@ -149,6 +152,19 @@ struct UserLoginView_Previews: PreviewProvider {
                     )
             )
             .previewDisplayName("Login")
+
+            UserLoginViewWatch(
+                store:
+                    Store(
+                        initialState: .empty,
+                        reducer: UserLogoutReducer().dependency(\.userClient, .mockFailed())
+                    )
+                    .scope(
+                        state: UserLoginViewWatch.StateView.init(userLogoutState:),
+                        action: UserLogoutReducer.Action.init(userViewAction:)
+                    )
+            )
+            .previewDisplayName("Login Failed")
 
             UserLoginViewWatch(
                 store:

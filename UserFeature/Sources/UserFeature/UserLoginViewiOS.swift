@@ -78,10 +78,10 @@ public struct UserLoginViewiOS: View {
                     .background(Color.green.opacity(0.2))
                     .cornerRadius(32)
                 }
+                .disabled(viewStore.isLoadingUser)
                 .frame(maxWidth: 500).padding()
             }
             .frame(maxWidth: .infinity)
-            .disabled(viewStore.isLoadingUser)
             .alert(
                 item: viewStore.binding(
                     get: { $0.errorMessageToDisplayText.map(AlertInfo.init(title:)) },
@@ -180,6 +180,21 @@ struct UserLoginView_Previews: PreviewProvider {
             )
             .preferredColorScheme(.dark)
             .previewDisplayName("Login")
+
+            UserLoginViewiOS(
+                store:
+                    Store(
+                        initialState: .empty,
+                        reducer: UserLogoutReducer()
+                            .dependency(\.userClient, .mockFailed())
+                    )
+                    .scope(
+                        state: UserLoginViewiOS.StateView.init(userLogoutState:),
+                        action: UserLogoutReducer.Action.init(userViewAction:)
+                    )
+            )
+            .preferredColorScheme(.dark)
+            .previewDisplayName("Login Failed")
 
             UserLoginViewiOS(
                 store:
