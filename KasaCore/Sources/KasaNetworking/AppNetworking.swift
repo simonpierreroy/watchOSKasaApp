@@ -37,22 +37,48 @@ extension Networking {
             let result: Model?
         }
 
-        enum EndPoint: String, Encodable {
-            case passthrough
-            case getDeviceList
-            case login
+        public struct Method: Hashable {
+            public init(
+                endpoint: String
+            ) {
+                self.endpoint = endpoint
+            }
+            let endpoint: String
+        }
 
-            func httpMethod() -> Networking.HTTP {
-                switch self {
-                case .login, .passthrough, .getDeviceList:
-                    return .post
-                }
+        public struct RequestInfo<Param: Encodable> {
+            public init(
+                method: Method,
+                params: Param,
+                queryItems: [String: String],
+                httpMethod: Networking.HTTP
+            ) {
+                self.method = method
+                self.params = params
+                self.queryItems = queryItems
+                self.httpMethod = httpMethod
+            }
+
+            public let method: Method
+            public let params: Param
+            public let queryItems: [String: String]
+            public let httpMethod: Networking.HTTP
+
+            fileprivate func getRequest() -> Request<Param> {
+                return .init(method: self.method.endpoint, params: self.params)
             }
         }
 
-        struct Request<Param: Encodable>: Encodable {
-            let method: EndPoint
-            let params: Param
+        fileprivate struct Request<Param: Encodable>: Encodable {
+            public init(
+                method: String,
+                params: Param
+            ) {
+                self.method = method
+                self.params = params
+            }
+            public let method: String
+            public let params: Param
         }
 
         static func responseToModel<Model: Decodable>(_ response: Response<Model>) throws -> Model {
@@ -74,12 +100,11 @@ extension Networking {
             <> setHeader("Content-Type", "application/json")
 
         static func performResquest<ModelRequest: Encodable, ModelForResponse: Decodable>(
-            request: Request<ModelRequest>,
-            queryItems: [String: String]
+            requestInfo: RequestInfo<ModelRequest>
         ) async throws -> Response<ModelForResponse> {
 
-            let data = try Networking.App.encoder.encode(request)
-            let endpointQuerry = baseUrl |> Networking.setQuery(items: queryItems)
+            let data = try Networking.App.encoder.encode(requestInfo.getRequest())
+            let endpointQuerry = baseUrl |> Networking.setQuery(items: requestInfo.queryItems)
 
             guard let endpoint = endpointQuerry else {
                 throw Networking.ResquestError(errorDescription: "Invalid endpoint query items")
@@ -87,7 +112,7 @@ extension Networking {
 
             let request =
                 URLRequest(url: endpoint)
-                |> mut(^\.httpMethod, request.method.httpMethod().rawValue)
+                |> mut(^\.httpMethod, requestInfo.httpMethod.rawValue)
                 <> baseRequest
                 <> mut(^\.httpBody, data)
 
@@ -100,24 +125,20 @@ extension Networking {
             return response
         }
 
-        static func performResquestToModel<ModelRequest: Encodable, ModelForResponse: Decodable>(
-            request: Request<ModelRequest>,
-            queryItems: [String: String]
+        public static func performResquestToModel<ModelRequest: Encodable, ModelForResponse: Decodable>(
+            requestInfo: RequestInfo<ModelRequest>
         ) async throws -> ModelForResponse {
             let response: Response<ModelForResponse> = try await performResquest(
-                request: request,
-                queryItems: queryItems
+                requestInfo: requestInfo
             )
             return try responseToModel(response)
         }
 
-        static func performResquestToAPIResponse<ModelRequest: Encodable, ModelForResponse: Decodable>(
-            request: Request<ModelRequest>,
-            queryItems: [String: String]
+        public static func performResquestToAPIResponse<ModelRequest: Encodable, ModelForResponse: Decodable>(
+            requestInfo: RequestInfo<ModelRequest>
         ) async throws -> APIResponse<ModelForResponse> {
             let response: Response<ModelForResponse> = try await performResquest(
-                request: request,
-                queryItems: queryItems
+                requestInfo: requestInfo
             )
             return responseToAPIResponse(response)
         }

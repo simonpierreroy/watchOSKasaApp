@@ -8,15 +8,14 @@
 
 import Foundation
 import SwiftUI
-import WatchKit
 
 @main
-struct KasaWatchAppApp: App {
-    @WKApplicationDelegateAdaptor private var extensionDelegate: KasaWatchAppDelegate
+struct KasaApp: App {
+    @UIApplicationDelegateAdaptor private var appDelegate: AppDelegate
 
     var body: some Scene {
         WindowGroup {
-            ContentView(store: KasaWatchAppDelegate.store)
+            ContentView(store: AppDelegate.store)
         }
     }
 }

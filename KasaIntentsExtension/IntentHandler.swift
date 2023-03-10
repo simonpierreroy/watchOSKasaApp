@@ -13,7 +13,7 @@ import WidgetClient
 import WidgetClientLive
 import WidgetFeature
 
-class IntentHandler: INExtension {
+final class IntentHandler: INExtension {
 
     @Dependency(\.userCache.loadBlocking) var loadUser
     @Dependency(\.devicesCache.loadBlocking) var loadDevices
@@ -21,7 +21,6 @@ class IntentHandler: INExtension {
     override func handler(for intent: INIntent) -> Any {
         return self
     }
-
 }
 
 extension IntentHandler: SelectDevicesIntentHandling {

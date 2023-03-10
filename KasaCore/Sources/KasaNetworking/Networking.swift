@@ -11,7 +11,7 @@ import KasaCore
 
 public enum Networking {
 
-    enum HTTP: String {
+    public enum HTTP: String {
         case post = "POST"
         case get = "GET"
     }
@@ -70,14 +70,19 @@ public enum Networking {
 
 extension Networking {
 
-    struct ResquestError: LocalizedError {
-        var errorDescription: String?
+    public struct ResquestError: LocalizedError {
+        public init(
+            errorDescription: String
+        ) {
+            self.errorDescription = errorDescription
+        }
+        public var errorDescription: String?
     }
 
-    struct CodeError: LocalizedError {
-        let statusCode: Int
+    public struct CodeError: LocalizedError {
+        public let statusCode: Int
 
-        var errorDescription: String? {
+        public var errorDescription: String? {
             return "Request was not completed successfully (status code: \(self.statusCode))."
         }
     }

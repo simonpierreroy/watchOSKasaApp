@@ -7,8 +7,20 @@
 //
 
 import ComposableArchitecture
+import DeviceClient
 import Foundation
 import KasaCore
+import KasaNetworking
+
+extension Token {
+    func queryItem() -> [String: String] {
+        return ["token": self.rawValue]
+    }
+}
+
+extension Networking.App.Method {
+    fileprivate static let passthrough = Self(endpoint: "passthrough")
+}
 
 extension Networking.App {
 
@@ -121,20 +133,21 @@ extension Networking.App {
 
 extension Networking.App {
 
-    public static func getDeviceState(
+    static func getDeviceState(
         token: Token,
         id: DeviceID
     ) async throws -> KasaDeviceSystemInfo {
 
-        let request = Request<DeviceStateParam>
+        let request = RequestInfo<DeviceStateParam>
             .init(
                 method: .passthrough,
-                params: .init(deviceId: id.rawValue)
+                params: .init(deviceId: id.rawValue),
+                queryItems: token.queryItem(),
+                httpMethod: .post
             )
 
         let deviceStateResponse: DeviceStateResponse = try await performResquestToModel(
-            request: request,
-            queryItems: ["token": token.rawValue]
+            requestInfo: request
         )
 
         return deviceStateResponse.responseData.wrapping.system.info
@@ -145,21 +158,22 @@ extension Networking.App {
         id: DeviceID
     ) async throws -> APIResponse<KasaDeviceSystemInfo> {
 
-        let request = Request<DeviceStateParam>
+        let request = RequestInfo<DeviceStateParam>
             .init(
                 method: .passthrough,
-                params: .init(deviceId: id.rawValue)
+                params: .init(deviceId: id.rawValue),
+                queryItems: token.queryItem(),
+                httpMethod: .post
             )
 
         let deviceStateResponse: APIResponse<DeviceStateResponse> = try await performResquestToAPIResponse(
-            request: request,
-            queryItems: ["token": token.rawValue]
+            requestInfo: request
         )
 
         return deviceStateResponse.map(\.responseData.wrapping.system.info)
     }
 
-    public static func tryToGetDeviceRelayState(
+    static func tryToGetDeviceRelayState(
         token: Token,
         id: DeviceID,
         childId: DeviceID?
@@ -183,7 +197,7 @@ extension Networking.App {
         return try getRelayState(from: rawRelayState)
     }
 
-    public static func changeDeviceRelayState(
+    static func changeDeviceRelayState(
         token: Token,
         id: DeviceID,
         childId: DeviceID?,
@@ -193,18 +207,19 @@ extension Networking.App {
         let children: [DeviceID]
         if let childId = childId { children = [childId] } else { children = [] }
 
-        let request = Request<ChangeDeviceStateParam>(
+        let request = RequestInfo<ChangeDeviceStateParam>(
             method: .passthrough,
             params: .init(
                 deviceId: id,
                 state: state,
                 children: children
-            )
+            ),
+            queryItems: token.queryItem(),
+            httpMethod: .post
         )
 
         let deviceStateResponse: ChangeDeviceStateResponse = try await performResquestToModel(
-            request: request,
-            queryItems: ["token": token.rawValue]
+            requestInfo: request
         )
 
         guard deviceStateResponse.responseData.wrapping.system.state.errorCode == 0 else {
@@ -214,8 +229,7 @@ extension Networking.App {
         return state
     }
 
-    public static func toggleDeviceRelayState(token: Token, id: DeviceID, childId: DeviceID?) async throws -> RelayIsOn
-    {
+    static func toggleDeviceRelayState(token: Token, id: DeviceID, childId: DeviceID?) async throws -> RelayIsOn {
         let state = try await tryToGetDeviceRelayState(token: token, id: id, childId: childId)
         try Task.checkCancellation()
         return try await changeDeviceRelayState(token: token, id: id, childId: childId, state: state.toggle())

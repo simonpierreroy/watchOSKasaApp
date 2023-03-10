@@ -158,17 +158,17 @@ extension JSONValue: ExpressibleByDictionaryLiteral {
 let rawEncoder = JSONEncoder()
 let rawDecoder = JSONDecoder()
 
-struct RawStringJSONContainer<Model: Codable>: Codable {
+public struct RawStringJSONContainer<Model: Codable>: Codable {
 
-    init(
+    public init(
         wrapping: Model
     ) {
         self.wrapping = wrapping
     }
 
-    let wrapping: Model
+    public let wrapping: Model
 
-    func encode(to encoder: Encoder) throws {
+    public func encode(to encoder: Encoder) throws {
         var container = encoder.singleValueContainer()
         let data = try rawEncoder.encode(self.wrapping)
         guard let rawString = String(bytes: data, encoding: .utf8) else {
@@ -184,7 +184,7 @@ struct RawStringJSONContainer<Model: Codable>: Codable {
         try container.encode(rawString)
     }
 
-    init(
+    public init(
         from decoder: Decoder
     ) throws {
         let container = try decoder.singleValueContainer()

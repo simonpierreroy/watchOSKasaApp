@@ -15,7 +15,7 @@ import KasaCore
 import SwiftUI
 import UIKit
 
-class SceneDelegate: UIResponder, UIWindowSceneDelegate {
+final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     private static let viewStore: ViewStore<Void, AppReducer.Action> = {
         ViewStore(

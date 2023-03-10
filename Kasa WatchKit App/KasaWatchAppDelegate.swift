@@ -16,7 +16,7 @@ import UserClient
 import UserClientLive
 import WatchKit
 
-class KasaWatchAppDelegate: NSObject, WKApplicationDelegate {
+final class KasaWatchAppDelegate: NSObject, WKApplicationDelegate {
 
     static let store = StoreOf<AppReducer>(
         initialState: .empty,

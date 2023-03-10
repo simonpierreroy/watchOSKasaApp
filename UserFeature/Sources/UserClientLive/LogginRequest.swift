@@ -8,24 +8,21 @@
 
 import ComposableArchitecture
 import Foundation
-import KasaCore
+import KasaNetworking
+
+extension Networking.App.Method {
+    fileprivate static let login = Self(endpoint: "login")
+}
 
 extension Networking.App {
 
-    public struct Credential: Codable, Equatable {
-        public init(
-            email: String,
-            password: String
-        ) {
-            self.email = email
-            self.password = password
-        }
+    struct Credential: Codable, Equatable {
         let email: String
         let password: String
     }
 
-    public struct LoggedUserInfo: Codable {
-        public let token: String
+    struct LoggedUserInfo: Codable {
+        let token: String
     }
 
     private struct LoginParam: Encodable {
@@ -35,17 +32,19 @@ extension Networking.App {
         let terminalUUID: UUID
     }
 
-    public static func login(cred: Credential) async throws -> LoggedUserInfo {
+    static func login(cred: Credential) async throws -> LoggedUserInfo {
 
-        let params = Request<LoginParam>(
+        let requestInfo = RequestInfo<LoginParam>(
             method: .login,
             params: .init(
                 cloudUserName: cred.email,
                 cloudPassword: cred.password,
                 terminalUUID: .init()
-            )
+            ),
+            queryItems: [:],
+            httpMethod: .post
         )
 
-        return try await performResquestToModel(request: params, queryItems: [:])
+        return try await performResquestToModel(requestInfo: requestInfo)
     }
 }
