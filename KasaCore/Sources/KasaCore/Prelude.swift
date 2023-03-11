@@ -3,7 +3,6 @@
 //  Prelude
 //
 //  Created by Simon-Pierre Roy on 9/24/19.
-//  Copyright © 2019 Wayfair. All rights reserved.
 //
 
 import Combine

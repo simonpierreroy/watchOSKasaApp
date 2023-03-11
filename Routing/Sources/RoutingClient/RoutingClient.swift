@@ -29,11 +29,11 @@ public struct URLRouter {
 
 extension URLRouter: TestDependencyKey {
     public static var testValue = URLRouter(
-        parse: XCTUnimplemented("\(Self.self).parse", placeholder: .devices(.closeAll)),
+        parse: XCTUnimplemented("\(Self.self).parse", placeholder: .devices(.turnOffAllDevices)),
         print: XCTUnimplemented("\(Self.self).print", placeholder: .mock)
     )
 
-    public static let previewValue = URLRouter.mock(link: .devices(.closeAll), print: nil)
+    public static let previewValue = URLRouter.mock(link: .devices(.turnOffAllDevices), print: nil)
 }
 
 extension DependencyValues {

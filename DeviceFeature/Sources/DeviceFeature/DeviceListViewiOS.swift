@@ -65,7 +65,7 @@ private struct DeviceListViewSideBar: View {
 
     private enum ListSideBar: CaseIterable, Hashable, Identifiable {
         case refresh
-        case closeAll
+        case turnOffAll
         case logout
 
         var id: Int {
@@ -110,15 +110,15 @@ private struct DeviceListViewSideBar: View {
                             Text(Strings.logoutApp.key, bundle: .module)
                         }
                     }
-                case .closeAll:
+                case .turnOffAll:
                     Button {
-                        viewStore.send(.tappedCloseAll, animation: .default)
+                        viewStore.send(.tappedTurnOfAll, animation: .default)
                     } label: {
                         LoadingView(.constant(viewStore.isRefreshingDevices == .closingAll)) {
                             HStack {
                                 Image(systemName: "moon.fill")
                                     .foregroundColor(imageColor(viewStore.isRefreshingDevices.isInFlight))
-                                Text(Strings.closeAll.key, bundle: .module)
+                                Text(Strings.turnOff.key, bundle: .module)
                             }
                         }
                     }
@@ -167,11 +167,11 @@ private struct DeviceListViewBase: View {
 
                     if horizontalSizeClass == .compact {
                         Button {
-                            viewStore.send(.tappedCloseAll, animation: .default)
+                            viewStore.send(.tappedTurnOfAll, animation: .default)
                         } label: {
                             LoadingView(.constant(viewStore.isRefreshingDevices == .closingAll)) {
                                 Image(systemName: "moon.fill")
-                                Text(Strings.closeAll.key, bundle: .module)
+                                Text(Strings.turnOff.key, bundle: .module)
                             }
                         }
                         .modifier(ContentStyle(isLoading: viewStore.isRefreshingDevices.isInFlight))
@@ -191,7 +191,7 @@ private struct DeviceListViewBase: View {
                 .disabled(viewStore.isRefreshingDevices.isInFlight).padding()
             }
             .onAppear {
-                if case .nerverLoaded = viewStore.isRefreshingDevices {
+                if case .neverLoaded = viewStore.isRefreshingDevices {
                     viewStore.send(.viewAppearReload)
                 }
             }
@@ -226,7 +226,7 @@ extension DeviceListViewiOS {
             case tappedDeviceChild(index: DeviceChildReducer.State.ID, action: DeviceChildReducer.Action)
         }
 
-        case tappedCloseAll
+        case tappedTurnOfAll
         case tappedErrorAlert
         case tappedLogout
         case viewAppearReload
@@ -248,7 +248,7 @@ public struct DeviceRelayFailedViewiOS: View {
 
     public var body: some View {
         WithViewStore(self.store) { viewStore in
-            let style = styleFor(state: viewStore.relay)
+            let style = styleFor(details: viewStore.details)
             VStack {
                 Image(systemName: style.image).font(.title3)
                 Text(viewStore.name).multilineTextAlignment(.center).foregroundColor(style.tint)
@@ -264,10 +264,10 @@ public struct DeviceDetailViewiOS: View {
     public var body: some View {
         WithViewStore(self.store) { viewStore in
             VStack {
-                switch viewStore.relay {
-                case .relay:
+                switch viewStore.details {
+                case .status:
                     DeviceNoChildViewiOS(store: self.store)
-                case .none:
+                case .noRelay:
                     VStack(alignment: .center) {
                         HStack {
                             Image(systemName: "rectangle.3.group.fill")
@@ -317,7 +317,7 @@ public struct DeviceNoChildViewiOS: View {
                 viewStore.send(.tapped, animation: .default)
             } label: {
                 VStack {
-                    let style = styleFor(state: viewStore.relay)
+                    let style = styleFor(details: viewStore.details)
                     Image(systemName: style.image).font(.title3).tint(style.tint)
                     Text(viewStore.name).multilineTextAlignment(.center)
                     if viewStore.isLoading { ProgressView() }
@@ -408,8 +408,8 @@ extension DevicesReducer.Action {
             self = .errorHandled
         case .tappedRefreshButton, .viewAppearReload:
             self = .fetchFromRemote
-        case .tappedCloseAll:
-            self = .closeAll
+        case .tappedTurnOfAll:
+            self = .turnOffAllDevices
         case .tappedLogout:
             self = .delegate(.logout)
         }

@@ -58,13 +58,13 @@ extension DevicesLink {
     }
     .map(.case(Self.device))
 
-    private static let closeAllLink = ParsePrint(.case(Self.closeAll)) {
-        StartsWith<Substring>("closeAll")
+    private static let turnOffAllLink = ParsePrint(.case(Self.turnOffAllDevices)) {
+        StartsWith<Substring>("turnOffAllDevices")
         End()
     }
 
     public static let devices = OneOf {
         validDevicesToggle
-        closeAllLink
+        turnOffAllLink
     }
 }

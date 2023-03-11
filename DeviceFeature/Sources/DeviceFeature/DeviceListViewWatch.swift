@@ -41,12 +41,12 @@ public struct DeviceListViewWatch: View {
                     )
 
                     Button {
-                        viewStore.send(.tappedCloseAll, animation: .default)
+                        viewStore.send(.tappedTurnOffAll, animation: .default)
                     } label: {
                         LoadingView(.constant(viewStore.isRefreshingDevices == .closingAll)) {
                             HStack {
                                 Image(systemName: "moon.fill")
-                                Text(Strings.closeAll.key, bundle: .module)
+                                Text(Strings.turnOff.key, bundle: .module)
                             }
                         }
                     }
@@ -83,7 +83,7 @@ public struct DeviceListViewWatch: View {
                 content: { Alert(title: Text($0.title)) }
             )
             .onAppear {
-                if case .nerverLoaded = viewStore.isRefreshingDevices {
+                if case .neverLoaded = viewStore.isRefreshingDevices {
                     viewStore.send(.viewAppearReload)
                 }
             }
@@ -105,15 +105,15 @@ struct DeviceDetailViewWatch: View {
         if let child {
             style = styleFor(relay: child.relay)
         } else {
-            style = styleFor(state: device.relay)
+            style = styleFor(details: device.details)
         }
         return style
     }
 
     func disabled(child: DeviceChildReducer.State?, device: DeviceReducer.State) -> Bool {
-        switch device.relay {
+        switch device.details {
         case .failed: return true
-        case .none, .relay: return false
+        case .noRelay, .status: return false
         }
     }
 
@@ -205,7 +205,7 @@ extension DeviceListViewWatch {
             case tappedDeviceChild(index: DeviceChildReducer.State.ID, action: DeviceChildReducer.Action)
         }
 
-        case tappedCloseAll
+        case tappedTurnOffAll
         case tappedErrorAlert
         case viewAppearReload
         case tappedLogoutButton
@@ -268,8 +268,8 @@ extension DevicesReducer.Action {
             self = .delegate(.logout)
         case .tappedRefreshButton, .viewAppearReload:
             self = .fetchFromRemote
-        case .tappedCloseAll:
-            self = .closeAll
+        case .tappedTurnOffAll:
+            self = .turnOffAllDevices
         }
     }
 }

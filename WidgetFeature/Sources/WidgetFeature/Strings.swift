@@ -14,7 +14,7 @@ public enum Strings: String {
     case noDeviceSelected = "no_device_selected"
     case notLogged = "not_logged"
     case descriptionWidget = "description_widget"
-    case closeAll = "close_all"
+    case turnOff = "turn_off"
     case deviceGroup = "device_group"
 }
 
@@ -38,7 +38,7 @@ struct Strings_Previews: PreviewProvider {
                 Text(Strings.notLogged.key, bundle: .module)
                 Text(Strings.noDevice.key, bundle: .module)
                 Text(Strings.descriptionWidget.key, bundle: .module)
-                Text(Strings.closeAll.key, bundle: .module)
+                Text(Strings.turnOff.key, bundle: .module)
                 Text(Strings.deviceGroup.key, bundle: .module)
                 Text(Strings.noDeviceSelected.key, bundle: .module)
             }
@@ -47,7 +47,7 @@ struct Strings_Previews: PreviewProvider {
                 Text(Strings.notLogged.key, bundle: .module)
                 Text(Strings.noDevice.key, bundle: .module)
                 Text(Strings.descriptionWidget.key, bundle: .module)
-                Text(Strings.closeAll.key, bundle: .module)
+                Text(Strings.turnOff.key, bundle: .module)
                 Text(Strings.deviceGroup.key, bundle: .module)
                 Text(Strings.noDeviceSelected.key, bundle: .module)
             }

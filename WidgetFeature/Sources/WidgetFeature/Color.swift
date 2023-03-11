@@ -9,8 +9,8 @@ import Foundation
 import SwiftUI
 
 extension Color {
-    static let backgroudEnd = Self("backgroud_end", bundle: .module)
-    static let backgroudStart = Self("backgroud_start", bundle: .module)
+    static let backgroundEnd = Self("background_end", bundle: .module)
+    static let backgroundStart = Self("background_start", bundle: .module)
     static let button = Self("button", bundle: .module)
 
 }
@@ -21,16 +21,16 @@ struct Color_Previews: PreviewProvider {
     static var previews: some View {
         Group {
             VStack {
-                Text("backgroud_end").foregroundColor(.backgroudEnd)
-                Text("backgroud_start").foregroundColor(.backgroudStart)
+                Text("background_end").foregroundColor(.backgroundEnd)
+                Text("background_start").foregroundColor(.backgroundStart)
                 Text("button").foregroundColor(.button)
             }
             .preferredColorScheme(.light)
             .previewDisplayName("light")
 
             VStack {
-                Text("backgroud_end").foregroundColor(.backgroudEnd)
-                Text("backgroud_start").foregroundColor(.backgroudStart)
+                Text("background_end").foregroundColor(.backgroundEnd)
+                Text("background_start").foregroundColor(.backgroundStart)
                 Text("button").foregroundColor(.button)
             }
             .preferredColorScheme(.dark)

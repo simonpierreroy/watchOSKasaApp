@@ -11,7 +11,7 @@ import SwiftUI
 enum Strings: String {
     case logoutApp = "logout_app"
     case refreshList = "refresh_list"
-    case closeAll = "close_all"
+    case turnOff = "turn_off"
     case deviceGroup = "device_group"
 }
 
@@ -33,14 +33,14 @@ struct Strings_Previews: PreviewProvider {
             VStack {
                 Text(Strings.logoutApp.key, bundle: .module)
                 Text(Strings.refreshList.key, bundle: .module)
-                Text(Strings.closeAll.key, bundle: .module)
+                Text(Strings.turnOff.key, bundle: .module)
                 Text(Strings.deviceGroup.key, bundle: .module)
             }
             .previewDisplayName("English")
             VStack {
                 Text(Strings.logoutApp.key, bundle: .module)
                 Text(Strings.refreshList.key, bundle: .module)
-                Text(Strings.closeAll.key, bundle: .module)
+                Text(Strings.turnOff.key, bundle: .module)
                 Text(Strings.deviceGroup.key, bundle: .module)
             }
             .environment(\.locale, .init(identifier: "fr"))

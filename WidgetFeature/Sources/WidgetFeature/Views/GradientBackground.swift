@@ -14,7 +14,7 @@ struct GradientBackgroundWidget: View {
             .fill(
                 LinearGradient(
                     gradient: Gradient(
-                        colors: [.backgroudStart, .backgroudEnd]
+                        colors: [.backgroundStart, .backgroundEnd]
                     ),
                     startPoint: .top,
                     endPoint: .bottom
@@ -29,7 +29,7 @@ struct BackgroundWidget_Previews: PreviewProvider {
     static var previews: some View {
         Group {
             GradientBackgroundWidget()
-                .previewDisplayName("Background Darck")
+                .previewDisplayName("Background Dark")
                 .environment(\.colorScheme, .dark)
             GradientBackgroundWidget()
                 .previewDisplayName("Background")

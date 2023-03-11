@@ -62,7 +62,7 @@ public struct UserLoginViewiOS: View {
                     Spacer(minLength: 16)
 
                     Button {
-                        viewStore.send(.tappedLogingButton)
+                        viewStore.send(.tappedLoginButton)
                     } label: {
                         LoadingView(.constant(viewStore.isLoadingUser)) {
                             HStack {
@@ -113,7 +113,7 @@ extension UserLoginViewiOS {
 
     public enum Action: Equatable, BindableAction {
         case tappedErrorAlert
-        case tappedLogingButton
+        case tappedLoginButton
         case binding(BindingAction<StateView>)
     }
 }
@@ -155,7 +155,7 @@ extension UserLogoutReducer.Action {
         switch userViewAction {
         case .tappedErrorAlert:
             self = .errorHandled
-        case .tappedLogingButton:
+        case .tappedLoginButton:
             self = .login
         case .binding(let action):
             self = .binding(action.pullback(\.viewBindingActionKey))

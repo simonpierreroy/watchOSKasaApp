@@ -20,7 +20,7 @@ public struct DeviceReducer: ReducerProtocol {
         public let id: Device.Id
         public let name: String
         public var children: IdentifiedArrayOf<DeviceChildReducer.State>
-        public var relay: Device.State
+        public var details: Device.State
     }
 
     public enum Action {
@@ -28,7 +28,7 @@ public struct DeviceReducer: ReducerProtocol {
         case didToggleChild(childId: State.ID, state: RelayIsOn)
         case setError(Error)
         case errorHandled
-        case didToggle(state: RelayIsOn)
+        case didToggle(state: RelayIsOn, info: Device.Info)
         case deviceChild(index: DeviceChildReducer.State.ID, action: DeviceChildReducer.Action)
     }
 
@@ -38,17 +38,19 @@ public struct DeviceReducer: ReducerProtocol {
         Reduce { state, action in
             switch action {
             case .toggle:
-                guard let token = state.token, state.isLoading == false else { return .none }
+                guard let token = state.token, state.isLoading == false,
+                    case .status(_, let info) = state.details
+                else { return .none }
                 state.isLoading = true
                 return .run { [state] send in
                     let newState = try await toggleDeviceRelayState(token, state.id, nil)
-                    await send(.didToggle(state: newState), animation: .default)
+                    await send(.didToggle(state: newState, info: info), animation: .default)
                 } catch: { error, send in
                     await send(.setError(error))
                 }
-            case .didToggle(let status):
+            case .didToggle(let relay, let info):
                 state.isLoading = false
-                state.relay = .relay(status)
+                state.details = .status(relay: relay, info: info)
                 return .none
             case .didToggleChild(let id, let status):
                 state.isLoading = false

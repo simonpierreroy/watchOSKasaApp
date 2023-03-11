@@ -9,7 +9,7 @@
 import Foundation
 
 #if DEBUG
-// Usefull to debug JSON
+// Useful to debug JSON
 @dynamicMemberLookup
 public enum JSONValue {
     case null

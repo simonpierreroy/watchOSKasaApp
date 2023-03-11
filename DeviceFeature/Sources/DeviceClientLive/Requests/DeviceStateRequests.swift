@@ -140,7 +140,7 @@ extension Networking.App {
                 httpMethod: .post
             )
 
-        let deviceStateResponse: DeviceStateResponse = try await performResquestToModel(
+        let deviceStateResponse: DeviceStateResponse = try await performRequestToModel(
             requestInfo: request
         )
 
@@ -160,7 +160,7 @@ extension Networking.App {
                 httpMethod: .post
             )
 
-        let deviceStateResponse: APIResponse<DeviceStateResponse> = try await performResquestToAPIResponse(
+        let deviceStateResponse: APIResponse<DeviceStateResponse> = try await performRequestToAPIResponse(
             requestInfo: request
         )
 
@@ -177,7 +177,7 @@ extension Networking.App {
 
         if let childId = childId {
             guard let child = info.children?.first(where: { childId == $0.id }) else {
-                throw Networking.ResquestError(errorDescription: "No child matching")
+                throw Networking.RequestError(errorDescription: "No child matching")
             }
             rawRelayState = child.state
         } else {
@@ -185,7 +185,7 @@ extension Networking.App {
         }
 
         guard let rawRelayState = rawRelayState else {
-            throw Networking.ResquestError(errorDescription: "Device has no relay_state")
+            throw Networking.RequestError(errorDescription: "Device has no relay_state")
         }
 
         return try getRelayState(from: rawRelayState)
@@ -212,12 +212,12 @@ extension Networking.App {
             httpMethod: .post
         )
 
-        let deviceStateResponse: ChangeDeviceStateResponse = try await performResquestToModel(
+        let deviceStateResponse: ChangeDeviceStateResponse = try await performRequestToModel(
             requestInfo: request
         )
 
         guard deviceStateResponse.responseData.wrapping.system.state.errorCode == 0 else {
-            throw Networking.ResquestError(errorDescription: "Invalid JSON for set_relay_state")
+            throw Networking.RequestError(errorDescription: "Invalid JSON for set_relay_state")
         }
 
         return state

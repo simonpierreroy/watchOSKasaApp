@@ -32,19 +32,19 @@ extension Networking.App {
         let terminalUUID: UUID
     }
 
-    static func login(cred: Credential) async throws -> LoggedUserInfo {
+    static func login(with credential: Credential) async throws -> LoggedUserInfo {
 
         let requestInfo = RequestInfo<LoginParam>(
             method: .login,
             params: .init(
-                cloudUserName: cred.email,
-                cloudPassword: cred.password,
+                cloudUserName: credential.email,
+                cloudPassword: credential.password,
                 terminalUUID: .init()
             ),
             queryItems: [:],
             httpMethod: .post
         )
 
-        return try await performResquestToModel(requestInfo: requestInfo)
+        return try await performRequestToModel(requestInfo: requestInfo)
     }
 }

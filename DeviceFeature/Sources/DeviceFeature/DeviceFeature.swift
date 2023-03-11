@@ -22,10 +22,10 @@ public struct DevicesReducer: ReducerProtocol {
         case setError(Error)
         case errorHandled
         case deviceDetail(index: DeviceReducer.State.ID, action: DeviceReducer.Action)
-        case closeAll
-        case doneClosingAll
+        case turnOffAllDevices
+        case doneTurnOffAll
         case saveDevicesToCache
-        case attempDeepLink(DevicesLink)
+        case attemptDeepLink(DevicesLink)
         case delegate(Delegate)
 
         public enum Delegate {
@@ -34,7 +34,7 @@ public struct DevicesReducer: ReducerProtocol {
     }
 
     public struct State {
-        public static let empty = Self(devices: [], isLoading: .nerverLoaded, route: nil, token: nil)
+        public static let empty = Self(devices: [], isLoading: .neverLoaded, route: nil, token: nil)
 
         init(
             devices: [DeviceReducer.State],
@@ -51,7 +51,7 @@ public struct DevicesReducer: ReducerProtocol {
         }
 
         public enum Loading {
-            case nerverLoaded
+            case neverLoaded
             case loadingDevices
             case closingAll
             case loaded
@@ -60,7 +60,7 @@ public struct DevicesReducer: ReducerProtocol {
                 switch self {
                 case .loadingDevices, .closingAll:
                     return true
-                case .loaded, .nerverLoaded:
+                case .loaded, .neverLoaded:
                     return false
                 }
             }
@@ -98,7 +98,7 @@ public struct DevicesReducer: ReducerProtocol {
     public var body: some ReducerProtocol<State, Action> {
         Reduce { state, action in
             switch action {
-            case .attempDeepLink(let link):
+            case .attemptDeepLink(let link):
                 guard state.isLoading == .loaded else {
                     state.linkToComplete = link
                     return .none
@@ -106,7 +106,7 @@ public struct DevicesReducer: ReducerProtocol {
                 defer { state.linkToComplete = nil }
 
                 switch link {
-                case .closeAll: return .task { .closeAll }
+                case .turnOffAllDevices: return .task { .turnOffAllDevices }
                 case .device(let id, .toggle):
                     guard state.devices[id: id] != nil else { return .none }
                     return .task { .deviceDetail(index: id, action: .toggle) }
@@ -125,7 +125,7 @@ public struct DevicesReducer: ReducerProtocol {
                 return .run { [linkToComplete = state.linkToComplete] send in
                     await send(.saveDevicesToCache)
                     if let link = linkToComplete {
-                        await send(.attempDeepLink(link))
+                        await send(.attemptDeepLink(link))
                     }
                 }
             case .saveDevicesToCache:
@@ -152,14 +152,14 @@ public struct DevicesReducer: ReducerProtocol {
             case .errorHandled:
                 state.route = nil
                 return .none
-            case .closeAll:
+            case .turnOffAllDevices:
                 guard let token = state.token, state.isLoading == .loaded else { return .none }
                 state.isLoading = .closingAll
                 return
                     .task { [devices = state.devices] in
                         return try await withThrowingTaskGroup(of: Void.self) { group in
                             for device in devices {
-                                if case .relay = device.relay {
+                                if case .status = device.details {
                                     group.addTask { _ = try await changeDeviceRelayState(token, device.id, nil, false) }
                                 }
                                 for child in device.children {
@@ -169,13 +169,13 @@ public struct DevicesReducer: ReducerProtocol {
                                 }
                             }
                             try await group.waitForAll()
-                            return .doneClosingAll
+                            return .doneTurnOffAll
                         }
                     } catch: {
                         return .setError($0)
                     }
                     .animation()
-            case .doneClosingAll:
+            case .doneTurnOffAll:
                 state.isLoading = .loaded
                 return .task { Action.fetchFromRemote }
             case .deviceDetail: return .none
@@ -197,7 +197,7 @@ extension DeviceReducer.State {
     ) {
         self.id = device.id
         self.name = device.name
-        self.relay = device.state
+        self.details = device.details
         let tmpChildren = device.children
             .map {
                 DeviceChildReducer.State.init(relay: $0.state, id: $0.id, name: $0.name)
@@ -215,23 +215,23 @@ extension Device {
             name: deviceState.name,
             children: deviceState.children
                 .map { Device.DeviceChild.init(id: $0.id, name: $0.name, state: $0.relay) },
-            state: deviceState.relay
+            details: deviceState.details
         )
     }
 }
 
 #if DEBUG
 extension DevicesReducer.State {
-    static let emptyLogged = Self(devices: [], isLoading: .nerverLoaded, route: nil, token: "logged")
+    static let emptyLogged = Self(devices: [], isLoading: .neverLoaded, route: nil, token: "logged")
     static let emptyLoggedLink = Self(
         devices: [],
-        isLoading: .nerverLoaded,
+        isLoading: .neverLoaded,
         route: nil,
         token: "logged",
         link: .device(Device.debug1.id, .toggle)
     )
     static let emptyLoading = Self(devices: [], isLoading: .loadingDevices, route: nil, token: "logged")
-    static let emptyNeverLoaded = Self(devices: [], isLoading: .nerverLoaded, route: nil, token: "logged")
+    static let emptyNeverLoaded = Self(devices: [], isLoading: .neverLoaded, route: nil, token: "logged")
     static let oneDeviceLoaded = Self(
         devices: [.init(device: .debug1)],
         isLoading: .loaded,
@@ -247,7 +247,7 @@ extension DevicesReducer.State {
                     id: .init(rawValue: "1"),
                     name: "1",
                     children: .init(),
-                    relay: .none
+                    details: .noRelay(info: .mock)
                 )
             ],
             isLoading: .loaded,
@@ -259,12 +259,12 @@ extension DevicesReducer.State {
 
     static func nDeviceLoaded(n: Int, childrenCount: Int = 0, indexFailed: [Int] = []) -> Self {
         var children: [Device.DeviceChild] = []
-        var state: Device.State = .relay(false)
+        var state: Device.State = .status(relay: false, info: .mock)
 
         if childrenCount >= 1 {
             children = (1...childrenCount)
                 .map { Device.DeviceChild(id: "child \($0)", name: "child \($0)", state: true) }
-            state = .none
+            state = .noRelay(info: .mock)
         }
 
         return Self(
@@ -275,7 +275,7 @@ extension DevicesReducer.State {
                             id: "\($0)",
                             name: "Test device number \($0)",
                             children: children,
-                            state: indexFailed.contains($0) ? .failed(.init(code: -1, message: "Error")) : state
+                            details: indexFailed.contains($0) ? .failed(.init(code: -1, message: "Error")) : state
                         )
                     )
                 },

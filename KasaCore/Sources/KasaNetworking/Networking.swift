@@ -3,7 +3,6 @@
 //  Networking
 //
 //  Created by Simon-Pierre Roy on 9/22/19.
-//  Copyright © 2019 Wayfair. All rights reserved.
 //
 
 import Foundation
@@ -24,10 +23,10 @@ public enum Networking {
 
     private static func fetcher(
         urlSession: URLSession,
-        urlResquest: URLRequest,
+        urlRequest: URLRequest,
         workQueue: DispatchQueue = defaultWorkQueue
     ) async throws -> Data {
-        let (data, response) = try await urlSession.data(for: urlResquest, delegate: nil)
+        let (data, response) = try await urlSession.data(for: urlRequest, delegate: nil)
         guard let httpResponse = response as? HTTPURLResponse, !(200...299).contains(httpResponse.statusCode) else {
             return data
         }
@@ -37,10 +36,10 @@ public enum Networking {
     static func modelFetcher<Model: Decodable>(
         decoder: JSONDecoder,
         urlSession: URLSession,
-        urlResquest: URLRequest,
+        urlRequest: URLRequest,
         workQueue: DispatchQueue = defaultWorkQueue
     ) async throws -> Model {
-        let data = try await fetcher(urlSession: urlSession, urlResquest: urlResquest, workQueue: workQueue)
+        let data = try await fetcher(urlSession: urlSession, urlRequest: urlRequest, workQueue: workQueue)
         return try decoder.decode(Model.self, from: data)
     }
 
@@ -76,7 +75,7 @@ extension URLComponents {
 
 extension Networking {
 
-    public struct ResquestError: LocalizedError {
+    public struct RequestError: LocalizedError {
         public init(
             errorDescription: String
         ) {

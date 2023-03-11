@@ -6,6 +6,36 @@ import Tagged
 
 public struct Device: Equatable, Identifiable, Codable {
 
+    public struct Info: Equatable, Codable {
+
+        public init(
+            softwareVersion: SoftwareVersion,
+            hardwareVersion: HardwareVersion,
+            model: Model,
+            macAddress: Mac
+        ) {
+            self.softwareVersion = softwareVersion
+            self.hardwareVersion = hardwareVersion
+            self.model = model
+            self.macAddress = macAddress
+        }
+
+        //Shared Types
+        public struct SoftwareVersionTag {}
+        public typealias SoftwareVersion = Tagged<Self.SoftwareVersionTag, String>
+        public struct HardwareVersionTag {}
+        public typealias HardwareVersion = Tagged<Self.HardwareVersionTag, String>
+        public struct ModelTag {}
+        public typealias Model = Tagged<Self.ModelTag, String>
+        public struct MacTag {}
+        public typealias Mac = Tagged<Self.ModelTag, String>
+
+        public let softwareVersion: SoftwareVersion
+        public let hardwareVersion: HardwareVersion
+        public let model: Model
+        public let macAddress: Mac
+    }
+
     public struct DeviceChild: Equatable, Identifiable, Codable {
         public init(
             id: Id,
@@ -26,45 +56,53 @@ public struct Device: Equatable, Identifiable, Codable {
         id: Id,
         name: String,
         children: [DeviceChild] = [],
-        state: State
+        details: State
     ) {
         self.id = id
         self.name = name
         self.children = children
-        self.state = state
+        self.details = details
     }
 
     public typealias Id = Tagged<Device, String>
 
-    public enum State: Equatable, Codable {
-
-        public struct Failed: Equatable, Codable {
-            public init(
-                code: Int,
-                message: String
-            ) {
-                self.code = code
-                self.message = message
-            }
-            public let code: Int
-            public let message: String
+    public struct Failed: Equatable, Codable {
+        public init(
+            code: Int,
+            message: String
+        ) {
+            self.code = code
+            self.message = message
         }
+        public let code: Int
+        public let message: String
+    }
 
-        case relay(RelayIsOn)
-        case none
+    public enum State: Equatable, Codable {
+        case status(relay: RelayIsOn, info: Info)
+        case noRelay(info: Info)
         case failed(Failed)
     }
 
     public let id: Id
     public let name: String
     public let children: [DeviceChild]
-    public var state: State
+    public var details: State
+}
+
+extension Device.Info {
+    public static let mock = Device.Info(
+        softwareVersion: "1.2.3",
+        hardwareVersion: "9.8.7",
+        model: "HS123",
+        macAddress: "123456789"
+    )
 }
 
 extension Device {
 
-    public static let debug1 = Self(id: "1", name: "Test device 1", state: .relay(false))
-    public static let debug2 = Self(id: "2", name: "Test device 2", state: .relay(true))
+    public static let debug1 = Self(id: "1", name: "Test device 1", details: .status(relay: false, info: .mock))
+    public static let debug2 = Self(id: "2", name: "Test device 2", details: .status(relay: true, info: .mock))
     public static let debug3 = Self(
         id: "3",
         name: "Test device 3",
@@ -72,7 +110,7 @@ extension Device {
             .init(id: "Child 1-3", name: "Child 1 of device 3", state: true),
             .init(id: "Child 2-3", name: "Child 2 of device 3", state: false),
         ],
-        state: .relay(false)
+        details: .status(relay: false, info: .mock)
     )
 }
 
@@ -125,7 +163,7 @@ extension [Device] {
 
 public enum DevicesLink: Equatable {
     case device(Device.ID, Device.Link)
-    case closeAll
+    case turnOffAllDevices
 }
 
 extension Device {

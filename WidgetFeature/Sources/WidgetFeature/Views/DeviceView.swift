@@ -134,7 +134,7 @@ struct DeviceViewMaybe: View {
     }
 }
 
-struct CloseAll: View {
+struct TurnOffView: View {
     let getURL: (AppLink) -> URL
     let toltalNumberDevices: Int
     @Environment(\.widgetFamily) var widgetFamily
@@ -164,16 +164,16 @@ struct CloseAll: View {
     }
 
     var body: some View {
-        Link(destination: getURL(.devices(.closeAll))) {
+        Link(destination: getURL(.devices(.turnOffAllDevices))) {
             VStack {
                 Image(systemName: "moon.zzz.fill")
-                    .font(CloseAll.font(widgetFamily: widgetFamily))
-                if CloseAll.showText(widgetFamily: widgetFamily) {
-                    Text(Strings.closeAll.key, bundle: .module)
+                    .font(TurnOffView.font(widgetFamily: widgetFamily))
+                if TurnOffView.showText(widgetFamily: widgetFamily) {
+                    Text(Strings.turnOff.key, bundle: .module)
                 }
             }
         }
-        .widgetURL(getURL(.devices(.closeAll)))  // for small views
+        .widgetURL(getURL(.devices(.turnOffAllDevices)))  // for small views
     }
 }
 
@@ -189,7 +189,7 @@ struct StackList: View {
                 switch widgetFamily {
                 case .systemSmall, .accessoryCircular, .accessoryInline, .accessoryRectangular:
                     if staticIntent {
-                        CloseAll(
+                        TurnOffView(
                             getURL: getURL,
                             toltalNumberDevices: devices.count
                         )
@@ -229,7 +229,7 @@ struct StackList: View {
 #if DEBUG
 struct DeviceView_Preview: PreviewProvider {
     static let previewDevices = (1...10)
-        .map { i in Device.init(id: "\(i)", name: "Preview no \(i)", state: .relay(false)) }
+        .map { i in Device.init(id: "\(i)", name: "Preview no \(i)", details: .status(relay: false, info: .mock)) }
     static var previews: some View {
         Group {
             StackList(

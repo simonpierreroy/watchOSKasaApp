@@ -27,7 +27,7 @@ struct AppDelegateReducer: ReducerProtocol {
             for url in urls {
                 if let link = try? parse(url) {
                     switch link {
-                    case .devices(let deviceLink): return .task { .devicesAction(.attempDeepLink(deviceLink)) }
+                    case .devices(let deviceLink): return .task { .devicesAction(.attemptDeepLink(deviceLink)) }
                     }
                 }
             }

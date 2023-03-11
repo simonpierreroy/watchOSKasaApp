@@ -29,11 +29,17 @@ extension Device {
         let children: [Networking.App.KasaChildrenDevice]
         switch kasa.info {
         case .success(let data):
+            let info = Device.Info.init(
+                softwareVersion: .init(data.softwareVersion),
+                hardwareVersion: .init(data.hardwareVersion),
+                model: .init(data.model),
+                macAddress: .init(data.mac)
+            )
             if let relayState = data.relayState {
                 let relay = try Networking.App.getRelayState(from: relayState)
-                infoState = .relay(relay)
+                infoState = .status(relay: relay, info: info)
             } else {
-                infoState = .none
+                infoState = .noRelay(info: info)
             }
             children = data.children ?? []
         case .failure(let error):
@@ -53,7 +59,7 @@ extension Device {
                         state: try Networking.App.getRelayState(from: $0.state)
                     )
                 },
-            state: infoState
+            details: infoState
         )
     }
 }

@@ -34,12 +34,12 @@ extension Networking.App {
     }
 
     //Shared Types
-    struct IDTtag {}
-    typealias DeviceID = Tagged<Networking.App.IDTtag, String>
+    struct IDTag {}
+    typealias DeviceID = Tagged<Self.IDTag, String>
     struct AliasTag {}
-    typealias Alias = Tagged<Networking.App.AliasTag, String>
+    typealias Alias = Tagged<Self.AliasTag, String>
     struct RawStateTag {}
-    typealias RawState = Tagged<Networking.App.RawStateTag, Int>
+    typealias RawState = Tagged<Self.RawStateTag, Int>
 
     struct KasaDevice: Codable {
         let deviceId: DeviceID
@@ -93,7 +93,7 @@ extension Networking.App {
             queryItems: token.queryItem(),
             httpMethod: .post
         )
-        return try await performResquestToModel(requestInfo: request)
+        return try await performRequestToModel(requestInfo: request)
     }
 
     static func getDevicesAndInfo(token: Token) async throws -> KasaDeviceList {
@@ -103,7 +103,7 @@ extension Networking.App {
             queryItems: token.queryItem(),
             httpMethod: .post
         )
-        return try await performResquestToModel(requestInfo: request)
+        return try await performRequestToModel(requestInfo: request)
     }
 
     static func getDevicesAndSysInfo(token: Token) async throws -> [KasaDeviceAndSystemInfo] {

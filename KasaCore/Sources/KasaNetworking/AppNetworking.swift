@@ -3,7 +3,6 @@
 //  Networking
 //
 //  Created by Simon-Pierre Roy on 9/22/19.
-//  Copyright © 2019 Wayfair. All rights reserved.
 //
 
 import ComposableArchitecture
@@ -105,15 +104,15 @@ extension Networking {
             guaranteeHeaders
             <> setHeader("Content-Type", "application/json")
 
-        private static func performResquest<ModelRequest: Encodable, ModelForResponse: Decodable>(
+        private static func performRequest<ModelRequest: Encodable, ModelForResponse: Decodable>(
             requestInfo: RequestInfo<ModelRequest>
         ) async throws -> Response<ModelForResponse> {
 
             let data = try Networking.App.encoder.encode(requestInfo.getRequest())
-            let endpointQuerry = baseUrl |> Networking.setQuery(items: requestInfo.queryItems)
+            let endpointQuery = baseUrl |> Networking.setQuery(items: requestInfo.queryItems)
 
-            guard let endpoint = endpointQuerry else {
-                throw Networking.ResquestError(errorDescription: "Invalid endpoint query items")
+            guard let endpoint = endpointQuery else {
+                throw Networking.RequestError(errorDescription: "Invalid endpoint query items")
             }
 
             let request =
@@ -125,25 +124,25 @@ extension Networking {
             let response: Response<ModelForResponse> = try await Networking.modelFetcher(
                 decoder: decoder,
                 urlSession: session,
-                urlResquest: request
+                urlRequest: request
             )
 
             return response
         }
 
-        public static func performResquestToModel<ModelRequest: Encodable, ModelForResponse: Decodable>(
+        public static func performRequestToModel<ModelRequest: Encodable, ModelForResponse: Decodable>(
             requestInfo: RequestInfo<ModelRequest>
         ) async throws -> ModelForResponse {
-            let response: Response<ModelForResponse> = try await performResquest(
+            let response: Response<ModelForResponse> = try await performRequest(
                 requestInfo: requestInfo
             )
             return try responseToModel(response)
         }
 
-        public static func performResquestToAPIResponse<ModelRequest: Encodable, ModelForResponse: Decodable>(
+        public static func performRequestToAPIResponse<ModelRequest: Encodable, ModelForResponse: Decodable>(
             requestInfo: RequestInfo<ModelRequest>
         ) async throws -> APIResponse<ModelForResponse> {
-            let response: Response<ModelForResponse> = try await performResquest(
+            let response: Response<ModelForResponse> = try await performRequest(
                 requestInfo: requestInfo
             )
             return responseToAPIResponse(response)

@@ -17,6 +17,6 @@ extension UserClient: DependencyKey {
 
 @Sendable
 private func login(with credential: User.Credential) async throws -> User {
-    let info = try await Networking.App.login(cred: credential.networkCredential())
+    let info = try await Networking.App.login(with: credential.networkCredential())
     return User(token: .init(rawValue: info.token))
 }

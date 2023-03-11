@@ -1,6 +1,6 @@
 "no_device" = "No devices";
 "not_logged" = "Please login";
 "description_widget" = "Toggle lights superfast";
-"close_all" = "Turn off";
+"turn_off" = "Turn off";
 "device_group" = "Device group";
 "no_device_selected" = "No device selected";

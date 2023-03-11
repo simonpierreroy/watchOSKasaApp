@@ -50,13 +50,13 @@ extension DataDeviceEntry {
                 .map {
                     Device.init(
                         id: .init(rawValue: "\($0)"),
-                        name: "Lampe du salaon \($0)",
+                        name: "Lampe du salon \($0)",
                         children: $0 == 3
                             ? [
                                 .init(id: .init(rawValue: "child 1\($0)"), name: "child 1 of \($0)", state: false),
                                 .init(id: .init(rawValue: "child 2\($0)"), name: "child 1 of \($0)", state: false),
                             ] : [],
-                        state: .relay(false)
+                        details: .status(relay: false, info: .mock)
                     )
                 }
                 .flatten()
