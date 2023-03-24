@@ -9,23 +9,51 @@ public struct DeviceReducer: ReducerProtocol {
 
     public struct State: Equatable, Identifiable {
 
+        init(
+            isLoading: Bool = false,
+            route: Route? = nil,
+            id: Device.Id,
+            name: String,
+            children: [DeviceChildReducer.State],
+            details: Device.State
+        ) {
+            self.isLoading = isLoading
+            self.route = route
+            self.id = id
+            self.name = name
+            self.details = details
+            self._children = .init(uniqueElements: children)
+        }
+
         public enum Route: Equatable {
             case error(String)
         }
 
-        public var isLoading: Bool = false
-        public var token: Token? = nil
-        public var route: Route? = nil
-
+        public var isLoading: Bool
+        public var route: Route?
         public let id: Device.Id
         public let name: String
-        public var children: IdentifiedArrayOf<DeviceChildReducer.State>
         public var details: Device.State
+
+        public var token: Token? = nil
+
+        private var _children: IdentifiedArrayOf<DeviceChildReducer.State>
+        public var children: IdentifiedArrayOf<DeviceChildReducer.State> {
+            get {
+                return .init(
+                    uniqueElements: _children.map {
+                        var copy = $0
+                        copy.token = self.token
+                        return copy
+                    }
+                )
+            }
+            set { self._children = newValue }
+        }
     }
 
     public enum Action {
         case toggle
-        case didToggleChild(childId: State.ID, state: RelayIsOn)
         case setError(Error)
         case errorHandled
         case didToggle(state: RelayIsOn, info: Device.Info)
@@ -52,11 +80,6 @@ public struct DeviceReducer: ReducerProtocol {
                 state.isLoading = false
                 state.details = .status(relay: relay, info: info)
                 return .none
-            case .didToggleChild(let id, let status):
-                state.isLoading = false
-                return .run { send in
-                    await send(.deviceChild(index: id, action: .didToggleChild(state: status)), animation: .default)
-                }
             case .setError(let error):
                 state.isLoading = false
                 state.route = .error(error.localizedDescription)
@@ -64,18 +87,7 @@ public struct DeviceReducer: ReducerProtocol {
             case .errorHandled:
                 state.route = nil
                 return .none
-            case .deviceChild(let childId, .delegate(.toggleChild)):
-                guard let token = state.token, let child = state.children[id: childId], state.isLoading == false else {
-                    return .none
-                }
-                state.isLoading = true
-                return .run { [stateId = state.id, childId = child.id] send in
-                    let tog = try await toggleDeviceRelayState(token, stateId, childId)
-                    await send(.didToggleChild(childId: childId, state: tog), animation: .default)
-                } catch: { error, send in
-                    await send(.setError(error))
-                }
-            case .deviceChild(_, .didToggleChild):  // Child is taking care of it
+            case .deviceChild:  // Child is taking care of it
                 return .none
             }
         }
@@ -88,26 +100,52 @@ public struct DeviceReducer: ReducerProtocol {
 public struct DeviceChildReducer: ReducerProtocol {
 
     public enum Action {
-        case didToggleChild(state: RelayIsOn)
-        case delegate(Delegate)
-
-        public enum Delegate {
-            case toggleChild
-        }
+        case didToggleChild(relay: RelayIsOn)
+        case toggleChild
+        case setError(Error)
+        case errorHandled
     }
 
     public struct State: Equatable, Identifiable {
+
+        public enum Route: Equatable {
+            case error(String)
+        }
+
         public var relay: RelayIsOn
+        public let parentId: Device.Id
         public let id: Device.Id
+        public var isLoading: Bool = false
         public let name: String
+        public var token: Token? = nil
+        public var route: Route? = nil
     }
+
+    @Dependency(\.devicesClient.toggleDeviceRelayState) var toggleDeviceRelayState
 
     public func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
         switch action {
-        case .delegate:
-            return .none
+        case .toggleChild:
+            guard let token = state.token, state.isLoading == false else {
+                return .none
+            }
+            state.isLoading = true
+            return .run { [parentId = state.parentId, childId = state.id] send in
+                let relay = try await toggleDeviceRelayState(token, parentId, childId)
+                await send(.didToggleChild(relay: relay), animation: .default)
+            } catch: { error, send in
+                await send(.setError(error))
+            }
         case .didToggleChild(let status):
+            state.isLoading = false
             state.relay = status
+            return .none
+        case .setError(let error):
+            state.isLoading = false
+            state.route = .error(error.localizedDescription)
+            return .none
+        case .errorHandled:
+            state.route = nil
             return .none
         }
     }

@@ -268,41 +268,13 @@ public struct DeviceDetailViewiOS: View {
                 case .status:
                     DeviceNoChildViewiOS(store: self.store)
                 case .noRelay:
-                    VStack(alignment: .center) {
-                        HStack {
-                            Image(systemName: "rectangle.3.group.fill")
-                            Text(Strings.deviceGroup.key, bundle: .module)
-                        }
-                        if viewStore.isLoading { ProgressView() }
-                        Spacer()
-                        ForEachStore(
-                            self.store.scope(
-                                state: \DeviceReducer.State.children,
-                                action: DeviceListViewiOS.Action.DeviceAction.tappedDeviceChild(index:action:)
-                            ),
-                            content: { store in
-                                DeviceChildViewiOS(store: store)
-                            }
-                        )
-                    }
-                    .padding()
+                    DeviceChildGroupViewiOS(store: self.store)
                 case .failed:
                     DeviceRelayFailedViewiOS(store: self.store)
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .disabled(viewStore.isLoading)
-            .alert(
-                item: viewStore.binding(
-                    get: {
-                        CasePath(DeviceReducer.State.Route.error)
-                            .extract(from: $0.route)
-                            .map { AlertInfo(title: $0) }
-                    },
-                    send: .tappedErrorAlert
-                ),
-                content: { Alert(title: Text($0.title)) }
-            )
         }
     }
 }
@@ -324,6 +296,46 @@ public struct DeviceNoChildViewiOS: View {
                 }
                 .padding()
             }
+            .alert(
+                item: viewStore.binding(
+                    get: {
+                        CasePath(DeviceReducer.State.Route.error)
+                            .extract(from: $0.route)
+                            .map { AlertInfo(title: $0) }
+                    },
+                    send: .tappedErrorAlert
+                ),
+                content: { Alert(title: Text($0.title)) }
+            )
+        }
+    }
+}
+
+public struct DeviceChildGroupViewiOS: View {
+
+    let store: Store<DeviceReducer.State, DeviceListViewiOS.Action.DeviceAction>
+
+    public var body: some View {
+        WithViewStore(self.store, observe: { $0.isLoading }) { viewStore in
+
+            VStack(alignment: .center) {
+                HStack {
+                    Image(systemName: "rectangle.3.group.fill")
+                    Text(Strings.deviceGroup.key, bundle: .module)
+                }
+                if viewStore.state { ProgressView() }
+                Spacer()
+                ForEachStore(
+                    self.store.scope(
+                        state: \DeviceReducer.State.children,
+                        action: DeviceListViewiOS.Action.DeviceAction.tappedDeviceChild(index:action:)
+                    ),
+                    content: { store in
+                        DeviceChildViewiOS(store: store)
+                    }
+                )
+            }
+            .padding()
         }
     }
 }
@@ -334,24 +346,37 @@ public struct DeviceChildViewiOS: View {
 
     public var body: some View {
         WithViewStore(self.store) { viewStore in
-            Button {
-                viewStore.send(.delegate(.toggleChild), animation: .default)
-            } label: {
-                HStack {
-                    let style = styleFor(relay: viewStore.relay)
-                    Image(systemName: style.image).font(.title3).tint(style.tint)
-                    Text(viewStore.name)
+            VStack {
+                Button {
+                    viewStore.send(.toggleChild, animation: .default)
+                } label: {
+                    HStack {
+                        let style = styleFor(relay: viewStore.relay)
+                        Image(systemName: style.image).font(.title3).tint(style.tint)
+                        Text(viewStore.name)
+                    }
                 }
+                if viewStore.isLoading { ProgressView() }
             }
+            .disabled(viewStore.isLoading)
+            .alert(
+                item: viewStore.binding(
+                    get: {
+                        CasePath(DeviceChildReducer.State.Route.error)
+                            .extract(from: $0.route)
+                            .map { AlertInfo(title: $0) }
+                    },
+                    send: .errorHandled
+                ),
+                content: { Alert(title: Text($0.title)) }
+            )
         }
     }
 }
 
-extension DeviceDetailViewiOS {
-    struct AlertInfo: Identifiable {
-        var title: String
-        var id: String { self.title }
-    }
+struct AlertInfo: Identifiable {
+    var title: String
+    var id: String { self.title }
 }
 
 struct ContentStyle: ViewModifier {

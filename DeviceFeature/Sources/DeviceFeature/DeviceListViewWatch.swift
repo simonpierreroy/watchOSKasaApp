@@ -96,21 +96,45 @@ struct AlertInfo: Identifiable {
     var id: String { self.title }
 }
 
+struct DeviceDetailDataViewWatch: View {
+    let action: () -> Void
+    let style: (image: String, tint: Color)
+    let isLoading: Bool
+    let isDisabled: Bool
+    let name: String
+    let alertInfo: Binding<AlertInfo?>
+
+    var body: some View {
+        Button {
+            action()
+        } label: {
+            HStack {
+                Image(systemName: style.image).font(.title3)
+                    .foregroundColor(style.tint)
+                Text(name)
+                    .multilineTextAlignment(.center)
+                Spacer()
+            }
+        }
+        .frame(maxWidth: .infinity)
+        .overlay(alignment: .center) {
+            HStack {
+                if isLoading { ProgressView() }
+            }
+        }
+        .disabled(isDisabled)
+        .alert(
+            item: self.alertInfo,
+            content: { Alert(title: Text($0.title)) }
+        )
+    }
+}
+
 struct DeviceDetailViewWatch: View {
 
     let store: Store<ListEntry, DeviceListViewWatch.Action.DeviceAction>
 
-    func style(child: DeviceChildReducer.State?, device: DeviceReducer.State) -> (image: String, tint: Color) {
-        let style: (image: String, tint: Color)
-        if let child {
-            style = styleFor(relay: child.relay)
-        } else {
-            style = styleFor(details: device.details)
-        }
-        return style
-    }
-
-    func disabled(child: DeviceChildReducer.State?, device: DeviceReducer.State) -> Bool {
+    func isDisabled(_ device: DeviceReducer.State) -> Bool {
         switch device.details {
         case .failed: return true
         case .noRelay, .status: return false
@@ -119,43 +143,46 @@ struct DeviceDetailViewWatch: View {
 
     var body: some View {
         WithViewStore(self.store) { viewStore in
-            Button {
-                if let child = viewStore.child {
-                    viewStore.send(
-                        .tappedDeviceChild(index: child.id, action: .delegate(.toggleChild)),
-                        animation: .default
-                    )
-                } else {
-                    viewStore.send(.tapped, animation: .default)
-                }
-            } label: {
-                HStack {
-                    let style = style(child: viewStore.child, device: viewStore.device)
-                    Image(systemName: style.image).font(.title3)
-                        .foregroundColor(style.tint)
-                    Text(viewStore.child?.name ?? viewStore.device.name)
-                        .multilineTextAlignment(.center)
-                    Spacer()
-                }
-            }
-            .frame(maxWidth: .infinity)
-            .overlay(alignment: .center) {
-                HStack {
-                    if viewStore.device.isLoading { ProgressView() }
-                }
-            }
-            .disabled(disabled(child: viewStore.child, device: viewStore.device))
-            .alert(
-                item: viewStore.binding(
-                    get: {
-                        CasePath(DeviceReducer.State.Route.error)
-                            .extract(from: $0.device.route)
-                            .map { AlertInfo(title: $0) }
+            if let child = viewStore.child {
+                DeviceDetailDataViewWatch(
+                    action: {
+                        viewStore.send(
+                            .tappedDeviceChild(index: child.id, action: .toggleChild),
+                            animation: .default
+                        )
                     },
-                    send: .tappedErrorAlert
-                ),
-                content: { Alert(title: Text($0.title)) }
-            )
+                    style: styleFor(relay: child.relay),
+                    isLoading: child.isLoading,
+                    isDisabled: false,
+                    name: child.name,
+                    alertInfo: viewStore.binding(
+                        get: { _ in
+                            CasePath(DeviceChildReducer.State.Route.error)
+                                .extract(from: child.route)
+                                .map { AlertInfo(title: $0) }
+                        },
+                        send: .tappedDeviceChild(index: child.id, action: .errorHandled)
+                    )
+                )
+            } else {
+                DeviceDetailDataViewWatch(
+                    action: {
+                        viewStore.send(.tapped, animation: .default)
+                    },
+                    style: styleFor(details: viewStore.device.details),
+                    isLoading: viewStore.device.isLoading,
+                    isDisabled: isDisabled(viewStore.device),
+                    name: viewStore.device.name,
+                    alertInfo: viewStore.binding(
+                        get: {
+                            CasePath(DeviceReducer.State.Route.error)
+                                .extract(from: $0.device.route)
+                                .map { AlertInfo(title: $0) }
+                        },
+                        send: .tappedErrorAlert
+                    )
+                )
+            }
         }
     }
 }

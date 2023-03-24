@@ -115,7 +115,7 @@ public struct DevicesReducer: ReducerProtocol {
                     return .task {
                         return .deviceDetail(
                             index: id,
-                            action: .deviceChild(index: childId, action: .delegate(.toggleChild))
+                            action: .deviceChild(index: childId, action: .toggleChild)
                         )
                     }
                 }
@@ -195,14 +195,12 @@ extension DeviceReducer.State {
     init(
         device: Device
     ) {
-        self.id = device.id
-        self.name = device.name
-        self.details = device.details
         let tmpChildren = device.children
             .map {
-                DeviceChildReducer.State.init(relay: $0.state, id: $0.id, name: $0.name)
+                DeviceChildReducer.State.init(relay: $0.state, parentId: device.id, id: $0.id, name: $0.name)
             }
-        self.children = .init(uniqueElements: tmpChildren)
+
+        self.init(id: device.id, name: device.name, children: tmpChildren, details: device.details)
     }
 }
 
