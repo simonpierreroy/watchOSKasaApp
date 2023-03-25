@@ -142,29 +142,31 @@ struct DeviceDetailViewWatch: View {
     }
 
     var body: some View {
-        WithViewStore(self.store) { viewStore in
-            if let child = viewStore.child {
+        IfLetStore(self.store.scope(state: \.child)) { childStore in
+            WithViewStore(childStore) { viewStore in
                 DeviceDetailDataViewWatch(
                     action: {
                         viewStore.send(
-                            .tappedDeviceChild(index: child.id, action: .toggleChild),
+                            .tappedDeviceChild(index: viewStore.state.id, action: .toggleChild),
                             animation: .default
                         )
                     },
-                    style: styleFor(relay: child.relay),
-                    isLoading: child.isLoading,
+                    style: styleFor(relay: viewStore.state.relay),
+                    isLoading: viewStore.state.isLoading,
                     isDisabled: false,
-                    name: child.name,
+                    name: viewStore.state.name,
                     alertInfo: viewStore.binding(
                         get: { _ in
                             CasePath(DeviceChildReducer.State.Route.error)
-                                .extract(from: child.route)
+                                .extract(from: viewStore.state.route)
                                 .map { AlertInfo(title: $0) }
                         },
-                        send: .tappedDeviceChild(index: child.id, action: .errorHandled)
+                        send: .tappedDeviceChild(index: viewStore.state.id, action: .errorHandled)
                     )
                 )
-            } else {
+            }
+        } else: {
+            WithViewStore(self.store) { viewStore in
                 DeviceDetailDataViewWatch(
                     action: {
                         viewStore.send(.tapped, animation: .default)
