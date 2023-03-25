@@ -180,8 +180,7 @@ public struct DevicesReducer: ReducerProtocol {
                 return .task { Action.fetchFromRemote }
             case .deviceDetail: return .none
             case .delegate(.logout):
-                state.devices = []
-                state.token = nil
+                state = .empty
                 return .task { .saveDevicesToCache }  // Will be provide by an other feature
             }
         }
