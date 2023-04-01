@@ -14,23 +14,31 @@ import RoutingClient
 
 extension AppLink {
 
-    private static let deviceEntryLink = ParsePrint(.case(Self.devices)) {
-        StartsWith<Substring>("devices/")
-        DevicesLink.devices
+    private static func deviceEntryLink() -> some ParserPrinter<Substring, Self> {
+        ParsePrint(.case(Self.devices)) {
+            StartsWith<Substring>("devices/")
+            DevicesLink.Parser()
+        }
     }
 
-    public static let appLinkParser = OneOf {
-        deviceEntryLink
+    public struct Parser: ParserPrinter {
+        public init() {}
+
+        public var body: some ParserPrinter<Substring, AppLink> {
+            OneOf {
+                AppLink.deviceEntryLink()
+            }
+        }
     }
 
     @Sendable
     static func parserDeepLink(url: URL) throws -> Self {
-        return try appLinkParser.parse(url.absoluteString[...])
+        return try Self.Parser().parse(url.absoluteString[...])
     }
 
     @Sendable
     static func getURL(link: Self) throws -> URL {
-        let rawURL = String(try appLinkParser.print(link))
+        let rawURL = String(try Self.Parser().print(link))
         guard let url = URL(string: rawURL) else {
             throw NSError(domain: "Invalid string to URL for DeepLink", code: -1)
         }

@@ -11,60 +11,87 @@ import KasaCore
 import Parsing
 
 extension Device.DeviceChild.Link {
-
-    private static let validChildToggle = ParsePrint {
-        StartsWith<Substring>("toggle")
-        End()
+    private static func validChildToggle() -> some ParserPrinter<Substring, Self> {
+        ParsePrint {
+            StartsWith<Substring>("toggle")
+            End()
+        }
+        .map(.case(Self.toggle))
     }
-    .map(.case(Self.toggle))
 
-    fileprivate static let child = OneOf {
-        validChildToggle
+    fileprivate struct Parser: ParserPrinter {
+        fileprivate init() {}
+
+        fileprivate var body: some ParserPrinter<Substring, Device.DeviceChild.Link> {
+            OneOf {
+                Device.DeviceChild.Link.validChildToggle()
+            }
+        }
     }
 }
 
 extension Device.Link {
 
-    private static let validDeviceToggle = ParsePrint {
-        StartsWith<Substring>("toggle")
-        End()
+    private static func validDeviceToggle() -> some ParserPrinter<Substring, Self> {
+        ParsePrint {
+            StartsWith<Substring>("toggle")
+            End()
+        }
+        .map(.case(Self.toggle))
     }
-    .map(.case(Self.toggle))
 
-    private static let child = ParsePrint {
-        StartsWith<Substring>("child/")
-        Prefix(1...) { $0.isNumber || $0.isLetter }
-            .map(.string).map(.memberwise(Device.ID.init(rawValue:)))
-        Skip { "/" }
-        Device.DeviceChild.Link.child
-        End()
+    private static func child() -> some ParserPrinter<Substring, Self> {
+        ParsePrint {
+            StartsWith<Substring>("child/")
+            Prefix(1...) { $0.isNumber || $0.isLetter }
+                .map(.string).map(.memberwise(Device.ID.init(rawValue:)))
+            Skip { "/" }
+            Device.DeviceChild.Link.Parser()
+            End()
+        }
+        .map(.case(Self.child))
     }
-    .map(.case(Self.child))
 
-    fileprivate static let device = OneOf {
-        validDeviceToggle
-        child
+    fileprivate struct Parser: ParserPrinter {
+        fileprivate init() {}
+
+        fileprivate var body: some ParserPrinter<Substring, Device.Link> {
+            OneOf {
+                Device.Link.validDeviceToggle()
+                Device.Link.child()
+            }
+        }
     }
 }
 
 extension DevicesLink {
 
-    private static let validDevicesToggle = ParsePrint {
-        StartsWith<Substring>("device/")
-        Prefix(1...) { $0.isNumber || $0.isLetter }
-            .map(.string).map(.memberwise(Device.ID.init(rawValue:)))
-        Skip { "/" }
-        Device.Link.device
-    }
-    .map(.case(Self.device))
-
-    private static let turnOffAllLink = ParsePrint(.case(Self.turnOffAllDevices)) {
-        StartsWith<Substring>("turnOffAllDevices")
-        End()
+    private static func validDevicesToggle() -> some ParserPrinter<Substring, Self> {
+        ParsePrint {
+            StartsWith<Substring>("device/")
+            Prefix(1...) { $0.isNumber || $0.isLetter }
+                .map(.string).map(.memberwise(Device.ID.init(rawValue:)))
+            Skip { "/" }
+            Device.Link.Parser()
+        }
+        .map(.case(Self.device))
     }
 
-    public static let devices = OneOf {
-        validDevicesToggle
-        turnOffAllLink
+    private static func turnOffAllLink() -> some ParserPrinter<Substring, Self> {
+        ParsePrint(.case(Self.turnOffAllDevices)) {
+            StartsWith<Substring>("turnOffAllDevices")
+            End()
+        }
+    }
+
+    public struct Parser: ParserPrinter {
+        public init() {}
+
+        public var body: some ParserPrinter<Substring, DevicesLink> {
+            OneOf {
+                DevicesLink.validDevicesToggle()
+                DevicesLink.turnOffAllLink()
+            }
+        }
     }
 }

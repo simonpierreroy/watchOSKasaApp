@@ -27,11 +27,11 @@ let package = Package(
         ),
         .package(
             url: "https://github.com/pointfreeco/swift-tagged.git",
-            exact: "0.9.0"
+            exact: "0.10.0"
         ),
         .package(
             url: "https://github.com/pointfreeco/swift-parsing.git",
-            exact: "0.11.0"
+            exact: "0.12.0"
         ),
     ],
     targets: [
