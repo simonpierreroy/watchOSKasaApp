@@ -111,7 +111,7 @@ public struct DevicesReducer: ReducerProtocol {
                     guard state.devices[id: id] != nil else { return .none }
                     return .task { .deviceDetail(index: id, action: .toggle) }
                 case .device(let id, .child(let childId, .toggle)):
-                    guard let d = state.devices[id: id], d.children[id: childId] != nil else { return .none }
+                    guard let device = state.devices[id: id], device.children[id: childId] != nil else { return .none }
                     return .task {
                         return .deviceDetail(
                             index: id,
@@ -140,7 +140,7 @@ public struct DevicesReducer: ReducerProtocol {
                 return
                     .run { send in
                         let devices = try await loadDevices(token).map(DeviceReducer.State.init(device:))
-                        let states = IdentifiedArrayOf<DeviceReducer.State>(uniqueElements: devices)
+                        let states = IdentifiedArrayOf(uniqueElements: devices)
                         await send(.set(to: states), animation: .default)
                     } catch: { error, send in
                         await send(.setError(error), animation: .default)
@@ -157,20 +157,7 @@ public struct DevicesReducer: ReducerProtocol {
                 state.isLoading = .closingAll
                 return
                     .task { [devices = state.devices] in
-                        return try await withThrowingTaskGroup(of: Void.self) { group in
-                            for device in devices {
-                                if case .status = device.details {
-                                    group.addTask { _ = try await changeDeviceRelayState(token, device.id, nil, false) }
-                                }
-                                for child in device.children {
-                                    group.addTask {
-                                        _ = try await changeDeviceRelayState(token, device.id, child.id, false)
-                                    }
-                                }
-                            }
-                            try await group.waitForAll()
-                            return .doneTurnOffAll
-                        }
+                        return try await turnOffAllDevices(devices, token: token)
                     } catch: {
                         return .setError($0)
                     }
@@ -188,16 +175,35 @@ public struct DevicesReducer: ReducerProtocol {
             DeviceReducer()
         }
     }
+
+    private func turnOffAllDevices(
+        _ devices: IdentifiedArrayOf<DeviceReducer.State>,
+        token: Token
+    ) async throws -> Action {
+        try await withThrowingTaskGroup(of: Void.self) { group in
+            for device in devices {
+                if case .status = device.details {
+                    group.addTask { _ = try await changeDeviceRelayState(token, device.id, nil, false) }
+                }
+                for child in device.children {
+                    group.addTask {
+                        _ = try await changeDeviceRelayState(token, device.id, child.id, false)
+                    }
+                }
+            }
+            try await group.waitForAll()
+            return .doneTurnOffAll
+        }
+    }
 }
 
 extension DeviceReducer.State {
     init(
         device: Device
     ) {
-        let tmpChildren = device.children
-            .map {
-                DeviceChildReducer.State.init(relay: $0.state, parentId: device.id, id: $0.id, name: $0.name)
-            }
+        let tmpChildren = device.children.map {
+            DeviceChildReducer.State.init(relay: $0.state, parentId: device.id, id: $0.id, name: $0.name)
+        }
 
         self.init(id: device.id, name: device.name, children: tmpChildren, details: device.details)
     }
