@@ -254,12 +254,3 @@ public prefix func ^ <Root, Value>(
 public func absurd<A>(_: Never) -> A {}
 public func always<A>(_: A) {}
 
-extension Empty {
-    public static func completeImmediately() -> Empty {
-        return Empty(completeImmediately: true)
-    }
-}
-
-public func map<A, B>(_ f: @escaping (A) -> B) -> ([A]) -> [B] {
-    return { $0.map(f) }
-}
