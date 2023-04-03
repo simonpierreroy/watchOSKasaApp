@@ -36,7 +36,7 @@ public struct AppReducer: ReducerProtocol {
                 case .logout:
                     copy.token = nil
                 case .logged(let userState):
-                    copy.token = userState.user.token
+                    copy.token = userState.user.tokenInfo.token
                 }
                 return copy
             }

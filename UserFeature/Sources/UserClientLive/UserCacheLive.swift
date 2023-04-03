@@ -12,21 +12,37 @@ extension UserCache: DependencyKey {
 }
 
 private let userKey = "userToken"
+private let encoder = JSONEncoder()
+private let decoder = JSONDecoder()
 
 @Sendable
-private func save(user: User?) async {
-    UserDefaults.kasaAppGroup.setValue(user?.token.rawValue, forKeyPath: userKey)
-}
+private func save(user: User?) async throws {
 
-@Sendable
-private func loadBlockingUser() -> User? {
-    if let token = UserDefaults.kasaAppGroup.string(forKey: userKey) {
-        return User.init(token: .init(rawValue: token))
+    guard let user else {
+        UserDefaults.kasaAppGroup.setValue(nil, forKeyPath: userKey)
+        return
     }
-    return nil
+
+    let data = try encoder.encode(user)
+    let string = String(data: data, encoding: .utf8)
+    UserDefaults.kasaAppGroup.setValue(string, forKeyPath: userKey)
 }
 
 @Sendable
-private func loadUser() async -> User? {
-    return loadBlockingUser()
+private func loadBlockingUser() throws -> User? {
+
+    guard let stringData = UserDefaults.kasaAppGroup.string(forKey: userKey) else {
+        return nil
+    }
+
+    guard let data = stringData.data(using: .utf8) else {
+        throw UserCache.Failure.dataConversion
+    }
+    return try decoder.decode(User.self, from: data)
+
+}
+
+@Sendable
+private func loadUser() async throws -> User? {
+    return try loadBlockingUser()
 }

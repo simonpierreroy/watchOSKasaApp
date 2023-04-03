@@ -5,10 +5,15 @@ import Tagged
 import XCTestDynamicOverlay
 
 public struct UserCache {
+
+    public enum Failure: Error {
+        case dataConversion
+    }
+
     public init(
-        save: @escaping @Sendable (User?) async -> Void,
-        load: @escaping @Sendable () async -> User?,
-        loadBlocking: @escaping @Sendable () -> User?
+        save: @escaping @Sendable (User?) async throws -> Void,
+        load: @escaping @Sendable () async throws -> User?,
+        loadBlocking: @escaping @Sendable () throws -> User?
 
     ) {
         self.save = save
@@ -16,9 +21,9 @@ public struct UserCache {
         self.loadBlocking = loadBlocking
     }
 
-    public let save: @Sendable (User?) async -> Void
-    public let load: @Sendable () async -> User?
-    public let loadBlocking: @Sendable () -> User?
+    public let save: @Sendable (User?) async throws -> Void
+    public let load: @Sendable () async throws -> User?
+    public let loadBlocking: @Sendable () throws -> User?
 }
 
 extension UserCache: TestDependencyKey {

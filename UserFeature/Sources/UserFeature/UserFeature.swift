@@ -63,12 +63,12 @@ public struct UserLoggedReducer: ReducerProtocol {
         switch action {
         case .save:
             return .run { [user = state.user] send in
-                await userCache.save(user)
+                try await userCache.save(user)
                 await reloadAppExtensions()
             }
         case .delegate(.logout):
             return .run { send in
-                await userCache.save(nil)
+                try await userCache.save(nil)
                 await reloadAppExtensions()
             }
         }
@@ -108,29 +108,44 @@ public struct UserLogoutReducer: ReducerProtocol {
     @Dependency(\.userClient) var client
     @Dependency(\.userCache) var userCache
     @Dependency(\.reloadAppExtensions) var reloadAppExtensions
+    @Dependency(\.calendar) var calendar
+    @Dependency(\.date.now) var now
 
     public var body: some ReducerProtocol<State, Action> {
         BindingReducer()
         Reduce { state, action in
             switch action {
             case .login:
+                guard state.isLoading == false else { return .none }
                 state.isLoading = true
                 let credential = User.Credential(email: state.email, password: state.password)
                 return
                     .run { send in
-                        let token = try await client.login(credential).token
-                        await send(.delegate(.setUser(.init(token: token))), animation: .default)
+                        let user = try await client.login(credential)
+                        await send(.delegate(.setUser(user)), animation: .default)
                     } catch: { error, send in
                         await send(.setError(error))
                     }
             case .loadSavedUser:
+                guard state.isLoading == false else { return .none }
                 state.isLoading = true
                 return .run { send in
-                    guard let user = await userCache.load() else {
+                    guard var user = try await userCache.load() else {
                         await send(.noUserInCacheFound)
                         return
                     }
+
+                    let tokenInfo = user.tokenInfo
+                    if let expiration = calendar.date(byAdding: .hour, value: 6, to: tokenInfo.creationDate),
+                        now > expiration
+                    {
+                        let newToken = try await client.refreshToken(tokenInfo.refreshToken, user.terminalId)
+                        user.tokenInfo = .init(token: newToken, refreshToken: tokenInfo.refreshToken, creationDate: now)
+                    }
+
                     await send(.delegate(.setUser(user)))
+                } catch: { error, send in
+                    await send(.setError(error))
                 }
             case .noUserInCacheFound:
                 state.isLoading = false

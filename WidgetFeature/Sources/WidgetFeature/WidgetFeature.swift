@@ -13,7 +13,7 @@ public struct WidgetDataCache {
 
     public init(
         loadDevices: @escaping @Sendable () throws -> [Device],
-        loadUser: @escaping @Sendable () -> User?
+        loadUser: @escaping @Sendable () throws -> User?
 
     ) {
         self.loadDevices = loadDevices
@@ -21,12 +21,12 @@ public struct WidgetDataCache {
 
     }
     public let loadDevices: @Sendable () throws -> [Device]
-    public let loadUser: @Sendable () -> User?
+    public let loadUser: @Sendable () throws -> User?
 
 }
 
 public func getCacheState(cache: WidgetDataCache) throws -> WidgetState {
-    let user = cache.loadUser()
+    let user = try cache.loadUser()
     let devices = try cache.loadDevices()
     return WidgetState.init(user: user, device: devices)
 }

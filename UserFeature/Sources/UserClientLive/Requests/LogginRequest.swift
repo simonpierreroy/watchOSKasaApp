@@ -8,7 +8,9 @@
 
 import ComposableArchitecture
 import Foundation
+import KasaCore
 import KasaNetworking
+import UserClient
 
 extension Networking.App.Method {
     fileprivate static let login = Self(endpoint: "login")
@@ -23,23 +25,27 @@ extension Networking.App {
 
     struct LoggedUserInfo: Codable {
         let token: String
+        let refreshToken: String
+        let email: String
+        let accountId: String
     }
 
     private struct LoginParam: Encodable {
-        let appType = "Kasa_Android"
+        let appType: AppType = .iOS
         let cloudUserName: String
         let cloudPassword: String
-        let terminalUUID: UUID
+        let terminalUUID: User.TerminalId
+        let refreshTokenNeeded: Bool = true
     }
 
-    static func login(with credential: Credential) async throws -> LoggedUserInfo {
+    static func login(with credential: Credential, terminalUUID: User.TerminalId) async throws -> LoggedUserInfo {
 
         let requestInfo = RequestInfo<LoginParam>(
             method: .login,
             params: .init(
                 cloudUserName: credential.email,
                 cloudPassword: credential.password,
-                terminalUUID: .init()
+                terminalUUID: terminalUUID
             ),
             queryItems: [:],
             httpMethod: .post
