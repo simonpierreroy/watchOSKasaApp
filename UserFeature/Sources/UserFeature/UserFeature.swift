@@ -135,12 +135,9 @@ public struct UserLogoutReducer: ReducerProtocol {
                         return
                     }
 
-                    let tokenInfo = user.tokenInfo
-                    if let expiration = calendar.date(byAdding: .hour, value: 6, to: tokenInfo.creationDate),
-                        now > expiration
-                    {
-                        let newToken = try await client.refreshToken(tokenInfo.refreshToken, user.terminalId)
-                        user.tokenInfo = .init(token: newToken, refreshToken: tokenInfo.refreshToken, creationDate: now)
+                    if user.tokenInfo.isExpired(for: self.calendar, now: self.now) {
+                        let newToken = try await self.client.refreshToken(user.tokenInfo.refreshToken, user.terminalId)
+                        user.updateToken(to: newToken, now: self.now)
                     }
 
                     await send(.delegate(.setUser(user)))

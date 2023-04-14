@@ -36,11 +36,18 @@ public struct User: Equatable, Codable {
         public let token: Token
         public let refreshToken: RefreshToken
         public let creationDate: Date
-    }
 
-    public var tokenInfo: TokenInfo
-    public let terminalId: TerminalId
-    public let email: String
+        public func isExpired(for calendar: Calendar, now: Date) -> Bool {
+            if let expiration = calendar.date(byAdding: .hour, value: 6, to: self.creationDate) {
+                return now > expiration
+            }
+            return false
+        }
+
+        public func newInfoWithUpdatedToken(to token: Token, now: Date) -> Self {
+            return TokenInfo(token: token, refreshToken: self.refreshToken, creationDate: now)
+        }
+    }
 
     public init(
         token: Token,
@@ -52,6 +59,14 @@ public struct User: Equatable, Codable {
         self.tokenInfo = .init(token: token, refreshToken: refreshToken, creationDate: creationDateForToken)
         self.terminalId = terminalId
         self.email = email
+    }
+
+    public var tokenInfo: TokenInfo
+    public let terminalId: TerminalId
+    public let email: String
+
+    public mutating func updateToken(to newToken: Token, now: Date) {
+        self.tokenInfo = self.tokenInfo.newInfoWithUpdatedToken(to: newToken, now: now)
     }
 }
 
