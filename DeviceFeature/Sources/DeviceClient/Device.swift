@@ -115,7 +115,7 @@ extension Device {
 }
 
 public struct FlattenDevice: Equatable, Identifiable {
-    public struct DoubleID: Equatable, Hashable {
+    public struct DoubleID: Equatable, Hashable, Identifiable {
 
         public init(
             parent: Device.ID,
@@ -128,8 +128,12 @@ public struct FlattenDevice: Equatable, Identifiable {
         public let parent: Device.ID
         public let child: Device.ID?
 
-        public func added() -> String {
+        public var id: String {
             return parent.rawValue + (child?.rawValue ?? "")
+        }
+        
+        public func callAsFunction() -> String {
+            return self.id
         }
     }
 

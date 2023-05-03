@@ -37,7 +37,7 @@ extension IntentHandler: SelectDevicesIntentHandling {
         let cachedDevices = cache.device.flatten()
         let options = cachedDevices.map {
             let selected = SelectedDevice(
-                identifier: $0.id.added(),
+                identifier: $0.id(),
                 display: $0.child?.name ?? $0.device.name
             )
             selected.childId = $0.child?.id.rawValue
