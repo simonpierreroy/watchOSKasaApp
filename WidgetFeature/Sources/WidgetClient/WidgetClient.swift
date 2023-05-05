@@ -68,4 +68,10 @@ extension DataDeviceEntry {
         userIsLogged: false,
         devices: []
     )
+
+    public static let previewNoDevice = Self(
+        date: Date(),
+        userIsLogged: true,
+        devices: []
+    )
 }

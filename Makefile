@@ -21,6 +21,7 @@ FORMAT_PATHS := "$(GIT_REPO_TOPLEVEL)/Kasa WatchKit App" "$(GIT_REPO_TOPLEVEL)/K
 "$(GIT_REPO_TOPLEVEL)/DeviceFeature/Sources" "$(GIT_REPO_TOPLEVEL)/DeviceFeature/Package.swift" \
 "$(GIT_REPO_TOPLEVEL)/UserFeature/Sources" "$(GIT_REPO_TOPLEVEL)/UserFeature/Package.swift" \
 "$(GIT_REPO_TOPLEVEL)/KasaCore/Sources" "$(GIT_REPO_TOPLEVEL)/KasaCore/Package.swift" \
+"$(GIT_REPO_TOPLEVEL)/KasaWatchWidgetExtension"
 
 # Tasks
 

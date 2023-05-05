@@ -10,32 +10,55 @@ import RoutingClient
 import SwiftUI
 import WidgetKit
 
+extension View {
+    @ViewBuilder
+    func widgetLabelOptional<Label: View>(active: Bool, @ViewBuilder label: () -> Label) -> some View {
+        if active {
+            self.widgetLabel(label: label)
+        } else {
+            self
+        }
+    }
+}
+
 struct NoDevicesView: View {
 
     @Environment(\.widgetFamily) var widgetFamily
     let staticIntent: Bool
 
-    static func showText(widgetFamily: WidgetFamily) -> Bool {
+    static func showText(for widgetFamily: WidgetFamily) -> Bool {
         switch widgetFamily {
         case .accessoryInline, .systemMedium, .systemSmall,
             .systemLarge, .systemExtraLarge, .accessoryRectangular:
             return true
-        case .accessoryCircular:
+        case .accessoryCircular, .accessoryCorner:
             return false
         @unknown default:
             return false
         }
     }
 
-    static func font(widgetFamily: WidgetFamily) -> Font {
+    static func font(for widgetFamily: WidgetFamily) -> Font {
         switch widgetFamily {
         case .accessoryRectangular:
             return .callout
         case .systemMedium, .systemSmall, .systemLarge,
-            .systemExtraLarge, .accessoryInline, .accessoryCircular:
+            .systemExtraLarge, .accessoryInline, .accessoryCircular, .accessoryCorner:
             return .largeTitle
         @unknown default:
             return .largeTitle
+        }
+    }
+
+    static func showWidgetText(for widgetFamily: WidgetFamily) -> Bool {
+        switch widgetFamily {
+        case .accessoryCorner:
+            return true
+        case .accessoryInline, .systemMedium, .systemSmall,
+            .systemLarge, .systemExtraLarge, .accessoryRectangular, .accessoryCircular:
+            return false
+        @unknown default:
+            return false
         }
     }
 
@@ -45,17 +68,25 @@ struct NoDevicesView: View {
                 systemName:
                     staticIntent ? "lightbulb.slash.fill" : "square.and.pencil.circle"
             )
-            .font(NoDevicesView.font(widgetFamily: widgetFamily))
-            if NoDevicesView.showText(widgetFamily: widgetFamily) {
+            .font(NoDevicesView.font(for: widgetFamily))
+            .widgetLabelOptional(active: TurnOffView.showWidgetText(for: widgetFamily)) {
+                Text(
+                    staticIntent ? Strings.noDevice.key : Strings.noDeviceSelected.key,
+                    bundle: .module
+                )
+            }
+            if NoDevicesView.showText(for: widgetFamily) {
                 Text(
                     staticIntent ? Strings.noDevice.key : Strings.noDeviceSelected.key,
                     bundle: .module
                 )
             }
         }
+        .widgetAccentable(true)
     }
 }
 
+#if os(iOS)
 struct DeviceView: View {
 
     @Environment(\.widgetFamily) var widgetFamily
@@ -63,7 +94,7 @@ struct DeviceView: View {
     let device: FlattenDevice
     let getURL: (AppLink) -> URL
 
-    static func font(_ family: WidgetFamily) -> (Font, Font) {
+    static func font(for family: WidgetFamily) -> (Font, Font) {
 
         switch family {
         case .systemLarge:
@@ -85,10 +116,10 @@ struct DeviceView: View {
         Link(destination: getURL(getLink())) {
             VStack {
                 Image(systemName: "light.max")
-                    .font(DeviceView.font(widgetFamily).0)
+                    .font(DeviceView.font(for: widgetFamily).0)
                 Text("\(device.child?.name ?? device.device.name )")
                     .multilineTextAlignment(.center)
-                    .font(DeviceView.font(widgetFamily).1)
+                    .font(DeviceView.font(for: widgetFamily).1)
 
             }
             .padding()
@@ -133,30 +164,43 @@ struct DeviceViewMaybe: View {
         }
     }
 }
+#endif
 
 struct TurnOffView: View {
     let getURL: (AppLink) -> URL
     let toltalNumberDevices: Int
     @Environment(\.widgetFamily) var widgetFamily
 
-    static func showText(widgetFamily: WidgetFamily) -> Bool {
+    static func showText(for widgetFamily: WidgetFamily) -> Bool {
         switch widgetFamily {
         case .accessoryInline, .systemMedium, .systemSmall,
             .systemLarge, .systemExtraLarge, .accessoryRectangular:
             return true
-        case .accessoryCircular:
+        case .accessoryCircular, .accessoryCorner:
             return false
         @unknown default:
             return false
         }
     }
 
-    static func font(widgetFamily: WidgetFamily) -> Font {
+    static func showWidgetText(for widgetFamily: WidgetFamily) -> Bool {
+        switch widgetFamily {
+        case .accessoryCorner:
+            return true
+        case .accessoryInline, .systemMedium, .systemSmall,
+            .systemLarge, .systemExtraLarge, .accessoryRectangular, .accessoryCircular:
+            return false
+        @unknown default:
+            return false
+        }
+    }
+
+    static func font(for widgetFamily: WidgetFamily) -> Font {
         switch widgetFamily {
         case .accessoryRectangular:
             return .callout
         case .systemMedium, .systemSmall, .systemLarge,
-            .systemExtraLarge, .accessoryInline, .accessoryCircular:
+            .systemExtraLarge, .accessoryInline, .accessoryCircular, .accessoryCorner:
             return .largeTitle
         @unknown default:
             return .largeTitle
@@ -167,11 +211,15 @@ struct TurnOffView: View {
         Link(destination: getURL(.devices(.turnOffAllDevices))) {
             VStack {
                 Image(systemName: "moon.zzz.fill")
-                    .font(TurnOffView.font(widgetFamily: widgetFamily))
-                if TurnOffView.showText(widgetFamily: widgetFamily) {
+                    .font(TurnOffView.font(for: widgetFamily))
+                    .widgetLabelOptional(active: TurnOffView.showWidgetText(for: widgetFamily)) {
+                        Text(Strings.turnOff.key, bundle: .module)
+                    }
+                if TurnOffView.showText(for: widgetFamily) {
                     Text(Strings.turnOff.key, bundle: .module)
                 }
             }
+            .widgetAccentable(true)
         }
         .widgetURL(getURL(.devices(.turnOffAllDevices)))  // for small views
     }
@@ -187,15 +235,18 @@ struct StackList: View {
         if devices.count > 0 {
             VStack {
                 switch widgetFamily {
-                case .systemSmall, .accessoryCircular, .accessoryInline, .accessoryRectangular:
+                case .systemSmall, .accessoryCircular, .accessoryInline, .accessoryRectangular, .accessoryCorner:
                     if staticIntent {
                         TurnOffView(
                             getURL: getURL,
                             toltalNumberDevices: devices.count
                         )
                     } else {
+                        #if os(iOS)
                         DeviceViewMaybe(device: devices[safeIndex: 0], getURL: getURL)
+                        #endif
                     }
+                #if os(iOS)
                 case .systemMedium:
                     VStack {
                         DeviceRowMaybe(devices: (devices[safeIndex: 0], devices[safeIndex: 1]), getURL: getURL)
@@ -214,6 +265,7 @@ struct StackList: View {
                         DeviceRowMaybe(devices: (devices[safeIndex: 4], devices[safeIndex: 5]), getURL: getURL)
                         DeviceRowMaybe(devices: (devices[safeIndex: 6], devices[safeIndex: 7]), getURL: getURL)
                     }
+                #endif
                 @unknown default:
                     EmptyView()
                 }

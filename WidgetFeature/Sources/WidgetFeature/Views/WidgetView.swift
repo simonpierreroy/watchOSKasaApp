@@ -8,6 +8,7 @@
 import DeviceClient
 import RoutingClient
 import SwiftUI
+import WidgetClient
 import WidgetKit
 
 public struct WidgetView: View {
@@ -37,10 +38,12 @@ public struct WidgetView: View {
             switch widgetFamily {
             case .accessoryCircular, .accessoryInline:
                 AccessoryWidgetBackground()
-            case .accessoryRectangular:
+            case .accessoryRectangular, .accessoryCorner:
                 EmptyView()
+            #if os(iOS)
             case .systemMedium, .systemSmall, .systemLarge, .systemExtraLarge:
                 GradientBackgroundWidget()
+            #endif
             @unknown default:
                 EmptyView()
             }
@@ -57,5 +60,31 @@ public struct WidgetView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(WidgetView.getBackground(for: widgetFamily))
+    }
+}
+
+public struct KasaAppWidgetEntryView: View {
+
+    public init(
+        entry: DataDeviceEntry,
+        getURL: @escaping (AppLink) -> URL,
+        staticIntent: Bool
+    ) {
+        self.entry = entry
+        self.getURL = getURL
+        self.staticIntent = staticIntent
+    }
+
+    public let entry: DataDeviceEntry
+    public let getURL: (AppLink) -> URL
+    public let staticIntent: Bool
+
+    public var body: some View {
+        WidgetView(
+            logged: entry.userIsLogged,
+            devices: entry.devices,
+            getURL: getURL,
+            staticIntent: staticIntent
+        )
     }
 }

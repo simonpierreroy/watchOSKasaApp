@@ -7,7 +7,6 @@
 //
 
 import Combine
-import Dependencies
 import DeviceClient
 import RoutingClient
 import RoutingClientLive
@@ -16,22 +15,6 @@ import WidgetClient
 import WidgetClientLive
 import WidgetFeature
 import WidgetKit
-
-struct ProviderConfig {
-
-    @Dependency(\.userCache.loadBlocking) var loadUser
-    @Dependency(\.devicesCache.loadBlocking) var loadDevices
-    @Dependency(\.urlRouter.print) var getURL
-
-    func render(link: AppLink) -> URL {
-        do {
-            return try getURL(link)
-        } catch {
-            return URL(string: "urlWidgetDeepLinkIssue")!
-        }
-    }
-
-}
 
 struct StaticProvider: TimelineProvider {
 
@@ -130,33 +113,18 @@ struct IntentProvider: IntentTimelineProvider {
     }
 }
 
-struct KasaAppWidgetEntryView: View {
-    var entry: DataDeviceEntry
-    let getURL: (AppLink) -> URL
-    let staticIntent: Bool
-
-    var body: some View {
-        WidgetView(
-            logged: entry.userIsLogged,
-            devices: entry.devices,
-            getURL: getURL,
-            staticIntent: staticIntent
-        )
-    }
-}
-
 @main
 struct KasaAppWidgets: WidgetBundle {
 
     @WidgetBundleBuilder
     var body: some Widget {
-        KasaAppWidgetWithItent()
+        KasaAppWidgetWithIntent()
         KasaAppWidgetStatic()
     }
 }
 
-struct KasaAppWidgetWithItent: Widget {
-    let kind: String = "KasaAppWidgetWithItent"
+struct KasaAppWidgetWithIntent: Widget {
+    let kind: String = "KasaAppWidgetWithIntent"
 
     var body: some WidgetConfiguration {
         let provider = IntentProvider()

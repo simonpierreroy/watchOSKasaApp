@@ -131,7 +131,7 @@ public struct FlattenDevice: Equatable, Identifiable {
         public var id: String {
             return parent.rawValue + (child?.rawValue ?? "")
         }
-        
+
         public func callAsFunction() -> String {
             return self.id
         }

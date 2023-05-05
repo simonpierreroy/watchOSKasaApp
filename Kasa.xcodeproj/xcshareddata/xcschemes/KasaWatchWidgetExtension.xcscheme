@@ -15,9 +15,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "32213C7825283032009F42FD"
-               BuildableName = "KasaAppWidgetExtension.appex"
-               BlueprintName = "KasaAppWidgetExtension"
+               BlueprintIdentifier = "B358E4762A0313DA00B72F6D"
+               BuildableName = "KasaWatchWidgetExtensionExtension.appex"
+               BlueprintName = "KasaWatchWidgetExtensionExtension"
                ReferencedContainer = "container:Kasa.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -29,9 +29,23 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "32821CEB2526DB50005E9623"
-               BuildableName = "KasaApp.app"
-               BlueprintName = "KasaApp"
+               BlueprintIdentifier = "328950DE24821A3800EC3A49"
+               BuildableName = "Kasa.app"
+               BlueprintName = "Kasa WatchKit App"
+               ReferencedContainer = "container:Kasa.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "328950DA24821A3800EC3A49"
+               BuildableName = "Kasa.app"
+               BlueprintName = "Kasa"
                ReferencedContainer = "container:Kasa.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -41,9 +55,8 @@
       buildConfiguration = "Debug"
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
-      shouldUseLaunchSchemeArgsEnv = "YES">
-      <Testables>
-      </Testables>
+      shouldUseLaunchSchemeArgsEnv = "YES"
+      shouldAutocreateTestPlan = "YES">
    </TestAction>
    <LaunchAction
       buildConfiguration = "Debug"
@@ -57,23 +70,22 @@
       debugServiceExtension = "internal"
       allowLocationSimulation = "YES"
       launchAutomaticallySubstyle = "2">
-      <RemoteRunnable
-         runnableDebuggingMode = "2"
-         BundleIdentifier = "com.apple.springboard">
+      <BuildableProductRunnable
+         runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "32213C7825283032009F42FD"
-            BuildableName = "KasaAppWidgetExtension.appex"
-            BlueprintName = "KasaAppWidgetExtension"
+            BlueprintIdentifier = "B358E4762A0313DA00B72F6D"
+            BuildableName = "KasaWatchWidgetExtensionExtension.appex"
+            BlueprintName = "KasaWatchWidgetExtensionExtension"
             ReferencedContainer = "container:Kasa.xcodeproj">
          </BuildableReference>
-      </RemoteRunnable>
+      </BuildableProductRunnable>
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "32821CEB2526DB50005E9623"
-            BuildableName = "KasaApp.app"
-            BlueprintName = "KasaApp"
+            BlueprintIdentifier = "328950DE24821A3800EC3A49"
+            BuildableName = "Kasa.app"
+            BlueprintName = "Kasa WatchKit App"
             ReferencedContainer = "container:Kasa.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
@@ -100,16 +112,14 @@
       shouldUseLaunchSchemeArgsEnv = "YES"
       savedToolIdentifier = ""
       useCustomWorkingDirectory = "NO"
-      debugDocumentVersioning = "YES"
-      askForAppToLaunch = "Yes"
-      launchAutomaticallySubstyle = "2">
+      debugDocumentVersioning = "YES">
       <BuildableProductRunnable
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "32821CEB2526DB50005E9623"
-            BuildableName = "KasaApp.app"
-            BlueprintName = "KasaApp"
+            BlueprintIdentifier = "B358E4762A0313DA00B72F6D"
+            BuildableName = "KasaWatchWidgetExtensionExtension.appex"
+            BlueprintName = "KasaWatchWidgetExtensionExtension"
             ReferencedContainer = "container:Kasa.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>

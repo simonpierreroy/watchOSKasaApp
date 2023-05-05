@@ -6,7 +6,7 @@ import PackageDescription
 let package = Package(
     name: "WidgetFeature",
     defaultLocalization: "en",
-    platforms: [.iOS(.v16)],
+    platforms: [.iOS(.v16), .watchOS(.v9)],
     products: [
         .library(
             name: "WidgetFeature",

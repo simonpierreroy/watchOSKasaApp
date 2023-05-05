@@ -21,9 +21,9 @@ struct LogoutView: View {
 
     @Environment(\.widgetFamily) var widgetFamily
 
-    static func showBackground(widgetFamily: WidgetFamily) -> Bool {
+    static func showBackground(for widgetFamily: WidgetFamily) -> Bool {
         switch widgetFamily {
-        case .accessoryInline, .accessoryRectangular, .accessoryCircular:
+        case .accessoryInline, .accessoryRectangular, .accessoryCircular, .accessoryCorner:
             return false
         case .systemMedium, .systemSmall, .systemLarge, .systemExtraLarge:
             return true
@@ -32,9 +32,9 @@ struct LogoutView: View {
         }
     }
 
-    static func showText(widgetFamily: WidgetFamily) -> Bool {
+    static func showText(for widgetFamily: WidgetFamily) -> Bool {
         switch widgetFamily {
-        case .accessoryCircular:
+        case .accessoryCircular, .accessoryCorner:
             return false
         case .systemMedium, .systemSmall, .systemLarge, .systemExtraLarge, .accessoryInline, .accessoryRectangular:
             return true
@@ -43,30 +43,47 @@ struct LogoutView: View {
         }
     }
 
-    static func imageFont(widgetFamily: WidgetFamily) -> Font {
+    static func imageFont(for widgetFamily: WidgetFamily) -> Font {
         switch widgetFamily {
         case .accessoryRectangular:
             return .body
-        case .systemMedium, .systemSmall, .systemLarge, .systemExtraLarge, .accessoryInline, .accessoryCircular:
+        case .systemMedium, .systemSmall, .systemLarge, .systemExtraLarge, .accessoryInline, .accessoryCircular,
+            .accessoryCorner:
             return .largeTitle
         @unknown default:
             return .largeTitle
         }
     }
 
+    static func showWidgetText(for widgetFamily: WidgetFamily) -> Bool {
+        switch widgetFamily {
+        case .accessoryCorner:
+            return true
+        case .accessoryInline, .systemMedium, .systemSmall,
+            .systemLarge, .systemExtraLarge, .accessoryRectangular, .accessoryCircular:
+            return false
+        @unknown default:
+            return false
+        }
+    }
+
     var body: some View {
         ZStack {
-            if LogoutView.showBackground(widgetFamily: widgetFamily) {
+            if LogoutView.showBackground(for: widgetFamily) {
                 StackList(devices: LogoutView.logoutDevicesPreview, getURL: getURL, staticIntent: staticIntent)
                     .blur(radius: 4.0)
             }
             VStack {
                 Image(systemName: "person.crop.circle.badge.exclamationmark")
-                    .font(LogoutView.imageFont(widgetFamily: widgetFamily))
-                if LogoutView.showText(widgetFamily: widgetFamily) {
+                    .font(LogoutView.imageFont(for: widgetFamily))
+                    .widgetLabelOptional(active: TurnOffView.showWidgetText(for: widgetFamily)) {
+                        Text(Strings.notLogged.key, bundle: .module)
+                    }
+                if LogoutView.showText(for: widgetFamily) {
                     Text(Strings.notLogged.key, bundle: .module)
                 }
             }
+            .widgetAccentable(true)
         }
     }
 }
