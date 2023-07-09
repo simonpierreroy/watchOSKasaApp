@@ -11,14 +11,14 @@ public struct DeviceReducer: ReducerProtocol {
 
         init(
             isLoading: Bool = false,
-            route: Route? = nil,
+            alert: AlertState<Action.Alert>? = nil,
             id: Device.Id,
             name: String,
             children: [DeviceChildReducer.State],
             details: Device.State
         ) {
             self.isLoading = isLoading
-            self.route = route
+            self.alert = alert
             self.id = id
             self.name = name
             self.details = details
@@ -30,10 +30,10 @@ public struct DeviceReducer: ReducerProtocol {
         }
 
         public var isLoading: Bool
-        public var route: Route?
         public let id: Device.Id
         public let name: String
         public var details: Device.State
+        @PresentationState public var alert: AlertState<Action.Alert>?
 
         public var token: Token? = nil
 
@@ -55,9 +55,11 @@ public struct DeviceReducer: ReducerProtocol {
     public enum Action {
         case toggle
         case setError(Error)
-        case errorHandled
         case didToggle(state: RelayIsOn, info: Device.Info)
         case deviceChild(index: DeviceChildReducer.State.ID, action: DeviceChildReducer.Action)
+        case alert(PresentationAction<Alert>)
+
+        public enum Alert: Equatable {}
     }
 
     @Dependency(\.devicesClient.toggleDeviceRelayState) var toggleDeviceRelayState
@@ -82,15 +84,15 @@ public struct DeviceReducer: ReducerProtocol {
                 return .none
             case .setError(let error):
                 state.isLoading = false
-                state.route = .error(error.localizedDescription)
+                state.alert = AlertState(title: { TextState(error.localizedDescription) })
                 return .none
-            case .errorHandled:
-                state.route = nil
+            case .alert:
                 return .none
             case .deviceChild:  // Child is taking care of it
                 return .none
             }
         }
+        .ifLet(\.$alert, action: /Action.alert)
         .forEach(\.children, action: /Action.deviceChild(index:action:)) {
             DeviceChildReducer()
         }
@@ -103,14 +105,13 @@ public struct DeviceChildReducer: ReducerProtocol {
         case didToggleChild(relay: RelayIsOn)
         case toggleChild
         case setError(Error)
-        case errorHandled
+
+        case alert(PresentationAction<Alert>)
+        public enum Alert: Equatable {}
+
     }
 
     public struct State: Equatable, Identifiable {
-
-        public enum Route: Equatable {
-            case error(String)
-        }
 
         public var relay: RelayIsOn
         public let parentId: Device.Id
@@ -118,35 +119,38 @@ public struct DeviceChildReducer: ReducerProtocol {
         public var isLoading: Bool = false
         public let name: String
         public var token: Token? = nil
-        public var route: Route? = nil
+
+        @PresentationState public var alert: AlertState<Action.Alert>?
     }
 
     @Dependency(\.devicesClient.toggleDeviceRelayState) var toggleDeviceRelayState
 
-    public func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
-        switch action {
-        case .toggleChild:
-            guard let token = state.token, state.isLoading == false else {
+    public var body: some ReducerProtocol<State, Action> {
+        Reduce { state, action in
+            switch action {
+            case .toggleChild:
+                guard let token = state.token, state.isLoading == false else {
+                    return .none
+                }
+                state.isLoading = true
+                return .run { [parentId = state.parentId, childId = state.id] send in
+                    let relay = try await toggleDeviceRelayState(token, parentId, childId)
+                    await send(.didToggleChild(relay: relay), animation: .default)
+                } catch: { error, send in
+                    await send(.setError(error))
+                }
+            case .didToggleChild(let status):
+                state.isLoading = false
+                state.relay = status
+                return .none
+            case .setError(let error):
+                state.isLoading = false
+                state.alert = AlertState(title: { TextState(error.localizedDescription) })
+                return .none
+            case .alert:
                 return .none
             }
-            state.isLoading = true
-            return .run { [parentId = state.parentId, childId = state.id] send in
-                let relay = try await toggleDeviceRelayState(token, parentId, childId)
-                await send(.didToggleChild(relay: relay), animation: .default)
-            } catch: { error, send in
-                await send(.setError(error))
-            }
-        case .didToggleChild(let status):
-            state.isLoading = false
-            state.relay = status
-            return .none
-        case .setError(let error):
-            state.isLoading = false
-            state.route = .error(error.localizedDescription)
-            return .none
-        case .errorHandled:
-            state.route = nil
-            return .none
         }
+        .ifLet(\.$alert, action: /Action.alert)
     }
 }

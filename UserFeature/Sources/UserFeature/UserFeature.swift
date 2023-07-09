@@ -78,16 +78,12 @@ public struct UserLoggedReducer: ReducerProtocol {
 public struct UserLogoutReducer: ReducerProtocol {
 
     public struct State {
-        public static let empty = State(email: "", password: "", isLoading: false, route: nil)
-        public enum Route {
-            case error(Error)
-        }
+        public static let empty = State(email: "", password: "", isLoading: false, alert: nil)
 
         @BindingState public var email: String
         @BindingState public var password: String
         public var isLoading: Bool
-        public var route: Route?
-
+        @PresentationState public var alert: AlertState<Action.Alert>?
     }
 
     public enum Action: BindableAction {
@@ -96,11 +92,13 @@ public struct UserLogoutReducer: ReducerProtocol {
             case setUser(User)
         }
 
+        public enum Alert: Equatable {}
+
         case login
         case noUserInCacheFound
         case loadSavedUser
         case setError(Error)
-        case errorHandled
+        case alert(PresentationAction<Alert>)
         case delegate(Delegate)
         case binding(BindingAction<State>)
     }
@@ -152,14 +150,14 @@ public struct UserLogoutReducer: ReducerProtocol {
                 return .none
             case .setError(let error):
                 state.isLoading = false
-                state.route = .error(error)
+                state.alert = AlertState(title: { TextState(error.localizedDescription) })
                 return .none
-            case .errorHandled:
-                state.route = nil
+            case .alert:
                 return .none
             case .binding:
                 return .none
             }
         }
+        .ifLet(\.$alert, action: /Action.alert)
     }
 }

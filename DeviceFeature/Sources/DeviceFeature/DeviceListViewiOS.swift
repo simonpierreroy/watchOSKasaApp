@@ -50,11 +50,10 @@ public struct DeviceListViewiOS: View {
                 }
             }
             .alert(
-                item: viewStore.binding(
-                    get: { $0.errorMessageToDisplayText.map(DeviceListViewiOS.AlertInfo.init(title:)) },
-                    send: .tappedErrorAlert
-                ),
-                content: { Alert(title: Text($0.title)) }
+                store: self.store.scope(
+                    state: \.$alert,
+                    action: { .alert($0) }
+                )
             )
 
         }
@@ -112,7 +111,7 @@ private struct DeviceListViewSideBar: View {
                     }
                 case .turnOffAll:
                     Button {
-                        viewStore.send(.tappedTurnOfAll, animation: .default)
+                        viewStore.send(.tappedTurnOffAll, animation: .default)
                     } label: {
                         LoadingView(.constant(viewStore.isRefreshingDevices == .closingAll)) {
                             HStack {
@@ -167,7 +166,7 @@ private struct DeviceListViewBase: View {
 
                     if horizontalSizeClass == .compact {
                         Button {
-                            viewStore.send(.tappedTurnOfAll, animation: .default)
+                            viewStore.send(.tappedTurnOffAll, animation: .default)
                         } label: {
                             LoadingView(.constant(viewStore.isRefreshingDevices == .closingAll)) {
                                 Image(systemName: "moon.fill")
@@ -204,16 +203,16 @@ extension DeviceListViewiOS {
 
     public struct StateView: Equatable {
         public init(
-            errorMessageToDisplayText: String?,
+            alert: AlertState<DevicesReducer.Action.Alert>?,
             isRefreshingDevices: DevicesReducer.State.Loading,
             devicesToDisplay: IdentifiedArrayOf<DeviceReducer.State>
         ) {
-            self.errorMessageToDisplayText = errorMessageToDisplayText
+            self.alert = alert
             self.isRefreshingDevices = isRefreshingDevices
             self.devicesToDisplay = devicesToDisplay
         }
 
-        let errorMessageToDisplayText: String?
+        @PresentationState var alert: AlertState<DevicesReducer.Action.Alert>?
         let isRefreshingDevices: DevicesReducer.State.Loading
         let devicesToDisplay: IdentifiedArrayOf<DeviceReducer.State>
     }
@@ -221,25 +220,17 @@ extension DeviceListViewiOS {
     public enum Action {
 
         public enum DeviceAction {
+            case alert(PresentationAction<DeviceReducer.Action.Alert>)
             case tapped
-            case tappedErrorAlert
             case tappedDeviceChild(index: DeviceChildReducer.State.ID, action: DeviceChildReducer.Action)
         }
 
-        case tappedTurnOfAll
-        case tappedErrorAlert
+        case alert(PresentationAction<DevicesReducer.Action.Alert>)
+        case tappedTurnOffAll
         case tappedLogout
         case viewAppearReload
         case tappedRefreshButton
         case tappedDevice(index: DeviceReducer.State.ID, action: DeviceAction)
-    }
-}
-
-extension DeviceListViewiOS {
-    struct AlertInfo: Identifiable {
-        var title: String
-        var id: String { self.title }
-
     }
 }
 
@@ -297,15 +288,10 @@ public struct DeviceNoChildViewiOS: View {
                 .padding()
             }
             .alert(
-                item: viewStore.binding(
-                    get: {
-                        CasePath(DeviceReducer.State.Route.error)
-                            .extract(from: $0.route)
-                            .map { AlertInfo(title: $0) }
-                    },
-                    send: .tappedErrorAlert
-                ),
-                content: { Alert(title: Text($0.title)) }
+                store: self.store.scope(
+                    state: \.$alert,
+                    action: { .alert($0) }
+                )
             )
         }
     }
@@ -327,7 +313,7 @@ public struct DeviceChildGroupViewiOS: View {
                 Spacer()
                 ForEachStore(
                     self.store.scope(
-                        state: \DeviceReducer.State.children,
+                        state: \.children,
                         action: DeviceListViewiOS.Action.DeviceAction.tappedDeviceChild(index:action:)
                     ),
                     content: { store in
@@ -360,23 +346,13 @@ public struct DeviceChildViewiOS: View {
             }
             .disabled(viewStore.isLoading)
             .alert(
-                item: viewStore.binding(
-                    get: {
-                        CasePath(DeviceChildReducer.State.Route.error)
-                            .extract(from: $0.route)
-                            .map { AlertInfo(title: $0) }
-                    },
-                    send: .errorHandled
-                ),
-                content: { Alert(title: Text($0.title)) }
+                store: self.store.scope(
+                    state: \.$alert,
+                    action: { .alert($0) }
+                )
             )
         }
     }
-}
-
-struct AlertInfo: Identifiable {
-    var title: String
-    var id: String { self.title }
 }
 
 struct ContentStyle: ViewModifier {
@@ -397,8 +373,8 @@ extension DeviceReducer.Action {
         switch viewDetailAction {
         case .tapped:
             self = .toggle
-        case .tappedErrorAlert:
-            self = .errorHandled
+        case .alert(let action):
+            self = .alert(action)
         case .tappedDeviceChild(index: let id, let action):
             self = .deviceChild(index: id, action: action)
         }
@@ -409,13 +385,7 @@ extension DeviceListViewiOS.StateView {
     public init(
         devices: DevicesReducer.State
     ) {
-        switch devices.route {
-        case nil:
-            self.errorMessageToDisplayText = nil
-        case .some(.error(let error)):
-            self.errorMessageToDisplayText = error.localizedDescription
-        }
-
+        self.alert = devices.alert
         self.devicesToDisplay = devices.devices
         self.isRefreshingDevices = devices.isLoading
     }
@@ -429,11 +399,11 @@ extension DevicesReducer.Action {
         case .tappedDevice(index: let idx, let action):
             let deviceDetailAction = DeviceReducer.Action.init(viewDetailAction: action)
             self = .deviceDetail(index: idx, action: deviceDetailAction)
-        case .tappedErrorAlert:
-            self = .errorHandled
+        case .alert(let state):
+            self = .alert(state)
         case .tappedRefreshButton, .viewAppearReload:
             self = .fetchFromRemote
-        case .tappedTurnOfAll:
+        case .tappedTurnOffAll:
             self = .turnOffAllDevices
         case .tappedLogout:
             self = .delegate(.logout)
@@ -521,6 +491,7 @@ struct DeviceListViewiOS_Previews: PreviewProvider {
                                 changeDevicesError: "changeDevicesError"
                             )
                         )
+                        ._printChanges()
                 )
                 .scope(
                     state: DeviceListViewiOS.StateView.init(devices:),

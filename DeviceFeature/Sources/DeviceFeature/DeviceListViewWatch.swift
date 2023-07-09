@@ -67,7 +67,7 @@ public struct DeviceListViewWatch: View {
                 .disabled(viewStore.isRefreshingDevices.isInFlight)
 
                 Button {
-                    viewStore.send(.tappedLogoutButton, animation: .default)
+                    viewStore.send(.tappedLogout, animation: .default)
                 } label: {
                     Text(Strings.logoutApp.key, bundle: .module)
                         .foregroundColor(Color.logout)
@@ -76,11 +76,10 @@ public struct DeviceListViewWatch: View {
 
             }
             .alert(
-                item: viewStore.binding(
-                    get: { $0.errorMessageToDisplayText.map(AlertInfo.init(title:)) },
-                    send: .tappedErrorAlert
-                ),
-                content: { Alert(title: Text($0.title)) }
+                store: self.store.scope(
+                    state: \.$alert,
+                    action: { .alert($0) }
+                )
             )
             .onAppear {
                 if case .neverLoaded = viewStore.isRefreshingDevices {
@@ -91,18 +90,12 @@ public struct DeviceListViewWatch: View {
     }
 }
 
-struct AlertInfo: Identifiable {
-    var title: String
-    var id: String { self.title }
-}
-
 struct DeviceDetailDataViewWatch: View {
     let action: () -> Void
     let style: (image: String, tint: Color)
     let isLoading: Bool
     let isDisabled: Bool
     let name: String
-    let alertInfo: Binding<AlertInfo?>
 
     var body: some View {
         Button {
@@ -123,10 +116,6 @@ struct DeviceDetailDataViewWatch: View {
             }
         }
         .disabled(isDisabled)
-        .alert(
-            item: self.alertInfo,
-            content: { Alert(title: Text($0.title)) }
-        )
     }
 }
 
@@ -142,7 +131,7 @@ struct DeviceDetailViewWatch: View {
     }
 
     var body: some View {
-        IfLetStore(self.store.scope(state: \.child)) { childStore in
+        IfLetStore(self.store.scope(state: \.child, action: { $0 })) { childStore in
             WithViewStore(childStore) { viewStore in
                 DeviceDetailDataViewWatch(
                     action: {
@@ -154,14 +143,12 @@ struct DeviceDetailViewWatch: View {
                     style: styleFor(relay: viewStore.state.relay),
                     isLoading: viewStore.state.isLoading,
                     isDisabled: false,
-                    name: viewStore.state.name,
-                    alertInfo: viewStore.binding(
-                        get: { _ in
-                            CasePath(DeviceChildReducer.State.Route.error)
-                                .extract(from: viewStore.state.route)
-                                .map { AlertInfo(title: $0) }
-                        },
-                        send: .tappedDeviceChild(index: viewStore.state.id, action: .errorHandled)
+                    name: viewStore.state.name
+                )
+                .alert(
+                    store: childStore.scope(
+                        state: \.$alert,
+                        action: { .tappedDeviceChild(index: viewStore.state.id, action: .alert($0)) }
                     )
                 )
             }
@@ -174,14 +161,12 @@ struct DeviceDetailViewWatch: View {
                     style: styleFor(details: viewStore.device.details),
                     isLoading: viewStore.device.isLoading,
                     isDisabled: isDisabled(viewStore.device),
-                    name: viewStore.device.name,
-                    alertInfo: viewStore.binding(
-                        get: {
-                            CasePath(DeviceReducer.State.Route.error)
-                                .extract(from: $0.device.route)
-                                .map { AlertInfo(title: $0) }
-                        },
-                        send: .tappedErrorAlert
+                    name: viewStore.device.name
+                )
+                .alert(
+                    store: self.store.scope(
+                        state: \.device.$alert,
+                        action: { .alert($0) }
                     )
                 )
             }
@@ -212,16 +197,16 @@ extension DeviceListViewWatch {
 
     public struct StateView: Equatable {
         public init(
-            errorMessageToDisplayText: String?,
+            alert: AlertState<DevicesReducer.Action.Alert>?,
             isRefreshingDevices: DevicesReducer.State.Loading,
             devicesToDisplay: IdentifiedArrayOf<ListEntry>
         ) {
-            self.errorMessageToDisplayText = errorMessageToDisplayText
+            self.alert = alert
             self.isRefreshingDevices = isRefreshingDevices
             self.devicesToDisplay = devicesToDisplay
         }
 
-        let errorMessageToDisplayText: String?
+        @PresentationState var alert: AlertState<DevicesReducer.Action.Alert>?
         let isRefreshingDevices: DevicesReducer.State.Loading
         let devicesToDisplay: IdentifiedArrayOf<ListEntry>
     }
@@ -229,15 +214,15 @@ extension DeviceListViewWatch {
     public enum Action {
 
         public enum DeviceAction {
+            case alert(PresentationAction<DeviceReducer.Action.Alert>)
             case tapped
-            case tappedErrorAlert
             case tappedDeviceChild(index: DeviceChildReducer.State.ID, action: DeviceChildReducer.Action)
         }
 
+        case alert(PresentationAction<DevicesReducer.Action.Alert>)
         case tappedTurnOffAll
-        case tappedErrorAlert
+        case tappedLogout
         case viewAppearReload
-        case tappedLogoutButton
         case tappedRefreshButton
         case tappedDevice(index: DeviceReducer.State.ID, action: DeviceAction)
     }
@@ -250,8 +235,8 @@ extension DeviceReducer.Action {
         switch viewDetailAction {
         case .tapped:
             self = .toggle
-        case .tappedErrorAlert:
-            self = .errorHandled
+        case .alert(let action):
+            self = .alert(action)
         case .tappedDeviceChild(index: let id, let action):
             self = .deviceChild(index: id, action: action)
         }
@@ -262,12 +247,7 @@ extension DeviceListViewWatch.StateView {
     public init(
         devices: DevicesReducer.State
     ) {
-        switch devices.route {
-        case nil:
-            self.errorMessageToDisplayText = nil
-        case .some(.error(let error)):
-            self.errorMessageToDisplayText = error.localizedDescription
-        }
+        self.alert = devices.alert
 
         var entries: [ListEntry] = []
         for device in devices.devices {
@@ -291,14 +271,14 @@ extension DevicesReducer.Action {
         case .tappedDevice(index: let idx, let action):
             let deviceDetailAction = DeviceReducer.Action.init(viewDetailAction: action)
             self = .deviceDetail(index: idx, action: deviceDetailAction)
-        case .tappedErrorAlert:
-            self = .errorHandled
-        case .tappedLogoutButton:
+        case .tappedLogout:
             self = .delegate(.logout)
         case .tappedRefreshButton, .viewAppearReload:
             self = .fetchFromRemote
         case .tappedTurnOffAll:
             self = .turnOffAllDevices
+        case .alert(let action):
+            self = .alert(action)
         }
     }
 }

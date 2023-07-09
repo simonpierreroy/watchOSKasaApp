@@ -20,13 +20,15 @@ public struct DevicesReducer: ReducerProtocol {
         case set(to: IdentifiedArrayOf<DeviceReducer.State>)
         case fetchFromRemote
         case setError(Error)
-        case errorHandled
         case deviceDetail(index: DeviceReducer.State.ID, action: DeviceReducer.Action)
         case turnOffAllDevices
         case doneTurnOffAll
         case saveDevicesToCache
         case attemptDeepLink(DevicesLink)
         case delegate(Delegate)
+        case alert(PresentationAction<Alert>)
+
+        public enum Alert: Equatable {}
 
         public enum Delegate {
             case logout
@@ -34,18 +36,18 @@ public struct DevicesReducer: ReducerProtocol {
     }
 
     public struct State {
-        public static let empty = Self(devices: [], isLoading: .neverLoaded, route: nil, token: nil)
+        public static let empty = Self(devices: [], isLoading: .neverLoaded, alert: nil, token: nil)
 
         init(
             devices: [DeviceReducer.State],
             isLoading: Loading,
-            route: Route?,
+            alert: AlertState<Action.Alert>?,
             token: Token?,
             link: DevicesLink? = nil
         ) {
             self._devices = .init(uniqueElements: devices)
             self.isLoading = isLoading
-            self.route = route
+            self.alert = alert
             self.token = token
             self.linkToComplete = link
         }
@@ -86,7 +88,7 @@ public struct DevicesReducer: ReducerProtocol {
 
         public var token: Token?
         public var isLoading: Loading
-        public var route: Route?
+        @PresentationState public var alert: AlertState<Action.Alert>?
         public var linkToComplete: DevicesLink?
     }
 
@@ -147,10 +149,9 @@ public struct DevicesReducer: ReducerProtocol {
                     }
             case .setError(let error):
                 state.isLoading = .loaded
-                state.route = .error(error)
+                state.alert = AlertState(title: { TextState(error.localizedDescription) })
                 return .none
-            case .errorHandled:
-                state.route = nil
+            case .alert:
                 return .none
             case .turnOffAllDevices:
                 guard let token = state.token, state.isLoading == .loaded else { return .none }
@@ -171,6 +172,7 @@ public struct DevicesReducer: ReducerProtocol {
                 return .task { .saveDevicesToCache }  // Will be provide by an other feature
             }
         }
+        .ifLet(\.$alert, action: /Action.alert)
         .forEach(\.devices, action: /Action.deviceDetail(index:action:)) {
             DeviceReducer()
         }
@@ -225,20 +227,20 @@ extension Device {
 
 #if DEBUG
 extension DevicesReducer.State {
-    static let emptyLogged = Self(devices: [], isLoading: .neverLoaded, route: nil, token: "logged")
+    static let emptyLogged = Self(devices: [], isLoading: .neverLoaded, alert: nil, token: "logged")
     static let emptyLoggedLink = Self(
         devices: [],
         isLoading: .neverLoaded,
-        route: nil,
+        alert: nil,
         token: "logged",
         link: .device(Device.debug1.id, .toggle)
     )
-    static let emptyLoading = Self(devices: [], isLoading: .loadingDevices, route: nil, token: "logged")
-    static let emptyNeverLoaded = Self(devices: [], isLoading: .neverLoaded, route: nil, token: "logged")
+    static let emptyLoading = Self(devices: [], isLoading: .loadingDevices, alert: nil, token: "logged")
+    static let emptyNeverLoaded = Self(devices: [], isLoading: .neverLoaded, alert: nil, token: "logged")
     static let oneDeviceLoaded = Self(
         devices: [.init(device: .debug1)],
         isLoading: .loaded,
-        route: nil,
+        alert: nil,
         token: "logged"
     )
     static func multiRoutes(parentError: String?, childError: String?) -> Self {
@@ -246,7 +248,7 @@ extension DevicesReducer.State {
             devices: [
                 .init(
                     isLoading: false,
-                    route: childError.map { .error($0) },
+                    alert: childError.map { .init(title: TextState($0)) },
                     id: .init(rawValue: "1"),
                     name: "1",
                     children: .init(),
@@ -254,7 +256,7 @@ extension DevicesReducer.State {
                 )
             ],
             isLoading: .loaded,
-            route: parentError.map { .error(NSError(domain: $0, code: 1)) },
+            alert: parentError.map { .init(title: TextState($0)) },
             token: "logged",
             link: nil
         )
@@ -283,7 +285,7 @@ extension DevicesReducer.State {
                     )
                 },
             isLoading: .loaded,
-            route: nil,
+            alert: nil,
             token: "logged"
         )
     }

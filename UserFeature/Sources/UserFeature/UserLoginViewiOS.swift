@@ -36,7 +36,7 @@ public struct UserLoginViewiOS: View {
                             .font(.title2)
                         TextField(
                             Strings.logEmail.string,
-                            text: viewStore.binding(\.$email)
+                            text: viewStore.$email
                         )
                         .textContentType(.emailAddress)
 
@@ -51,7 +51,7 @@ public struct UserLoginViewiOS: View {
 
                         SecureField(
                             Strings.logPassword.string,
-                            text: viewStore.binding(\.$password)
+                            text: viewStore.$password
                         )
                         .textContentType(.password)
                     }
@@ -83,11 +83,10 @@ public struct UserLoginViewiOS: View {
             }
             .frame(maxWidth: .infinity)
             .alert(
-                item: viewStore.binding(
-                    get: { $0.errorMessageToDisplayText.map(AlertInfo.init(title:)) },
-                    send: .tappedErrorAlert
-                ),
-                content: { Alert(title: Text($0.title)) }
+                store: self.store.scope(
+                    state: \.$alert,
+                    action: { .alert($0) }
+                )
             )
 
         }
@@ -96,25 +95,18 @@ public struct UserLoginViewiOS: View {
 }
 
 extension UserLoginViewiOS {
-    struct AlertInfo: Identifiable {
-        var title: String
-        var id: String { self.title }
-    }
-}
-
-extension UserLoginViewiOS {
 
     public struct StateView: Equatable {
-        let errorMessageToDisplayText: String?
         let isLoadingUser: Bool
         @BindingState var email: String
         @BindingState var password: String
+        @PresentationState var alert: AlertState<UserLogoutReducer.Action.Alert>?
     }
 
     public enum Action: Equatable, BindableAction {
-        case tappedErrorAlert
         case tappedLoginButton
         case binding(BindingAction<StateView>)
+        case alert(PresentationAction<UserLogoutReducer.Action.Alert>)
     }
 }
 
@@ -122,25 +114,17 @@ extension UserLoginViewiOS.StateView {
     public init(
         userLogoutState: UserLogoutReducer.State
     ) {
-
         self.isLoadingUser = userLogoutState.isLoading
-        switch userLogoutState.route {
-        case nil:
-            self.errorMessageToDisplayText = nil
-        case .some(.error(let error)):
-            self.errorMessageToDisplayText = error.localizedDescription
-        }
-
         self.password = userLogoutState.password
         self.email = userLogoutState.email
-
+        self.alert = userLogoutState.alert
     }
 }
 
 extension UserLogoutReducer.State {
     // How to map binding state
     fileprivate var viewBindingActionKey: UserLoginViewiOS.StateView {
-        get { .init(errorMessageToDisplayText: nil, isLoadingUser: false, email: self.email, password: self.password) }
+        get { .init(isLoadingUser: false, email: self.email, password: self.password, alert: nil) }
         set {
             self.password = newValue.password
             self.email = newValue.email
@@ -153,8 +137,8 @@ extension UserLogoutReducer.Action {
         userViewAction: UserLoginViewiOS.Action
     ) {
         switch userViewAction {
-        case .tappedErrorAlert:
-            self = .errorHandled
+        case .alert(let action):
+            self = .alert(action)
         case .tappedLoginButton:
             self = .login
         case .binding(let action):
