@@ -30,21 +30,25 @@ public struct DeviceListViewiOS: View {
         WithViewStore(self.store) { viewStore in
             Group {
                 if horizontalSizeClass == .compact {
-                    NavigationView {
+                    NavigationStack {
                         DeviceListViewBase(store: store)
-                            .navigationBarItems(
-                                trailing:
+                            .toolbar {
+                                ToolbarItem(placement: .navigationBarTrailing) {
                                     Button {
                                         viewStore.send(.tappedLogout, animation: .default)
                                     } label: {
                                         Text(Strings.logoutApp.key, bundle: .module)
                                             .foregroundColor(Color.logout)
                                     }
-                            )
+                                }
+                            }
+
                     }
                 } else {
-                    NavigationView {
+                    NavigationSplitView {
                         DeviceListViewSideBar(store: store)
+
+                    } detail: {
                         DeviceListViewBase(store: store)
                     }
                 }
@@ -222,6 +226,8 @@ extension DeviceListViewiOS {
         public enum DeviceAction {
             case alert(PresentationAction<DeviceReducer.Action.Alert>)
             case tapped
+            case tappedShowInfo
+            case info(PresentationAction<DeviceInfoReducer.Action>)
             case tappedDeviceChild(index: DeviceChildReducer.State.ID, action: DeviceChildReducer.Action)
         }
 
@@ -244,6 +250,7 @@ public struct DeviceRelayFailedViewiOS: View {
                 Image(systemName: style.image).font(.title3)
                 Text(viewStore.name).multilineTextAlignment(.center).foregroundColor(style.tint)
             }
+            .frame(maxWidth: .infinity).padding()
         }
     }
 }
@@ -251,6 +258,7 @@ public struct DeviceRelayFailedViewiOS: View {
 public struct DeviceDetailViewiOS: View {
 
     let store: Store<DeviceReducer.State, DeviceListViewiOS.Action.DeviceAction>
+    @Environment(\.horizontalSizeClass) var horizontalSizeClass: UserInterfaceSizeClass?
 
     public var body: some View {
         WithViewStore(self.store) { viewStore in
@@ -263,9 +271,91 @@ public struct DeviceDetailViewiOS: View {
                 case .failed:
                     DeviceRelayFailedViewiOS(store: self.store)
                 }
+                if viewStore.details.info != nil {
+                    let button = Button {
+                        viewStore.send(.tappedShowInfo, animation: .default)
+                    } label: {
+                        Image(systemName: "info.bubble.fill")
+                            .frame(maxWidth: .infinity)
+                            .padding([.bottom])
+                    }
+                    if horizontalSizeClass == .compact {
+                        button.navigationDestination(
+                            store: self.store.scope(state: \.$info, action: { .info($0) })
+                        ) { store in
+                            DeviceInfoViewiOS(store: store)
+                        }
+                    } else {
+                        button.sheet(
+                            store: self.store.scope(state: \.$info, action: { .info($0) })
+                        ) { store in
+                            DeviceInfoViewiOS(store: store)
+                        }
+                    }
+                }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .disabled(viewStore.isLoading)
+        }
+    }
+}
+
+public struct DeviceInfoViewiOS: View {
+
+    let store: Store<DeviceInfoReducer.State, DeviceInfoReducer.Action>
+    @Environment(\.horizontalSizeClass) var horizontalSizeClass: UserInterfaceSizeClass?
+
+    public var body: some View {
+        WithViewStore(self.store) { viewStore in
+            NavigationStack {
+                List {
+                    let info = viewStore.info
+                    DeviceInfoEntryiOS(settingName: .model, value: info.model.rawValue, imageName: "poweroutlet.type.b")
+                    DeviceInfoEntryiOS(
+                        settingName: .hardwareVersion,
+                        value: info.hardwareVersion.rawValue,
+                        imageName: "hammer"
+                    )
+                    DeviceInfoEntryiOS(
+                        settingName: .softwareVersion,
+                        value: info.softwareVersion.rawValue,
+                        imageName: "gear.badge"
+                    )
+                    DeviceInfoEntryiOS(
+                        settingName: .macAddress,
+                        value: info.macAddress.rawValue,
+                        imageName: "network"
+                    )
+                }
+                .toolbar {
+                    ToolbarItem(placement: .principal) {
+                        Text(viewStore.deviceName).font(.headline)
+                    }
+                    if horizontalSizeClass != .compact {
+                        ToolbarItem(placement: .navigationBarTrailing) {
+                            Button {
+                                viewStore.send(.dismiss)
+                            } label: {
+                                Text(Strings.doneAction.key, bundle: .module)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+public struct DeviceInfoEntryiOS: View {
+    let settingName: Strings
+    let value: String
+    let imageName: String
+    public var body: some View {
+        HStack {
+            Image(systemName: imageName)
+            Text(settingName.key, bundle: .module)
+            Spacer()
+            Text(value).foregroundColor(.gray).textSelection(.enabled)
         }
     }
 }
@@ -285,6 +375,7 @@ public struct DeviceNoChildViewiOS: View {
                     Text(viewStore.name).multilineTextAlignment(.center)
                     if viewStore.isLoading { ProgressView() }
                 }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .padding()
             }
             .alert(
@@ -309,6 +400,7 @@ public struct DeviceChildGroupViewiOS: View {
                     Image(systemName: "rectangle.3.group.fill")
                     Text(Strings.deviceGroup.key, bundle: .module)
                 }
+                .frame(maxWidth: .infinity).padding()
                 if viewStore.state { ProgressView() }
                 Spacer()
                 ForEachStore(
@@ -321,7 +413,7 @@ public struct DeviceChildGroupViewiOS: View {
                     }
                 )
             }
-            .padding()
+            .padding([.bottom])
         }
     }
 }
@@ -341,6 +433,8 @@ public struct DeviceChildViewiOS: View {
                         Image(systemName: style.image).font(.title3).tint(style.tint)
                         Text(viewStore.name)
                     }
+                    .frame(maxWidth: .infinity)
+                    .padding([.leading, .trailing])
                 }
                 if viewStore.isLoading { ProgressView() }
             }
@@ -373,6 +467,10 @@ extension DeviceReducer.Action {
         switch viewDetailAction {
         case .tapped:
             self = .toggle
+        case .tappedShowInfo:
+            self = .presentInfo
+        case .info(let infoAction):
+            self = .info(infoAction)
         case .alert(let action):
             self = .alert(action)
         case .tappedDeviceChild(index: let id, let action):
@@ -500,6 +598,18 @@ struct DeviceListViewiOS_Previews: PreviewProvider {
             )
             .preferredColorScheme(.dark)
             .previewDisplayName("Error on item")
+
+            DeviceListViewiOS(
+                store: Store(
+                    initialState: .deviceWithInfo(),
+                    reducer: DevicesReducer()
+                )
+                .scope(
+                    state: DeviceListViewiOS.StateView.init(devices:),
+                    action: DevicesReducer.Action.init(deviceAction:)
+                )
+            )
+            .previewDisplayName("Device Info")
         }
     }
 }

@@ -82,6 +82,15 @@ public struct Device: Equatable, Identifiable, Codable {
         case status(relay: RelayIsOn, info: Info)
         case noRelay(info: Info)
         case failed(Failed)
+
+        public var info: Info? {
+            switch self {
+            case .noRelay(let info), .status(relay: _, let info):
+                return info
+            case .failed:
+                return nil
+            }
+        }
     }
 
     public let id: Id

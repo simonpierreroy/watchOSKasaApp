@@ -15,7 +15,8 @@ public struct DeviceReducer: ReducerProtocol {
             id: Device.Id,
             name: String,
             children: [DeviceChildReducer.State],
-            details: Device.State
+            details: Device.State,
+            info: DeviceInfoReducer.State? = nil
         ) {
             self.isLoading = isLoading
             self.alert = alert
@@ -23,6 +24,7 @@ public struct DeviceReducer: ReducerProtocol {
             self.name = name
             self.details = details
             self._children = .init(uniqueElements: children)
+            self.info = info
         }
 
         public enum Route: Equatable {
@@ -33,7 +35,9 @@ public struct DeviceReducer: ReducerProtocol {
         public let id: Device.Id
         public let name: String
         public var details: Device.State
+
         @PresentationState public var alert: AlertState<Action.Alert>?
+        @PresentationState public var info: DeviceInfoReducer.State?
 
         public var token: Token? = nil
 
@@ -58,7 +62,8 @@ public struct DeviceReducer: ReducerProtocol {
         case didToggle(state: RelayIsOn, info: Device.Info)
         case deviceChild(index: DeviceChildReducer.State.ID, action: DeviceChildReducer.Action)
         case alert(PresentationAction<Alert>)
-
+        case info(PresentationAction<DeviceInfoReducer.Action>)
+        case presentInfo
         public enum Alert: Equatable {}
     }
 
@@ -90,7 +95,16 @@ public struct DeviceReducer: ReducerProtocol {
                 return .none
             case .deviceChild:  // Child is taking care of it
                 return .none
+            case .presentInfo:
+                guard let info = state.details.info else { return .none }
+                state.info = DeviceInfoReducer.State(info: info, deviceName: state.name)
+                return .none
+            case .info:
+                return .none
             }
+        }
+        .ifLet(\.$info, action: /Action.info) {
+            DeviceInfoReducer()
         }
         .ifLet(\.$alert, action: /Action.alert)
         .forEach(\.children, action: /Action.deviceChild(index:action:)) {

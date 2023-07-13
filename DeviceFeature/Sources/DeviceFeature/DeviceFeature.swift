@@ -289,5 +289,25 @@ extension DevicesReducer.State {
             token: "logged"
         )
     }
+
+    static func deviceWithInfo() -> Self {
+        Self(
+            devices: [
+                .init(
+                    isLoading: false,
+                    alert: nil,
+                    id: .init(rawValue: "1"),
+                    name: "Nice Device",
+                    children: .init(),
+                    details: .noRelay(info: .mock),
+                    info: .init(info: .mock, deviceName: "Nice Device")
+                )
+            ],
+            isLoading: .loaded,
+            alert: nil,
+            token: "logged",
+            link: nil
+        )
+    }
 }
 #endif
