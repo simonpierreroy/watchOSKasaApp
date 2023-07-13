@@ -74,6 +74,7 @@ struct NoDevicesView: View {
                     staticIntent ? Strings.noDevice.key : Strings.noDeviceSelected.key,
                     bundle: .module
                 )
+                .widgetAccentable(true)
             }
             if NoDevicesView.showText(for: widgetFamily) {
                 Text(
@@ -82,7 +83,6 @@ struct NoDevicesView: View {
                 )
             }
         }
-        .widgetAccentable(true)
     }
 }
 
@@ -213,13 +213,14 @@ struct TurnOffView: View {
                 Image(systemName: "moon.zzz.fill")
                     .font(TurnOffView.font(for: widgetFamily))
                     .widgetLabelOptional(active: TurnOffView.showWidgetText(for: widgetFamily)) {
-                        Text(Strings.turnOff.key, bundle: .module)
+                        Text(Strings.turnOff.key, bundle: .module).widgetAccentable(true)
+
                     }
                 if TurnOffView.showText(for: widgetFamily) {
                     Text(Strings.turnOff.key, bundle: .module)
                 }
             }
-            .widgetAccentable(true)
+            .widgetAccentable(widgetFamily == .accessoryRectangular)
         }
         .widgetURL(getURL(.devices(.turnOffAllDevices)))  // for small views
     }

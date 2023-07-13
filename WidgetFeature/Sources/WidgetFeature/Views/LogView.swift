@@ -77,13 +77,14 @@ struct LogoutView: View {
                 Image(systemName: "person.crop.circle.badge.exclamationmark")
                     .font(LogoutView.imageFont(for: widgetFamily))
                     .widgetLabelOptional(active: TurnOffView.showWidgetText(for: widgetFamily)) {
-                        Text(Strings.notLogged.key, bundle: .module)
+                        Text(Strings.notLogged.key, bundle: .module).widgetAccentable(true)
+
                     }
                 if LogoutView.showText(for: widgetFamily) {
                     Text(Strings.notLogged.key, bundle: .module)
                 }
             }
-            .widgetAccentable(true)
+            .widgetAccentable(widgetFamily == .accessoryRectangular)
         }
     }
 }

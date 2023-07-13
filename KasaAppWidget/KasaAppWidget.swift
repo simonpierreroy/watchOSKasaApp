@@ -172,68 +172,90 @@ struct KasaAppWidgetStatic: Widget {
 
 struct KasaAppWidget_Previews: PreviewProvider {
     static var previews: some View {
-        KasaAppWidgetEntryView(
-            entry: DataDeviceEntry.preview(10),
-            getURL: ProviderConfig().render(link:),
-            staticIntent: false
-        )
-        .previewContext(WidgetPreviewContext(family: .systemSmall))
-        .environment(\.colorScheme, .dark)
-        KasaAppWidgetEntryView(
-            entry: DataDeviceEntry.preview(10),
-            getURL: ProviderConfig().render(link:),
-            staticIntent: true
-        )
-        .previewContext(WidgetPreviewContext(family: .systemSmall))
-        .environment(\.colorScheme, .dark)
-        KasaAppWidgetEntryView(
-            entry: DataDeviceEntry.preview(0),
-            getURL: ProviderConfig().render(link:),
-            staticIntent: false
-        )
-        .previewContext(WidgetPreviewContext(family: .systemSmall))
-        KasaAppWidgetEntryView(
-            entry: DataDeviceEntry.preview(10),
-            getURL: ProviderConfig().render(link:),
-            staticIntent: false
-        )
-        .previewContext(WidgetPreviewContext(family: .systemMedium))
-        KasaAppWidgetEntryView(
-            entry: DataDeviceEntry.preview(3),
-            getURL: ProviderConfig().render(link:),
-            staticIntent: false
-        )
-        .previewContext(WidgetPreviewContext(family: .systemMedium))
-        .environment(\.colorScheme, .dark)
-        KasaAppWidgetEntryView(
-            entry: DataDeviceEntry.preview(1),
-            getURL: ProviderConfig().render(link:),
-            staticIntent: false
-        )
-        .previewContext(WidgetPreviewContext(family: .systemMedium))
-        KasaAppWidgetEntryView(
-            entry: DataDeviceEntry.preview(0),
-            getURL: ProviderConfig().render(link:),
-            staticIntent: false
-        )
-        .previewContext(WidgetPreviewContext(family: .systemMedium))
-        KasaAppWidgetEntryView(
-            entry: DataDeviceEntry.preview(10),
-            getURL: ProviderConfig().render(link:),
-            staticIntent: false
-        )
-        .previewContext(WidgetPreviewContext(family: .systemLarge))
-        KasaAppWidgetEntryView(
-            entry: DataDeviceEntry.preview(3),
-            getURL: ProviderConfig().render(link:),
-            staticIntent: false
-        )
-        .previewContext(WidgetPreviewContext(family: .systemLarge))
-        KasaAppWidgetEntryView(
-            entry: DataDeviceEntry.previewLogout,
-            getURL: ProviderConfig().render(link:),
-            staticIntent: false
-        )
-        .previewContext(WidgetPreviewContext(family: .systemSmall))
+        Group {
+            KasaAppWidgetEntryView(
+                entry: DataDeviceEntry.preview(10),
+                getURL: ProviderConfig().render(link:),
+                staticIntent: false
+            )
+            .previewContext(WidgetPreviewContext(family: .systemSmall))
+            .environment(\.colorScheme, .dark)
+            KasaAppWidgetEntryView(
+                entry: DataDeviceEntry.preview(10),
+                getURL: ProviderConfig().render(link:),
+                staticIntent: true
+            )
+            .previewContext(WidgetPreviewContext(family: .systemSmall))
+            .environment(\.colorScheme, .dark)
+            KasaAppWidgetEntryView(
+                entry: DataDeviceEntry.preview(0),
+                getURL: ProviderConfig().render(link:),
+                staticIntent: false
+            )
+            .previewContext(WidgetPreviewContext(family: .systemSmall))
+            KasaAppWidgetEntryView(
+                entry: DataDeviceEntry.preview(10),
+                getURL: ProviderConfig().render(link:),
+                staticIntent: false
+            )
+            .previewContext(WidgetPreviewContext(family: .systemMedium))
+            KasaAppWidgetEntryView(
+                entry: DataDeviceEntry.preview(3),
+                getURL: ProviderConfig().render(link:),
+                staticIntent: false
+            )
+            .previewContext(WidgetPreviewContext(family: .systemMedium))
+            .environment(\.colorScheme, .dark)
+            KasaAppWidgetEntryView(
+                entry: DataDeviceEntry.preview(1),
+                getURL: ProviderConfig().render(link:),
+                staticIntent: false
+            )
+            .previewContext(WidgetPreviewContext(family: .systemMedium))
+            KasaAppWidgetEntryView(
+                entry: DataDeviceEntry.preview(0),
+                getURL: ProviderConfig().render(link:),
+                staticIntent: false
+            )
+            .previewContext(WidgetPreviewContext(family: .systemMedium))
+            KasaAppWidgetEntryView(
+                entry: DataDeviceEntry.preview(10),
+                getURL: ProviderConfig().render(link:),
+                staticIntent: false
+            )
+            .previewContext(WidgetPreviewContext(family: .systemLarge))
+            KasaAppWidgetEntryView(
+                entry: DataDeviceEntry.preview(3),
+                getURL: ProviderConfig().render(link:),
+                staticIntent: false
+            )
+            .previewContext(WidgetPreviewContext(family: .systemLarge))
+            KasaAppWidgetEntryView(
+                entry: DataDeviceEntry.previewLogout,
+                getURL: ProviderConfig().render(link:),
+                staticIntent: false
+            )
+            .previewContext(WidgetPreviewContext(family: .systemSmall))
+        }
+        Group {
+            KasaAppWidgetEntryView(
+                entry: DataDeviceEntry.previewLogout,
+                getURL: ProviderConfig().render(link:),
+                staticIntent: true
+            )
+            .previewContext(WidgetPreviewContext(family: .accessoryInline))
+            KasaAppWidgetEntryView(
+                entry: DataDeviceEntry.preview(1),
+                getURL: ProviderConfig().render(link:),
+                staticIntent: true
+            )
+            .previewContext(WidgetPreviewContext(family: .accessoryRectangular))
+            KasaAppWidgetEntryView(
+                entry: DataDeviceEntry.previewNoDevice,
+                getURL: ProviderConfig().render(link:),
+                staticIntent: true
+            )
+            .previewContext(WidgetPreviewContext(family: .accessoryRectangular))
+        }
     }
 }
