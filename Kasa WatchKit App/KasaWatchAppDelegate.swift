@@ -26,6 +26,7 @@ final class KasaWatchAppDelegate: NSObject, WKApplicationDelegate {
     private static let viewStore: ViewStore<Void, AppReducer.Action> = {
         ViewStore(
             KasaWatchAppDelegate.store.scope(state: always, action: { $0 }),
+            observe: { return },
             removeDuplicates: { _, _ in true }
         )
     }()

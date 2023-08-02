@@ -20,7 +20,7 @@ public struct UserReducer: ReducerProtocol {
         case logout(UserLogoutReducer.State)
     }
 
-    public var body: some ReducerProtocol<State, Action> {
+    public var body: some ReducerOf<Self> {
         Reduce { state, action in
             switch action {
             case .loggedUser(.delegate(.logout)):
@@ -109,7 +109,7 @@ public struct UserLogoutReducer: ReducerProtocol {
     @Dependency(\.calendar) var calendar
     @Dependency(\.date.now) var now
 
-    public var body: some ReducerProtocol<State, Action> {
+    public var body: some ReducerOf<Self> {
         BindingReducer()
         Reduce { state, action in
             switch action {

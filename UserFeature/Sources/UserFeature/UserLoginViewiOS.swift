@@ -24,7 +24,7 @@ public struct UserLoginViewiOS: View {
     private let store: Store<StateView, Action>
 
     public var body: some View {
-        WithViewStore(self.store) { viewStore in
+        WithViewStore(self.store, observe: { $0 }) { viewStore in
             ScrollView {
 
                 Text("Kasa").font(.largeTitle)

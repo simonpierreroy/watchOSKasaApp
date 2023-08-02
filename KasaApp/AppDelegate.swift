@@ -26,6 +26,7 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
     private static let viewStore: ViewStore<Void, AppReducer.Action> = {
         ViewStore(
             AppDelegate.store.scope(state: always, action: { $0 }),
+            observe: { return },
             removeDuplicates: { _, _ in true }
         )
     }()

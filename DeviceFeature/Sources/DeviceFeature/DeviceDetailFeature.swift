@@ -69,7 +69,7 @@ public struct DeviceReducer: ReducerProtocol {
 
     @Dependency(\.devicesClient.toggleDeviceRelayState) var toggleDeviceRelayState
 
-    public var body: some ReducerProtocol<State, Action> {
+    public var body: some ReducerOf<Self> {
         Reduce { state, action in
             switch action {
             case .toggle:
@@ -139,7 +139,7 @@ public struct DeviceChildReducer: ReducerProtocol {
 
     @Dependency(\.devicesClient.toggleDeviceRelayState) var toggleDeviceRelayState
 
-    public var body: some ReducerProtocol<State, Action> {
+    public var body: some ReducerOf<Self> {
         Reduce { state, action in
             switch action {
             case .toggleChild:

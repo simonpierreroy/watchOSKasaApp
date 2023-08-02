@@ -56,7 +56,7 @@ public struct AppReducer: ReducerProtocol {
         case devicesAction(DevicesReducer.Action)
     }
 
-    public var body: some ReducerProtocol<State, Action> {
+    public var body: some ReducerOf<Self> {
         Scope(state: \State.userState, action: /Action.userAction) {
             UserReducer()
         }

@@ -24,7 +24,7 @@ public struct UserLoginViewWatch: View {
     private let store: Store<StateView, Action>
 
     public var body: some View {
-        WithViewStore(self.store) { viewStore in
+        WithViewStore(self.store, observe: { $0 }) { viewStore in
             ScrollView {
                 Image(systemName: "person.circle")
                     .font(.title)

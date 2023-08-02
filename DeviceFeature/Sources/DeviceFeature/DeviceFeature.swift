@@ -97,7 +97,7 @@ public struct DevicesReducer: ReducerProtocol {
     @Dependency(\.devicesClient.loadDevices) var loadDevices
     @Dependency(\.reloadAppExtensions) var reloadAppExtensions
 
-    public var body: some ReducerProtocol<State, Action> {
+    public var body: some ReducerOf<Self> {
         Reduce { state, action in
             switch action {
             case .attemptDeepLink(let link):

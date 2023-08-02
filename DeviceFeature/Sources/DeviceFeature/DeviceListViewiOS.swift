@@ -27,7 +27,7 @@ public struct DeviceListViewiOS: View {
     }
 
     public var body: some View {
-        WithViewStore(self.store) { viewStore in
+        WithViewStore(self.store, observe: always, removeDuplicates: { _, _ in true }) { viewStore in
             Group {
                 if horizontalSizeClass == .compact {
                     NavigationStack {
@@ -88,17 +88,17 @@ private struct DeviceListViewSideBar: View {
     }
 
     public var body: some View {
-        WithViewStore(self.store) { viewStore in
+        WithViewStore(self.store, observe: \.isRefreshingDevices) { viewStore in
             List(ListSideBar.allCases) { tab in
                 switch tab {
                 case .refresh:
                     Button {
                         viewStore.send(.tappedRefreshButton, animation: .default)
                     } label: {
-                        LoadingView(.constant(viewStore.isRefreshingDevices == .loadingDevices)) {
+                        LoadingView(.constant(viewStore.state == .loadingDevices)) {
                             HStack {
                                 Image(systemName: "arrow.clockwise.circle.fill")
-                                    .foregroundColor(imageColor(viewStore.isRefreshingDevices.isInFlight))
+                                    .foregroundColor(imageColor(viewStore.state.isInFlight))
                                 Text(Strings.refreshList.key, bundle: .module)
                             }
                         }
@@ -109,7 +109,7 @@ private struct DeviceListViewSideBar: View {
                     } label: {
                         HStack {
                             Image(systemName: "book.closed.fill")
-                                .foregroundColor(imageColor(viewStore.isRefreshingDevices.isInFlight))
+                                .foregroundColor(imageColor(viewStore.state.isInFlight))
                             Text(Strings.logoutApp.key, bundle: .module)
                         }
                     }
@@ -117,10 +117,10 @@ private struct DeviceListViewSideBar: View {
                     Button {
                         viewStore.send(.tappedTurnOffAll, animation: .default)
                     } label: {
-                        LoadingView(.constant(viewStore.isRefreshingDevices == .closingAll)) {
+                        LoadingView(.constant(viewStore.state == .closingAll)) {
                             HStack {
                                 Image(systemName: "moon.fill")
-                                    .foregroundColor(imageColor(viewStore.isRefreshingDevices.isInFlight))
+                                    .foregroundColor(imageColor(viewStore.state.isInFlight))
                                 Text(Strings.turnOff.key, bundle: .module)
                             }
                         }
@@ -128,7 +128,7 @@ private struct DeviceListViewSideBar: View {
                 }
             }
             .listStyle(SidebarListStyle())
-            .disabled(viewStore.isRefreshingDevices.isInFlight)
+            .disabled(viewStore.state.isInFlight)
             .navigationTitle(Text("Kasa"))
         }
     }
@@ -151,7 +151,7 @@ private struct DeviceListViewBase: View {
         GridItem(.flexible()),
     ]
     public var body: some View {
-        WithViewStore(self.store) { viewStore in
+        WithViewStore(self.store, observe: \.isRefreshingDevices) { viewStore in
             ScrollView {
                 LazyVGrid(columns: columns, spacing: 10) {
                     ForEachStore(
@@ -162,7 +162,7 @@ private struct DeviceListViewBase: View {
                         content: {
                             DeviceDetailViewiOS(store: $0)
                                 .modifier(
-                                    ContentStyle(isLoading: viewStore.isRefreshingDevices.isInFlight)
+                                    ContentStyle(isLoading: viewStore.state.isInFlight)
                                 )
 
                         }
@@ -172,29 +172,29 @@ private struct DeviceListViewBase: View {
                         Button {
                             viewStore.send(.tappedTurnOffAll, animation: .default)
                         } label: {
-                            LoadingView(.constant(viewStore.isRefreshingDevices == .closingAll)) {
+                            LoadingView(.constant(viewStore.state == .closingAll)) {
                                 Image(systemName: "moon.fill")
                                 Text(Strings.turnOff.key, bundle: .module)
                             }
                         }
-                        .modifier(ContentStyle(isLoading: viewStore.isRefreshingDevices.isInFlight))
+                        .modifier(ContentStyle(isLoading: viewStore.state.isInFlight))
 
                         Button {
                             viewStore.send(.tappedRefreshButton, animation: .default)
                         } label: {
-                            LoadingView(.constant(viewStore.isRefreshingDevices == .loadingDevices)) {
+                            LoadingView(.constant(viewStore.state == .loadingDevices)) {
                                 Image(systemName: "arrow.clockwise.circle.fill")
                                 Text(Strings.refreshList.key, bundle: .module)
                             }
                         }
-                        .modifier(ContentStyle(isLoading: viewStore.isRefreshingDevices.isInFlight))
+                        .modifier(ContentStyle(isLoading: viewStore.state.isInFlight))
                     }
 
                 }
-                .disabled(viewStore.isRefreshingDevices.isInFlight).padding()
+                .disabled(viewStore.state.isInFlight).padding()
             }
             .onAppear {
-                if case .neverLoaded = viewStore.isRefreshingDevices {
+                if case .neverLoaded = viewStore.state {
                     viewStore.send(.viewAppearReload)
                 }
             }
@@ -244,7 +244,7 @@ public struct DeviceRelayFailedViewiOS: View {
     let store: Store<DeviceReducer.State, DeviceListViewiOS.Action.DeviceAction>
 
     public var body: some View {
-        WithViewStore(self.store) { viewStore in
+        WithViewStore(self.store, observe: { $0 }) { viewStore in
             let style = styleFor(details: viewStore.details)
             VStack {
                 Image(systemName: style.image).font(.title3)
@@ -261,7 +261,7 @@ public struct DeviceDetailViewiOS: View {
     @Environment(\.horizontalSizeClass) var horizontalSizeClass: UserInterfaceSizeClass?
 
     public var body: some View {
-        WithViewStore(self.store) { viewStore in
+        WithViewStore(self.store, observe: { $0 }) { viewStore in
             VStack {
                 switch viewStore.details {
                 case .status:
@@ -306,7 +306,7 @@ public struct DeviceInfoViewiOS: View {
     @Environment(\.horizontalSizeClass) var horizontalSizeClass: UserInterfaceSizeClass?
 
     public var body: some View {
-        WithViewStore(self.store) { viewStore in
+        WithViewStore(self.store, observe: { $0 }) { viewStore in
             NavigationStack {
                 List {
                     let info = viewStore.info
@@ -365,7 +365,7 @@ public struct DeviceNoChildViewiOS: View {
     let store: Store<DeviceReducer.State, DeviceListViewiOS.Action.DeviceAction>
 
     public var body: some View {
-        WithViewStore(self.store) { viewStore in
+        WithViewStore(self.store, observe: { $0 }) { viewStore in
             Button {
                 viewStore.send(.tapped, animation: .default)
             } label: {
@@ -423,7 +423,7 @@ public struct DeviceChildViewiOS: View {
     let store: Store<DeviceChildReducer.State, DeviceChildReducer.Action>
 
     public var body: some View {
-        WithViewStore(self.store) { viewStore in
+        WithViewStore(self.store, observe: { $0 }) { viewStore in
             VStack {
                 Button {
                     viewStore.send(.toggleChild, animation: .default)

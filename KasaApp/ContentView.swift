@@ -31,29 +31,33 @@ struct ContentView: View {
                     state: \.userState,
                     action: AppReducer.Action.userAction
                 )
-        ) {
-            CaseLet(state: /UserReducer.State.logout, action: UserReducer.Action.logoutUser) { logoutStore in
-                UserLoginViewiOS(
-                    store:
-                        logoutStore
-                        .scope(
-                            state: UserLoginViewiOS.StateView.init(userLogoutState:),
-                            action: UserLogoutReducer.Action.init(userViewAction:)
-                        )
-                )
-            }
-            CaseLet(state: /UserReducer.State.logged, action: UserReducer.Action.loggedUser) { _ in
-                DeviceListViewiOS(
-                    store: self.globalStore
-                        .scope(
-                            state: \.devicesState,
-                            action: AppReducer.Action.devicesAction
-                        )
-                        .scope(
-                            state: DeviceListViewiOS.StateView.init(devices:),
-                            action: DevicesReducer.Action.init(deviceAction:)
-                        )
-                )
+        ) { userState in
+            switch userState {
+            case .logout:
+                CaseLet(/UserReducer.State.logout, action: UserReducer.Action.logoutUser) { logoutStore in
+                    UserLoginViewiOS(
+                        store:
+                            logoutStore
+                            .scope(
+                                state: UserLoginViewiOS.StateView.init(userLogoutState:),
+                                action: UserLogoutReducer.Action.init(userViewAction:)
+                            )
+                    )
+                }
+            case .logged:
+                CaseLet(/UserReducer.State.logged, action: UserReducer.Action.loggedUser) { _ in
+                    DeviceListViewiOS(
+                        store: self.globalStore
+                            .scope(
+                                state: \.devicesState,
+                                action: AppReducer.Action.devicesAction
+                            )
+                            .scope(
+                                state: DeviceListViewiOS.StateView.init(devices:),
+                                action: DevicesReducer.Action.init(deviceAction:)
+                            )
+                    )
+                }
             }
         }
     }

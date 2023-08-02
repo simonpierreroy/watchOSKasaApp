@@ -26,7 +26,7 @@ public struct DeviceListViewWatch: View {
     }
 
     public var body: some View {
-        WithViewStore(self.store) { viewStore in
+        WithViewStore(self.store, observe: \.isRefreshingDevices) { viewStore in
             List {
                 Group {
 
@@ -43,7 +43,7 @@ public struct DeviceListViewWatch: View {
                     Button {
                         viewStore.send(.tappedTurnOffAll, animation: .default)
                     } label: {
-                        LoadingView(.constant(viewStore.isRefreshingDevices == .closingAll)) {
+                        LoadingView(.constant(viewStore.state == .closingAll)) {
                             HStack {
                                 Image(systemName: "moon.fill")
                                 Text(Strings.turnOff.key, bundle: .module)
@@ -56,7 +56,7 @@ public struct DeviceListViewWatch: View {
                         viewStore.send(.tappedRefreshButton, animation: .default)
                     } label: {
                         HStack {
-                            LoadingView(.constant(viewStore.isRefreshingDevices == .loadingDevices)) {
+                            LoadingView(.constant(viewStore.state == .loadingDevices)) {
                                 Image(systemName: "arrow.clockwise.circle.fill")
                                 Text(Strings.refreshList.key, bundle: .module)
                             }
@@ -64,7 +64,7 @@ public struct DeviceListViewWatch: View {
                     }
                     .foregroundColor(Color.valid).listRowPlatterColor(Color.valid.opacity(0.14))
                 }
-                .disabled(viewStore.isRefreshingDevices.isInFlight)
+                .disabled(viewStore.state.isInFlight)
 
                 Button {
                     viewStore.send(.tappedLogout, animation: .default)
@@ -82,7 +82,7 @@ public struct DeviceListViewWatch: View {
                 )
             )
             .onAppear {
-                if case .neverLoaded = viewStore.isRefreshingDevices {
+                if case .neverLoaded = viewStore.state {
                     viewStore.send(.viewAppearReload)
                 }
             }
@@ -132,7 +132,7 @@ struct DeviceDetailViewWatch: View {
 
     var body: some View {
         IfLetStore(self.store.scope(state: \.child, action: { $0 })) { childStore in
-            WithViewStore(childStore) { viewStore in
+            WithViewStore(childStore, observe: { $0 }) { viewStore in
                 DeviceDetailDataViewWatch(
                     action: {
                         viewStore.send(
@@ -153,7 +153,7 @@ struct DeviceDetailViewWatch: View {
                 )
             }
         } else: {
-            WithViewStore(self.store) { viewStore in
+            WithViewStore(self.store, observe: { $0 }) { viewStore in
                 DeviceDetailDataViewWatch(
                     action: {
                         viewStore.send(.tapped, animation: .default)

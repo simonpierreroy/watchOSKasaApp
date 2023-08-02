@@ -23,7 +23,7 @@ let package = Package(
     dependencies: [
         .package(
             url: "https://github.com/pointfreeco/swift-composable-architecture.git",
-            exact: "0.56.0"
+            exact: "0.58.0"
         ),
         .package(
             url: "https://github.com/pointfreeco/swift-tagged.git",
