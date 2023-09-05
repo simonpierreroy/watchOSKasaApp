@@ -11,23 +11,24 @@ import DeviceClient
 import Foundation
 import UserClient
 
-struct AppDelegateReducer: ReducerProtocol {
+struct AppDelegateReducer: Reducer {
     typealias State = AppReducer.State
     typealias Action = AppReducer.Action
 
     @Dependency(\.urlRouter.parse) var parse
 
-    func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
+    func reduce(into state: inout State, action: Action) -> Effect<Action> {
         switch action {
         case .delegate(.applicationDidFinishLaunching):
-            return .task { .userAction(.logoutUser(.loadSavedUser)) }
+            return .send(.userAction(.logoutUser(.loadSavedUser)))
         case .delegate(.applicationWillTerminate), .delegate(.applicationWillResignActive):
-            return .task { .userAction(.loggedUser(.save)) }
+            return .send(.userAction(.loggedUser(.save)))
         case .delegate(.openURLContexts(let urls)):
             for url in urls {
                 if let link = try? parse(url) {
                     switch link {
-                    case .devices(let deviceLink): return .task { .devicesAction(.attemptDeepLink(deviceLink)) }
+                    case .devices(let deviceLink):
+                        return .send(.devicesAction(.attemptDeepLink(deviceLink)))
                     }
                 }
             }

@@ -70,7 +70,7 @@ struct ContentView_Previews: PreviewProvider {
         ContentView(
             store: Store(
                 initialState: .empty,
-                reducer: AppReducer()
+                reducer: { AppReducer() }
             )
         )
     }

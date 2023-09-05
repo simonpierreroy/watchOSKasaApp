@@ -5,7 +5,7 @@ import KasaCore
 import Tagged
 import UserClient
 
-public struct UserReducer: ReducerProtocol {
+public struct UserReducer: Reducer {
 
     public init() {}
 
@@ -28,7 +28,7 @@ public struct UserReducer: ReducerProtocol {
                 return .none
             case .logoutUser(.delegate(.setUser(let user))):
                 state = .logged(.init(user: user))
-                return .task { .loggedUser(.save) }
+                return .send(.loggedUser(.save))
             case .logoutUser, .loggedUser:
                 return .none
             }
@@ -42,7 +42,7 @@ public struct UserReducer: ReducerProtocol {
     }
 }
 
-public struct UserLoggedReducer: ReducerProtocol {
+public struct UserLoggedReducer: Reducer {
     public struct State: Equatable {
         public var user: User
     }
@@ -59,7 +59,7 @@ public struct UserLoggedReducer: ReducerProtocol {
     @Dependency(\.userCache) var userCache
     @Dependency(\.reloadAppExtensions) var reloadAppExtensions
 
-    public func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
+    public func reduce(into state: inout State, action: Action) -> Effect<Action> {
         switch action {
         case .save:
             return .run { [user = state.user] send in
@@ -75,21 +75,26 @@ public struct UserLoggedReducer: ReducerProtocol {
     }
 }
 
-public struct UserLogoutReducer: ReducerProtocol {
+public struct UserLogoutReducer: Reducer {
 
     public struct State {
         public static let empty = State(email: "", password: "", isLoading: false, alert: nil)
 
-        @BindingState public var email: String
-        @BindingState public var password: String
+        public var email: String
+        public var password: String
         public var isLoading: Bool
         @PresentationState public var alert: AlertState<Action.Alert>?
     }
 
-    public enum Action: BindableAction {
+    public enum Action {
 
         public enum Delegate {
             case setUser(User)
+        }
+
+        public enum Bind: Equatable {
+            case setEmail(String)
+            case setPassword(String)
         }
 
         public enum Alert: Equatable {}
@@ -100,7 +105,7 @@ public struct UserLogoutReducer: ReducerProtocol {
         case setError(Error)
         case alert(PresentationAction<Alert>)
         case delegate(Delegate)
-        case binding(BindingAction<State>)
+        case bind(Bind)
     }
 
     @Dependency(\.userClient) var client
@@ -110,7 +115,6 @@ public struct UserLogoutReducer: ReducerProtocol {
     @Dependency(\.date.now) var now
 
     public var body: some ReducerOf<Self> {
-        BindingReducer()
         Reduce { state, action in
             switch action {
             case .login:
@@ -154,7 +158,11 @@ public struct UserLogoutReducer: ReducerProtocol {
                 return .none
             case .alert:
                 return .none
-            case .binding:
+            case .bind(.setEmail(let email)):
+                state.email = email
+                return .none
+            case .bind(.setPassword(let password)):
+                state.password = password
                 return .none
             }
         }

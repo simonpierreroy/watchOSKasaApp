@@ -34,12 +34,12 @@ public struct UserLoginViewWatch: View {
                 Group {
                     TextField(
                         Strings.logEmail.string,
-                        text: viewStore.$email
+                        text: viewStore.binding(get: \.email, send: { .bind(.setEmail($0)) })
                     )
                     .textContentType(.emailAddress)
                     SecureField(
                         Strings.logPassword.string,
-                        text: viewStore.$password
+                        text: viewStore.binding(get: \.password, send: { .bind(.setPassword($0)) })
                     )
                     .textContentType(.password)
 
@@ -71,14 +71,14 @@ extension UserLoginViewWatch {
 
     public struct StateView: Equatable {
         let isLoadingUser: Bool
-        @BindingState var email: String
-        @BindingState var password: String
+        let email: String
+        let password: String
         @PresentationState var alert: AlertState<UserLogoutReducer.Action.Alert>?
     }
 
-    public enum Action: Equatable, BindableAction {
+    public enum Action: Equatable {
         case tappedLoginButton
-        case binding(BindingAction<StateView>)
+        case bind(UserLogoutReducer.Action.Bind)
         case alert(PresentationAction<UserLogoutReducer.Action.Alert>)
     }
 }
@@ -95,17 +95,6 @@ extension UserLoginViewWatch.StateView {
     }
 }
 
-extension UserLogoutReducer.State {
-    // How to map binding state
-    fileprivate var viewBindingActionKey: UserLoginViewWatch.StateView {
-        get { .init(isLoadingUser: false, email: self.email, password: self.password, alert: nil) }
-        set {
-            self.password = newValue.password
-            self.email = newValue.email
-        }
-    }
-}
-
 extension UserLogoutReducer.Action {
     public init(
         userViewAction: UserLoginViewWatch.Action
@@ -115,8 +104,8 @@ extension UserLogoutReducer.Action {
             self = .alert(action)
         case .tappedLoginButton:
             self = .login
-        case .binding(let action):
-            self = .binding(action.pullback(\.viewBindingActionKey))
+        case .bind(let bindingAction):
+            self = .bind(bindingAction)
         }
     }
 }
@@ -129,7 +118,7 @@ struct UserLoginView_Previews: PreviewProvider {
                 store:
                     Store(
                         initialState: .empty,
-                        reducer: UserLogoutReducer()
+                        reducer: { UserLogoutReducer() }
                     )
                     .scope(
                         state: UserLoginViewWatch.StateView.init(userLogoutState:),
@@ -142,7 +131,10 @@ struct UserLoginView_Previews: PreviewProvider {
                 store:
                     Store(
                         initialState: .empty,
-                        reducer: UserLogoutReducer().dependency(\.userClient, .mockFailed())
+                        reducer: {
+                            UserLogoutReducer().dependency(\.userClient, .mockFailed())
+
+                        }
                     )
                     .scope(
                         state: UserLoginViewWatch.StateView.init(userLogoutState:),
@@ -155,7 +147,7 @@ struct UserLoginView_Previews: PreviewProvider {
                 store:
                     Store(
                         initialState: .empty,
-                        reducer: UserLogoutReducer()
+                        reducer: { UserLogoutReducer() }
                     )
                     .scope(
                         state: UserLoginViewWatch.StateView.init(userLogoutState:),
@@ -169,7 +161,7 @@ struct UserLoginView_Previews: PreviewProvider {
                 store:
                     Store(
                         initialState: .init(email: "", password: "", isLoading: true),
-                        reducer: UserLogoutReducer()
+                        reducer: { UserLogoutReducer() }
                     )
                     .scope(
                         state: UserLoginViewWatch.StateView.init(userLogoutState:),

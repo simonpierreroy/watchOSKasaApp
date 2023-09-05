@@ -8,11 +8,11 @@
 import ComposableArchitecture
 import Foundation
 
-struct GlueFeatures: ReducerProtocol {
+struct GlueFeatures: Reducer {
     typealias State = AppReducer.State
     typealias Action = AppReducer.Action
 
-    func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
+    func reduce(into state: inout State, action: Action) -> Effect<Action> {
         switch action {
         case .devicesAction(.delegate(let delegated)):
             switch delegated {

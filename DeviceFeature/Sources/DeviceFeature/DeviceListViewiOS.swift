@@ -224,10 +224,9 @@ extension DeviceListViewiOS {
     public enum Action {
 
         public enum DeviceAction {
-            case alert(PresentationAction<DeviceReducer.Action.Alert>)
+            case destination(PresentationAction<DeviceReducer.Destination.Action>)
             case tapped
             case tappedShowInfo
-            case info(PresentationAction<DeviceInfoReducer.Action>)
             case tappedDeviceChild(index: DeviceChildReducer.State.ID, action: DeviceChildReducer.Action)
         }
 
@@ -281,13 +280,18 @@ public struct DeviceDetailViewiOS: View {
                     }
                     if horizontalSizeClass == .compact {
                         button.navigationDestination(
-                            store: self.store.scope(state: \.$info, action: { .info($0) })
+                            store: self.store.scope(state: \.$destination, action: { .destination($0) }),
+                            state: /DeviceReducer.Destination.State.info,
+                            action: DeviceReducer.Destination.Action.info
                         ) { store in
                             DeviceInfoViewiOS(store: store)
                         }
+
                     } else {
                         button.sheet(
-                            store: self.store.scope(state: \.$info, action: { .info($0) })
+                            store: self.store.scope(state: \.$destination, action: { .destination($0) }),
+                            state: /DeviceReducer.Destination.State.info,
+                            action: DeviceReducer.Destination.Action.info
                         ) { store in
                             DeviceInfoViewiOS(store: store)
                         }
@@ -379,10 +383,9 @@ public struct DeviceNoChildViewiOS: View {
                 .padding()
             }
             .alert(
-                store: self.store.scope(
-                    state: \.$alert,
-                    action: { .alert($0) }
-                )
+                store: self.store.scope(state: \.$destination, action: { .destination($0) }),
+                state: /DeviceReducer.Destination.State.alert,
+                action: DeviceReducer.Destination.Action.alert
             )
         }
     }
@@ -469,10 +472,8 @@ extension DeviceReducer.Action {
             self = .toggle
         case .tappedShowInfo:
             self = .presentInfo
-        case .info(let infoAction):
-            self = .info(infoAction)
-        case .alert(let action):
-            self = .alert(action)
+        case .destination(let destination):
+            self = .destination(destination)
         case .tappedDeviceChild(index: let id, let action):
             self = .deviceChild(index: id, action: action)
         }
@@ -516,7 +517,7 @@ struct DeviceListViewiOS_Previews: PreviewProvider {
             DeviceListViewiOS(
                 store: Store(
                     initialState: .emptyNeverLoaded,
-                    reducer: DevicesReducer()
+                    reducer: { DevicesReducer() }
                 )
                 .scope(
                     state: DeviceListViewiOS.StateView.init(devices:),
@@ -528,7 +529,7 @@ struct DeviceListViewiOS_Previews: PreviewProvider {
             DeviceListViewiOS(
                 store: Store(
                     initialState: .emptyLoggedLink,
-                    reducer: DevicesReducer()
+                    reducer: { DevicesReducer() }
                 )
                 .scope(
                     state: DeviceListViewiOS.StateView.init(devices:),
@@ -543,7 +544,7 @@ struct DeviceListViewiOS_Previews: PreviewProvider {
                         parentError: "Erorr parent",
                         childError: "Error child"
                     ),
-                    reducer: DevicesReducer()
+                    reducer: { DevicesReducer() }
                 )
                 .scope(
                     state: DeviceListViewiOS.StateView.init(devices:),
@@ -555,7 +556,7 @@ struct DeviceListViewiOS_Previews: PreviewProvider {
             DeviceListViewiOS(
                 store: Store(
                     initialState: .nDeviceLoaded(n: 5, indexFailed: [1, 4]),
-                    reducer: DevicesReducer()
+                    reducer: { DevicesReducer() }
                 )
                 .scope(
                     state: DeviceListViewiOS.StateView.init(devices:),
@@ -567,7 +568,7 @@ struct DeviceListViewiOS_Previews: PreviewProvider {
             DeviceListViewiOS(
                 store: Store(
                     initialState: .nDeviceLoaded(n: 5, childrenCount: 4, indexFailed: [3]),
-                    reducer: DevicesReducer()
+                    reducer: { DevicesReducer() }
                 )
                 .scope(
                     state: DeviceListViewiOS.StateView.init(devices:),
@@ -579,17 +580,19 @@ struct DeviceListViewiOS_Previews: PreviewProvider {
             DeviceListViewiOS(
                 store: Store(
                     initialState: .nDeviceLoaded(n: 4),
-                    reducer: DevicesReducer()
-                        .dependency(
-                            \.devicesClient,
-                            .devicesEnvError(
-                                loadError: "loadError",
-                                toggleError: "toggleError",
-                                getDevicesError: "getDevicesError",
-                                changeDevicesError: "changeDevicesError"
+                    reducer: {
+                        DevicesReducer()
+                            .dependency(
+                                \.devicesClient,
+                                .devicesEnvError(
+                                    loadError: "loadError",
+                                    toggleError: "toggleError",
+                                    getDevicesError: "getDevicesError",
+                                    changeDevicesError: "changeDevicesError"
+                                )
                             )
-                        )
-                        ._printChanges()
+                            ._printChanges()
+                    }
                 )
                 .scope(
                     state: DeviceListViewiOS.StateView.init(devices:),
@@ -602,7 +605,7 @@ struct DeviceListViewiOS_Previews: PreviewProvider {
             DeviceListViewiOS(
                 store: Store(
                     initialState: .deviceWithInfo(),
-                    reducer: DevicesReducer()
+                    reducer: { DevicesReducer() }
                 )
                 .scope(
                     state: DeviceListViewiOS.StateView.init(devices:),

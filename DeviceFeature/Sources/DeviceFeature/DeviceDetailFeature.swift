@@ -5,13 +5,33 @@ import Foundation
 import KasaCore
 import Tagged
 
-public struct DeviceReducer: ReducerProtocol {
+public struct DeviceReducer: Reducer {
+
+    public struct Destination: Reducer {
+
+        public enum State: Equatable {
+            case alert(AlertState<Action.Alert>)
+            case info(DeviceInfoReducer.State)
+        }
+
+        public enum Action {
+            public enum Alert: Equatable {}
+            case alert(Alert)
+            case info(DeviceInfoReducer.Action)
+        }
+
+        public var body: some ReducerOf<Self> {
+            Scope(state: /State.info, action: /Action.info) {
+                DeviceInfoReducer()
+            }
+        }
+    }
 
     public struct State: Equatable, Identifiable {
 
         init(
             isLoading: Bool = false,
-            alert: AlertState<Action.Alert>? = nil,
+            destination: Destination.State? = nil,
             id: Device.Id,
             name: String,
             children: [DeviceChildReducer.State],
@@ -19,16 +39,11 @@ public struct DeviceReducer: ReducerProtocol {
             info: DeviceInfoReducer.State? = nil
         ) {
             self.isLoading = isLoading
-            self.alert = alert
             self.id = id
             self.name = name
             self.details = details
             self._children = .init(uniqueElements: children)
-            self.info = info
-        }
-
-        public enum Route: Equatable {
-            case error(String)
+            self.destination = destination
         }
 
         public var isLoading: Bool
@@ -36,8 +51,7 @@ public struct DeviceReducer: ReducerProtocol {
         public let name: String
         public var details: Device.State
 
-        @PresentationState public var alert: AlertState<Action.Alert>?
-        @PresentationState public var info: DeviceInfoReducer.State?
+        @PresentationState public var destination: Destination.State?
 
         public var token: Token? = nil
 
@@ -61,10 +75,8 @@ public struct DeviceReducer: ReducerProtocol {
         case setError(Error)
         case didToggle(state: RelayIsOn, info: Device.Info)
         case deviceChild(index: DeviceChildReducer.State.ID, action: DeviceChildReducer.Action)
-        case alert(PresentationAction<Alert>)
-        case info(PresentationAction<DeviceInfoReducer.Action>)
+        case destination(PresentationAction<Destination.Action>)
         case presentInfo
-        public enum Alert: Equatable {}
     }
 
     @Dependency(\.devicesClient.toggleDeviceRelayState) var toggleDeviceRelayState
@@ -89,31 +101,32 @@ public struct DeviceReducer: ReducerProtocol {
                 return .none
             case .setError(let error):
                 state.isLoading = false
-                state.alert = AlertState(title: { TextState(error.localizedDescription) })
-                return .none
-            case .alert:
+                state.destination = .alert(
+                    AlertState(title: { TextState(error.localizedDescription) })
+                )
                 return .none
             case .deviceChild:  // Child is taking care of it
                 return .none
             case .presentInfo:
                 guard let info = state.details.info else { return .none }
-                state.info = DeviceInfoReducer.State(info: info, deviceName: state.name)
+                state.destination = .info(
+                    DeviceInfoReducer.State(info: info, deviceName: state.name)
+                )
                 return .none
-            case .info:
+            case .destination:
                 return .none
             }
         }
-        .ifLet(\.$info, action: /Action.info) {
-            DeviceInfoReducer()
+        .ifLet(\.$destination, action: /Action.destination) {
+            Destination()
         }
-        .ifLet(\.$alert, action: /Action.alert)
         .forEach(\.children, action: /Action.deviceChild(index:action:)) {
             DeviceChildReducer()
         }
     }
 }
 
-public struct DeviceChildReducer: ReducerProtocol {
+public struct DeviceChildReducer: Reducer {
 
     public enum Action {
         case didToggleChild(relay: RelayIsOn)

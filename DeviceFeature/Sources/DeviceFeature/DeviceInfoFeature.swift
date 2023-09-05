@@ -13,7 +13,7 @@ import Foundation
 import KasaCore
 import Tagged
 
-public struct DeviceInfoReducer: ReducerProtocol {
+public struct DeviceInfoReducer: Reducer {
 
     @Dependency(\.dismiss) var dismiss
     public struct State: Equatable {
@@ -25,10 +25,12 @@ public struct DeviceInfoReducer: ReducerProtocol {
         case dismiss
     }
 
-    public func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
+    public func reduce(into state: inout State, action: Action) -> Effect<Action> {
         switch action {
         case .dismiss:
-            return .fireAndForget { await self.dismiss(animation: .default) }
+            return .run { _ in
+                await self.dismiss(animation: .default)
+            }
         }
     }
 }

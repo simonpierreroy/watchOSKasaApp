@@ -12,7 +12,7 @@ import Foundation
 import KasaCore
 import Tagged
 
-public struct DevicesReducer: ReducerProtocol {
+public struct DevicesReducer: Reducer {
 
     public init() {}
 
@@ -82,10 +82,6 @@ public struct DevicesReducer: ReducerProtocol {
             set { self._devices = newValue }
         }
 
-        public enum Route {
-            case error(Error)
-        }
-
         public var token: Token?
         public var isLoading: Loading
         @PresentationState public var alert: AlertState<Action.Alert>?
@@ -108,18 +104,18 @@ public struct DevicesReducer: ReducerProtocol {
                 defer { state.linkToComplete = nil }
 
                 switch link {
-                case .turnOffAllDevices: return .task { .turnOffAllDevices }
+                case .turnOffAllDevices: return .send(.turnOffAllDevices)
                 case .device(let id, .toggle):
                     guard state.devices[id: id] != nil else { return .none }
-                    return .task { .deviceDetail(index: id, action: .toggle) }
+                    return .send(.deviceDetail(index: id, action: .toggle))
                 case .device(let id, .child(let childId, .toggle)):
                     guard let device = state.devices[id: id], device.children[id: childId] != nil else { return .none }
-                    return .task {
-                        return .deviceDetail(
+                    return .send(
+                        .deviceDetail(
                             index: id,
                             action: .deviceChild(index: childId, action: .toggleChild)
                         )
-                    }
+                    )
                 }
             case .set(let devices):
                 state.isLoading = .loaded
@@ -132,21 +128,20 @@ public struct DevicesReducer: ReducerProtocol {
                 }
             case .saveDevicesToCache:
                 let list = state.devices.map(Device.init(deviceState:))
-                return .fireAndForget {
+                return .run { _ in
                     try await saveToCache(list)
                     await reloadAppExtensions()
                 }
             case .fetchFromRemote:
                 guard let token = state.token else { return .none }
                 state.isLoading = .loadingDevices
-                return
-                    .run { send in
-                        let devices = try await loadDevices(token).map(DeviceReducer.State.init(device:))
-                        let states = IdentifiedArrayOf(uniqueElements: devices)
-                        await send(.set(to: states), animation: .default)
-                    } catch: { error, send in
-                        await send(.setError(error), animation: .default)
-                    }
+                return .run { send in
+                    let devices = try await loadDevices(token).map(DeviceReducer.State.init(device:))
+                    let states = IdentifiedArrayOf(uniqueElements: devices)
+                    await send(.set(to: states), animation: .default)
+                } catch: { error, send in
+                    await send(.setError(error), animation: .default)
+                }
             case .setError(let error):
                 state.isLoading = .loaded
                 state.alert = AlertState(title: { TextState(error.localizedDescription) })
@@ -157,19 +152,19 @@ public struct DevicesReducer: ReducerProtocol {
                 guard let token = state.token, state.isLoading == .loaded else { return .none }
                 state.isLoading = .closingAll
                 return
-                    .task { [devices = state.devices] in
-                        return try await turnOffAllDevices(devices, token: token)
-                    } catch: {
-                        return .setError($0)
+                    .run { [devices = state.devices] send in
+                        await send(try turnOffAllDevices(devices, token: token))
+                    } catch: { (error, send) in
+                        await send(.setError(error))
                     }
                     .animation()
             case .doneTurnOffAll:
                 state.isLoading = .loaded
-                return .task { Action.fetchFromRemote }
+                return .send(.fetchFromRemote)
             case .deviceDetail: return .none
             case .delegate(.logout):
                 state = .empty
-                return .task { .saveDevicesToCache }  // Will be provide by an other feature
+                return .send(.saveDevicesToCache)  // Will be provide by an other feature
             }
         }
         .ifLet(\.$alert, action: /Action.alert)
@@ -248,7 +243,7 @@ extension DevicesReducer.State {
             devices: [
                 .init(
                     isLoading: false,
-                    alert: childError.map { .init(title: TextState($0)) },
+                    destination: childError.map { .alert(.init(title: TextState($0))) },
                     id: .init(rawValue: "1"),
                     name: "1",
                     children: .init(),
@@ -295,7 +290,7 @@ extension DevicesReducer.State {
             devices: [
                 .init(
                     isLoading: false,
-                    alert: nil,
+                    destination: nil,
                     id: .init(rawValue: "1"),
                     name: "Nice Device",
                     children: .init(),

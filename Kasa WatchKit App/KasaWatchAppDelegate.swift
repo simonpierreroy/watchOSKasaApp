@@ -20,7 +20,7 @@ final class KasaWatchAppDelegate: NSObject, WKApplicationDelegate {
 
     static let store = StoreOf<AppReducer>(
         initialState: .empty,
-        reducer: AppReducer()._printChanges()
+        reducer: { AppReducer()._printChanges() }
     )
 
     private static let viewStore: ViewStore<Void, AppReducer.Action> = {

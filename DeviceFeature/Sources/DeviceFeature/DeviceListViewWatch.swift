@@ -164,10 +164,9 @@ struct DeviceDetailViewWatch: View {
                     name: viewStore.device.name
                 )
                 .alert(
-                    store: self.store.scope(
-                        state: \.device.$alert,
-                        action: { .alert($0) }
-                    )
+                    store: self.store.scope(state: \.device.$destination, action: { .destination($0) }),
+                    state: /DeviceReducer.Destination.State.alert,
+                    action: DeviceReducer.Destination.Action.alert
                 )
             }
         }
@@ -214,7 +213,7 @@ extension DeviceListViewWatch {
     public enum Action {
 
         public enum DeviceAction {
-            case alert(PresentationAction<DeviceReducer.Action.Alert>)
+            case destination(PresentationAction<DeviceReducer.Destination.Action>)
             case tapped
             case tappedDeviceChild(index: DeviceChildReducer.State.ID, action: DeviceChildReducer.Action)
         }
@@ -235,8 +234,8 @@ extension DeviceReducer.Action {
         switch viewDetailAction {
         case .tapped:
             self = .toggle
-        case .alert(let action):
-            self = .alert(action)
+        case .destination(let destination):
+            self = .destination(destination)
         case .tappedDeviceChild(index: let id, let action):
             self = .deviceChild(index: id, action: action)
         }
@@ -290,7 +289,7 @@ struct DeviceListView_Previews: PreviewProvider {
             DeviceListViewWatch(
                 store: Store(
                     initialState: .emptyLogged,
-                    reducer: DevicesReducer()
+                    reducer: { DevicesReducer() }
                 )
                 .scope(
                     state: DeviceListViewWatch.StateView.init(devices:),
@@ -302,7 +301,7 @@ struct DeviceListView_Previews: PreviewProvider {
             DeviceListViewWatch(
                 store: Store(
                     initialState: .emptyLoading,
-                    reducer: DevicesReducer()
+                    reducer: { DevicesReducer() }
                 )
                 .scope(
                     state: DeviceListViewWatch.StateView.init(devices:),
@@ -314,7 +313,7 @@ struct DeviceListView_Previews: PreviewProvider {
             DeviceListViewWatch(
                 store: Store(
                     initialState: .emptyNeverLoaded,
-                    reducer: DevicesReducer()
+                    reducer: { DevicesReducer() }
                 )
                 .scope(
                     state: DeviceListViewWatch.StateView.init(devices:),
@@ -326,7 +325,7 @@ struct DeviceListView_Previews: PreviewProvider {
             DeviceListViewWatch(
                 store: Store(
                     initialState: .oneDeviceLoaded,
-                    reducer: DevicesReducer()
+                    reducer: { DevicesReducer() }
                 )
                 .scope(
                     state: DeviceListViewWatch.StateView.init(devices:),
@@ -339,7 +338,7 @@ struct DeviceListView_Previews: PreviewProvider {
             DeviceListViewWatch(
                 store: Store(
                     initialState: .nDeviceLoaded(n: 5, indexFailed: [2, 4]),
-                    reducer: DevicesReducer()
+                    reducer: { DevicesReducer() }
                 )
                 .scope(
                     state: DeviceListViewWatch.StateView.init(devices:),
@@ -352,7 +351,7 @@ struct DeviceListView_Previews: PreviewProvider {
             DeviceListViewWatch(
                 store: Store(
                     initialState: .nDeviceLoaded(n: 5, childrenCount: 3, indexFailed: [2]),
-                    reducer: DevicesReducer()
+                    reducer: { DevicesReducer() }
                 )
                 .scope(
                     state: DeviceListViewWatch.StateView.init(devices:),
@@ -365,7 +364,7 @@ struct DeviceListView_Previews: PreviewProvider {
             DeviceListViewWatch(
                 store: Store(
                     initialState: .oneDeviceLoaded,
-                    reducer: DevicesReducer()
+                    reducer: { DevicesReducer() }
                 )
                 .scope(
                     state: DeviceListViewWatch.StateView.init(devices:),
@@ -378,16 +377,18 @@ struct DeviceListView_Previews: PreviewProvider {
             DeviceListViewWatch(
                 store: Store(
                     initialState: .nDeviceLoaded(n: 4),
-                    reducer: DevicesReducer()
-                        .dependency(
-                            \.devicesClient,
-                            .devicesEnvError(
-                                loadError: "loadError",
-                                toggleError: "toggleError",
-                                getDevicesError: "getDevicesError",
-                                changeDevicesError: "changeDevicesError"
+                    reducer: {
+                        DevicesReducer()
+                            .dependency(
+                                \.devicesClient,
+                                .devicesEnvError(
+                                    loadError: "loadError",
+                                    toggleError: "toggleError",
+                                    getDevicesError: "getDevicesError",
+                                    changeDevicesError: "changeDevicesError"
+                                )
                             )
-                        )
+                    }
                 )
                 .scope(
                     state: DeviceListViewWatch.StateView.init(devices:),

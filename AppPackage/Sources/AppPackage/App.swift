@@ -19,7 +19,7 @@ import UserClient
 import UserClientLive
 import UserFeature
 
-public struct AppReducer: ReducerProtocol {
+public struct AppReducer: Reducer {
 
     public init() {}
 
