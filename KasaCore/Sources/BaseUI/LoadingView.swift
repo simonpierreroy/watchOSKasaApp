@@ -30,9 +30,7 @@ public struct LoadingView<Content: View>: View {
 }
 
 #if DEBUG
-struct LoadingImage_Previews: PreviewProvider {
-    static var previews: some View {
-        LoadingView(.constant(true)) { Text("test") }
-    }
+#Preview {
+    LoadingView(.constant(true)) { Text("test") }
 }
 #endif

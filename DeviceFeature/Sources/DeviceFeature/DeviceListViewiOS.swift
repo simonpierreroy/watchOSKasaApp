@@ -129,7 +129,7 @@ private struct DeviceListViewSideBar: View {
             }
             .listStyle(SidebarListStyle())
             .disabled(viewStore.state.isInFlight)
-            .navigationTitle(Text("Kasa"))
+            .navigationTitle(Text(Strings.kasaName.key, bundle: .module))
         }
     }
 }
@@ -199,7 +199,7 @@ private struct DeviceListViewBase: View {
                 }
             }
         }
-        .navigationBarTitle("Kasa")
+        .navigationBarTitle(Text(Strings.kasaName.key, bundle: .module))
     }
 }
 
@@ -459,7 +459,7 @@ struct ContentStyle: ViewModifier {
             .frame(maxWidth: .infinity)
             .frame(minHeight: 100)
             .background(Color.tile.opacity(0.20))
-            .cornerRadius(25)
+            .clipShape(.rect(cornerRadius: 32))
     }
 }
 
@@ -511,110 +511,113 @@ extension DevicesReducer.Action {
 }
 
 #if DEBUG
-struct DeviceListViewiOS_Previews: PreviewProvider {
-    static var previews: some View {
-        Group {
-            DeviceListViewiOS(
-                store: Store(
-                    initialState: .emptyNeverLoaded,
-                    reducer: { DevicesReducer() }
-                )
-                .scope(
-                    state: DeviceListViewiOS.StateView.init(devices:),
-                    action: DevicesReducer.Action.init(deviceAction:)
-                )
-            )
-            .previewDisplayName("empty")
 
-            DeviceListViewiOS(
-                store: Store(
-                    initialState: .emptyLoggedLink,
-                    reducer: { DevicesReducer() }
-                )
-                .scope(
-                    state: DeviceListViewiOS.StateView.init(devices:),
-                    action: DevicesReducer.Action.init(deviceAction:)
-                )
-            )
-            .previewDisplayName("Link")
+#Preview("Empty") {
+    DeviceListViewiOS(
+        store: Store(
+            initialState: .emptyNeverLoaded,
+            reducer: { DevicesReducer() }
+        )
+        .scope(
+            state: DeviceListViewiOS.StateView.init(devices:),
+            action: DevicesReducer.Action.init(deviceAction:)
+        )
+    )
+    .previewDisplayName("empty")
+}
 
-            DeviceListViewiOS(
-                store: Store(
-                    initialState: .multiRoutes(
-                        parentError: "Erorr parent",
-                        childError: "Error child"
-                    ),
-                    reducer: { DevicesReducer() }
-                )
-                .scope(
-                    state: DeviceListViewiOS.StateView.init(devices:),
-                    action: DevicesReducer.Action.init(deviceAction:)
-                )
-            )
-            .previewDisplayName("Routes")
+#Preview("Link") {
+    DeviceListViewiOS(
+        store: Store(
+            initialState: .emptyLoggedLink,
+            reducer: { DevicesReducer() }
+        )
+        .scope(
+            state: DeviceListViewiOS.StateView.init(devices:),
+            action: DevicesReducer.Action.init(deviceAction:)
+        )
+    )
+}
 
-            DeviceListViewiOS(
-                store: Store(
-                    initialState: .nDeviceLoaded(n: 5, indexFailed: [1, 4]),
-                    reducer: { DevicesReducer() }
-                )
-                .scope(
-                    state: DeviceListViewiOS.StateView.init(devices:),
-                    action: DevicesReducer.Action.init(deviceAction:)
-                )
-            )
-            .previewDisplayName("5 item")
+#Preview("Routes") {
+    DeviceListViewiOS(
+        store: Store(
+            initialState: .multiRoutes(
+                parentError: "Erorr parent",
+                childError: "Error child"
+            ),
+            reducer: { DevicesReducer() }
+        )
+        .scope(
+            state: DeviceListViewiOS.StateView.init(devices:),
+            action: DevicesReducer.Action.init(deviceAction:)
+        )
+    )
+}
 
-            DeviceListViewiOS(
-                store: Store(
-                    initialState: .nDeviceLoaded(n: 5, childrenCount: 4, indexFailed: [3]),
-                    reducer: { DevicesReducer() }
-                )
-                .scope(
-                    state: DeviceListViewiOS.StateView.init(devices:),
-                    action: DevicesReducer.Action.init(deviceAction:)
-                )
-            )
-            .previewDisplayName("Group")
+#Preview("5 item") {
+    DeviceListViewiOS(
+        store: Store(
+            initialState: .nDeviceLoaded(n: 5, indexFailed: [1, 4]),
+            reducer: { DevicesReducer() }
+        )
+        .scope(
+            state: DeviceListViewiOS.StateView.init(devices:),
+            action: DevicesReducer.Action.init(deviceAction:)
+        )
+    )
+}
 
-            DeviceListViewiOS(
-                store: Store(
-                    initialState: .nDeviceLoaded(n: 4),
-                    reducer: {
-                        DevicesReducer()
-                            .dependency(
-                                \.devicesClient,
-                                .devicesEnvError(
-                                    loadError: "loadError",
-                                    toggleError: "toggleError",
-                                    getDevicesError: "getDevicesError",
-                                    changeDevicesError: "changeDevicesError"
-                                )
-                            )
-                            ._printChanges()
-                    }
-                )
-                .scope(
-                    state: DeviceListViewiOS.StateView.init(devices:),
-                    action: DevicesReducer.Action.init(deviceAction:)
-                )
-            )
-            .preferredColorScheme(.dark)
-            .previewDisplayName("Error on item")
+#Preview("Group") {
+    DeviceListViewiOS(
+        store: Store(
+            initialState: .nDeviceLoaded(n: 5, childrenCount: 4, indexFailed: [3]),
+            reducer: { DevicesReducer() }
+        )
+        .scope(
+            state: DeviceListViewiOS.StateView.init(devices:),
+            action: DevicesReducer.Action.init(deviceAction:)
+        )
+    )
+}
 
-            DeviceListViewiOS(
-                store: Store(
-                    initialState: .deviceWithInfo(),
-                    reducer: { DevicesReducer() }
-                )
-                .scope(
-                    state: DeviceListViewiOS.StateView.init(devices:),
-                    action: DevicesReducer.Action.init(deviceAction:)
-                )
-            )
-            .previewDisplayName("Device Info")
-        }
-    }
+#Preview("Error on item") {
+    DeviceListViewiOS(
+        store: Store(
+            initialState: .nDeviceLoaded(n: 4),
+            reducer: {
+                DevicesReducer()
+                    .dependency(
+                        \.devicesClient,
+                        .devicesEnvError(
+                            loadError: "loadError",
+                            toggleError: "toggleError",
+                            getDevicesError: "getDevicesError",
+                            changeDevicesError: "changeDevicesError"
+                        )
+                    )
+                    ._printChanges()
+            }
+        )
+        .scope(
+            state: DeviceListViewiOS.StateView.init(devices:),
+            action: DevicesReducer.Action.init(deviceAction:)
+        )
+    )
+    .preferredColorScheme(.dark)
+}
+
+#Preview("Device Info") {
+    DeviceListViewiOS(
+        store: Store(
+            initialState: .deviceWithInfo(),
+            reducer: { DevicesReducer() }
+        )
+        .scope(
+            state: DeviceListViewiOS.StateView.init(devices:),
+            action: DevicesReducer.Action.init(deviceAction:)
+        )
+    )
 }
 #endif
 #endif

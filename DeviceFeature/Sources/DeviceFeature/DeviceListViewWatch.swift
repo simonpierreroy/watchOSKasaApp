@@ -283,122 +283,128 @@ extension DevicesReducer.Action {
 }
 
 #if DEBUG
-struct DeviceListView_Previews: PreviewProvider {
-    static var previews: some View {
-        Group {
-            DeviceListViewWatch(
-                store: Store(
-                    initialState: .emptyLogged,
-                    reducer: { DevicesReducer() }
-                )
-                .scope(
-                    state: DeviceListViewWatch.StateView.init(devices:),
-                    action: DevicesReducer.Action.init(deviceAction:)
-                )
-            )
-            .previewDisplayName("List")
 
-            DeviceListViewWatch(
-                store: Store(
-                    initialState: .emptyLoading,
-                    reducer: { DevicesReducer() }
-                )
-                .scope(
-                    state: DeviceListViewWatch.StateView.init(devices:),
-                    action: DevicesReducer.Action.init(deviceAction:)
-                )
-            )
-            .previewDisplayName("Loading")
+#Preview("List") {
+    DeviceListViewWatch(
+        store: Store(
+            initialState: .emptyLogged,
+            reducer: { DevicesReducer() }
+        )
+        .scope(
+            state: DeviceListViewWatch.StateView.init(devices:),
+            action: DevicesReducer.Action.init(deviceAction:)
+        )
+    )
+}
 
-            DeviceListViewWatch(
-                store: Store(
-                    initialState: .emptyNeverLoaded,
-                    reducer: { DevicesReducer() }
-                )
-                .scope(
-                    state: DeviceListViewWatch.StateView.init(devices:),
-                    action: DevicesReducer.Action.init(deviceAction:)
-                )
-            )
-            .previewDisplayName("Never Loaded")
+#Preview("Loading") {
+    DeviceListViewWatch(
+        store: Store(
+            initialState: .emptyLoading,
+            reducer: { DevicesReducer() }
+        )
+        .scope(
+            state: DeviceListViewWatch.StateView.init(devices:),
+            action: DevicesReducer.Action.init(deviceAction:)
+        )
+    )
+    .previewDisplayName("Loading")
+}
 
-            DeviceListViewWatch(
-                store: Store(
-                    initialState: .oneDeviceLoaded,
-                    reducer: { DevicesReducer() }
-                )
-                .scope(
-                    state: DeviceListViewWatch.StateView.init(devices:),
-                    action: DevicesReducer.Action.init(deviceAction:)
-                )
-            )
-            .preferredColorScheme(.dark)
-            .previewDisplayName("1 item")
+#Preview("Never Loaded") {
+    DeviceListViewWatch(
+        store: Store(
+            initialState: .emptyNeverLoaded,
+            reducer: { DevicesReducer() }
+        )
+        .scope(
+            state: DeviceListViewWatch.StateView.init(devices:),
+            action: DevicesReducer.Action.init(deviceAction:)
+        )
+    )
+}
 
-            DeviceListViewWatch(
-                store: Store(
-                    initialState: .nDeviceLoaded(n: 5, indexFailed: [2, 4]),
-                    reducer: { DevicesReducer() }
-                )
-                .scope(
-                    state: DeviceListViewWatch.StateView.init(devices:),
-                    action: DevicesReducer.Action.init(deviceAction:)
-                )
-            )
-            .preferredColorScheme(.dark)
-            .previewDisplayName("5 items")
+#Preview("1 item") {
+    DeviceListViewWatch(
+        store: Store(
+            initialState: .oneDeviceLoaded,
+            reducer: { DevicesReducer() }
+        )
+        .scope(
+            state: DeviceListViewWatch.StateView.init(devices:),
+            action: DevicesReducer.Action.init(deviceAction:)
+        )
+    )
+    .preferredColorScheme(.dark)
+    .previewDisplayName("1 item")
+}
 
-            DeviceListViewWatch(
-                store: Store(
-                    initialState: .nDeviceLoaded(n: 5, childrenCount: 3, indexFailed: [2]),
-                    reducer: { DevicesReducer() }
-                )
-                .scope(
-                    state: DeviceListViewWatch.StateView.init(devices:),
-                    action: DevicesReducer.Action.init(deviceAction:)
-                )
-            )
-            .preferredColorScheme(.dark)
-            .previewDisplayName("Group")
+#Preview("5 items") {
+    DeviceListViewWatch(
+        store: Store(
+            initialState: .nDeviceLoaded(n: 5, indexFailed: [2, 4]),
+            reducer: { DevicesReducer() }
+        )
+        .scope(
+            state: DeviceListViewWatch.StateView.init(devices:),
+            action: DevicesReducer.Action.init(deviceAction:)
+        )
+    )
+    .preferredColorScheme(.dark)
+    .previewDisplayName("5 items")
+}
 
-            DeviceListViewWatch(
-                store: Store(
-                    initialState: .oneDeviceLoaded,
-                    reducer: { DevicesReducer() }
-                )
-                .scope(
-                    state: DeviceListViewWatch.StateView.init(devices:),
-                    action: DevicesReducer.Action.init(deviceAction:)
-                )
-            )
-            .environment(\.locale, .init(identifier: "fr"))
-            .previewDisplayName("1 item french")
+#Preview("Group") {
+    DeviceListViewWatch(
+        store: Store(
+            initialState: .nDeviceLoaded(n: 5, childrenCount: 3, indexFailed: [2]),
+            reducer: { DevicesReducer() }
+        )
+        .scope(
+            state: DeviceListViewWatch.StateView.init(devices:),
+            action: DevicesReducer.Action.init(deviceAction:)
+        )
+    )
+    .preferredColorScheme(.dark)
+}
 
-            DeviceListViewWatch(
-                store: Store(
-                    initialState: .nDeviceLoaded(n: 4),
-                    reducer: {
-                        DevicesReducer()
-                            .dependency(
-                                \.devicesClient,
-                                .devicesEnvError(
-                                    loadError: "loadError",
-                                    toggleError: "toggleError",
-                                    getDevicesError: "getDevicesError",
-                                    changeDevicesError: "changeDevicesError"
-                                )
-                            )
-                    }
-                )
-                .scope(
-                    state: DeviceListViewWatch.StateView.init(devices:),
-                    action: DevicesReducer.Action.init(deviceAction:)
-                )
-            )
-            .preferredColorScheme(.dark)
-            .previewDisplayName("Error on item")
-        }
-    }
+#Preview("1 item french") {
+    DeviceListViewWatch(
+        store: Store(
+            initialState: .oneDeviceLoaded,
+            reducer: { DevicesReducer() }
+        )
+        .scope(
+            state: DeviceListViewWatch.StateView.init(devices:),
+            action: DevicesReducer.Action.init(deviceAction:)
+        )
+    )
+    .environment(\.locale, .init(identifier: "fr"))
+}
+
+#Preview("Error on item") {
+    DeviceListViewWatch(
+        store: Store(
+            initialState: .nDeviceLoaded(n: 4),
+            reducer: {
+                DevicesReducer()
+                    .dependency(
+                        \.devicesClient,
+                        .devicesEnvError(
+                            loadError: "loadError",
+                            toggleError: "toggleError",
+                            getDevicesError: "getDevicesError",
+                            changeDevicesError: "changeDevicesError"
+                        )
+                    )
+            }
+        )
+        .scope(
+            state: DeviceListViewWatch.StateView.init(devices:),
+            action: DevicesReducer.Action.init(deviceAction:)
+        )
+    )
+    .preferredColorScheme(.dark)
 }
 #endif
 #endif

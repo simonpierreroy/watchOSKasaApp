@@ -68,25 +68,12 @@ struct KasaWatchWidgetExtension: Widget {
     }
 }
 
-struct KasaWatchWidgetExtension_Previews: PreviewProvider {
-    static var previews: some View {
-        KasaAppWidgetEntryView(
-            entry: DataDeviceEntry.preview(1),
-            getURL: ProviderConfig().render(link:),
-            staticIntent: true
-        )
-        .previewContext(WidgetPreviewContext(family: .accessoryRectangular))
-        KasaAppWidgetEntryView(
-            entry: DataDeviceEntry.previewLogout,
-            getURL: ProviderConfig().render(link:),
-            staticIntent: true
-        )
-        .previewContext(WidgetPreviewContext(family: .accessoryCorner))
-        KasaAppWidgetEntryView(
-            entry: DataDeviceEntry.previewNoDevice,
-            getURL: ProviderConfig().render(link:),
-            staticIntent: true
-        )
-        .previewContext(WidgetPreviewContext(family: .accessoryInline))
-    }
+#Preview(as: .accessoryCorner) {
+    KasaWatchWidgetExtension()
+} timeline: {
+    DataDeviceEntry.previewLogout
+    DataDeviceEntry.previewNoDevice
+    DataDeviceEntry.preview(1)
+    DataDeviceEntry.preview(3)
+    DataDeviceEntry.preview(10)
 }

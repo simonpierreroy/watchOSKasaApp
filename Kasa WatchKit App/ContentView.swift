@@ -65,14 +65,12 @@ struct ContentView: View {
     }
 }
 #if DEBUG
-struct ContentView_Previews: PreviewProvider {
-    static var previews: some View {
-        ContentView(
-            store: Store(
-                initialState: .empty,
-                reducer: { AppReducer() }
-            )
+#Preview {
+    ContentView(
+        store: Store(
+            initialState: .empty,
+            reducer: { AppReducer() }
         )
-    }
+    )
 }
 #endif

@@ -111,66 +111,64 @@ extension UserLogoutReducer.Action {
 }
 
 #if DEBUG
-struct UserLoginView_Previews: PreviewProvider {
-    static var previews: some View {
-        Group {
-            UserLoginViewWatch(
-                store:
-                    Store(
-                        initialState: .empty,
-                        reducer: { UserLogoutReducer() }
-                    )
-                    .scope(
-                        state: UserLoginViewWatch.StateView.init(userLogoutState:),
-                        action: UserLogoutReducer.Action.init(userViewAction:)
-                    )
+#Preview("Login") {
+    UserLoginViewWatch(
+        store:
+            Store(
+                initialState: .empty,
+                reducer: { UserLogoutReducer() }
             )
-            .previewDisplayName("Login")
-
-            UserLoginViewWatch(
-                store:
-                    Store(
-                        initialState: .empty,
-                        reducer: {
-                            UserLogoutReducer().dependency(\.userClient, .mockFailed())
-
-                        }
-                    )
-                    .scope(
-                        state: UserLoginViewWatch.StateView.init(userLogoutState:),
-                        action: UserLogoutReducer.Action.init(userViewAction:)
-                    )
+            .scope(
+                state: UserLoginViewWatch.StateView.init(userLogoutState:),
+                action: UserLogoutReducer.Action.init(userViewAction:)
             )
-            .previewDisplayName("Login Failed")
+    )
+}
 
-            UserLoginViewWatch(
-                store:
-                    Store(
-                        initialState: .empty,
-                        reducer: { UserLogoutReducer() }
-                    )
-                    .scope(
-                        state: UserLoginViewWatch.StateView.init(userLogoutState:),
-                        action: UserLogoutReducer.Action.init(userViewAction:)
-                    )
-            )
-            .environment(\.locale, .init(identifier: "fr"))
-            .previewDisplayName("Login French")
+#Preview("Login Failed") {
+    UserLoginViewWatch(
+        store:
+            Store(
+                initialState: .empty,
+                reducer: {
+                    UserLogoutReducer().dependency(\.userClient, .mockFailed())
 
-            UserLoginViewWatch(
-                store:
-                    Store(
-                        initialState: .init(email: "", password: "", isLoading: true),
-                        reducer: { UserLogoutReducer() }
-                    )
-                    .scope(
-                        state: UserLoginViewWatch.StateView.init(userLogoutState:),
-                        action: UserLogoutReducer.Action.init(userViewAction:)
-                    )
+                }
             )
-            .previewDisplayName("Loading")
-        }
-    }
+            .scope(
+                state: UserLoginViewWatch.StateView.init(userLogoutState:),
+                action: UserLogoutReducer.Action.init(userViewAction:)
+            )
+    )
+}
+
+#Preview("Login French") {
+    UserLoginViewWatch(
+        store:
+            Store(
+                initialState: .empty,
+                reducer: { UserLogoutReducer() }
+            )
+            .scope(
+                state: UserLoginViewWatch.StateView.init(userLogoutState:),
+                action: UserLogoutReducer.Action.init(userViewAction:)
+            )
+    )
+    .environment(\.locale, .init(identifier: "fr"))
+}
+
+#Preview("Loading") {
+    UserLoginViewWatch(
+        store:
+            Store(
+                initialState: .init(email: "", password: "", isLoading: true),
+                reducer: { UserLogoutReducer() }
+            )
+            .scope(
+                state: UserLoginViewWatch.StateView.init(userLogoutState:),
+                action: UserLogoutReducer.Action.init(userViewAction:)
+            )
+    )
 }
 #endif
 #endif

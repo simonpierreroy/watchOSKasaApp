@@ -7,6 +7,7 @@
 //
 
 import XCTest
+
 @testable import KasaApp
 
 class KasaAppTests: XCTestCase {

@@ -18,7 +18,7 @@ enum Strings: String {
     case hardwareVersion = "hardware_version"
     case softwareVersion = "software_version"
     case macAddress = "mac_address"
-
+    case kasaName = "kasa_name"
 }
 
 extension Strings {
@@ -30,38 +30,3 @@ extension Strings {
         NSLocalizedString(self.rawValue, bundle: .module, comment: "")
     }
 }
-
-#if DEBUG
-
-struct Strings_Previews: PreviewProvider {
-    static var previews: some View {
-        Group {
-            VStack {
-                Text(Strings.logoutApp.key, bundle: .module)
-                Text(Strings.refreshList.key, bundle: .module)
-                Text(Strings.turnOff.key, bundle: .module)
-                Text(Strings.deviceGroup.key, bundle: .module)
-                Text(Strings.doneAction.key, bundle: .module)
-                Text(Strings.model.key, bundle: .module)
-                Text(Strings.hardwareVersion.key, bundle: .module)
-                Text(Strings.softwareVersion.key, bundle: .module)
-                Text(Strings.macAddress.key, bundle: .module)
-            }
-            .previewDisplayName("English")
-            VStack {
-                Text(Strings.logoutApp.key, bundle: .module)
-                Text(Strings.refreshList.key, bundle: .module)
-                Text(Strings.turnOff.key, bundle: .module)
-                Text(Strings.deviceGroup.key, bundle: .module)
-                Text(Strings.doneAction.key, bundle: .module)
-                Text(Strings.model.key, bundle: .module)
-                Text(Strings.hardwareVersion.key, bundle: .module)
-                Text(Strings.softwareVersion.key, bundle: .module)
-                Text(Strings.macAddress.key, bundle: .module)
-            }
-            .environment(\.locale, .init(identifier: "fr"))
-            .previewDisplayName("Français")
-        }
-    }
-}
-#endif

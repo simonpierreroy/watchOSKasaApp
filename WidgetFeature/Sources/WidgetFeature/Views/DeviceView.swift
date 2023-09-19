@@ -126,8 +126,7 @@ struct DeviceView: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
             .frame(maxWidth: .infinity)
             .background(Color.button.opacity(0.2))
-            .cornerRadius(16)
-
+            .clipShape(.rect(cornerRadius: 16))
         }
         .widgetURL(getURL(getLink()))  // widgetURL when is small view
     }
@@ -271,8 +270,6 @@ struct StackList: View {
                     EmptyView()
                 }
             }
-            .padding()
-
         } else {
             NoDevicesView(staticIntent: staticIntent)
         }
@@ -280,24 +277,21 @@ struct StackList: View {
 }
 
 #if DEBUG
-struct DeviceView_Preview: PreviewProvider {
-    static let previewDevices = (1...10)
-        .map { i in Device.init(id: "\(i)", name: "Preview no \(i)", details: .status(relay: false, info: .mock)) }
-    static var previews: some View {
-        Group {
-            StackList(
-                devices: DeviceView_Preview.previewDevices.flatten(),
-                getURL: { _ in return .mock },
-                staticIntent: false
-            )
-            .previewDisplayName("StackList")
-            StackList(
-                devices: DeviceView_Preview.previewDevices.flatten(),
-                getURL: { _ in return .mock },
-                staticIntent: true
-            )
-            .previewDisplayName("StackList Static")
-        }
-    }
+let previewDevices = (1...10)
+    .map { i in Device.init(id: "\(i)", name: "Preview no \(i)", details: .status(relay: false, info: .mock)) }
+#Preview("StackList") {
+    StackList(
+        devices: previewDevices.flatten(),
+        getURL: { _ in return .mock },
+        staticIntent: false
+    )
+}
+
+#Preview("StackList Static") {
+    StackList(
+        devices: previewDevices.flatten(),
+        getURL: { _ in return .mock },
+        staticIntent: true
+    )
 }
 #endif

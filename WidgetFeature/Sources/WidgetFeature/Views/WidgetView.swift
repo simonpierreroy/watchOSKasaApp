@@ -58,8 +58,9 @@ public struct WidgetView: View {
                 LogoutView(getURL: getURL, staticIntent: staticIntent)
             }
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(WidgetView.getBackground(for: widgetFamily))
+        .containerBackground(for: .widget) {
+            WidgetView.getBackground(for: widgetFamily)
+        }
     }
 }
 

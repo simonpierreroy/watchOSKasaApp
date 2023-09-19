@@ -25,18 +25,8 @@ struct GradientBackgroundWidget: View {
 }
 
 #if DEBUG
-struct BackgroundWidget_Previews: PreviewProvider {
-
-    static var previews: some View {
-        Group {
-            GradientBackgroundWidget()
-                .previewDisplayName("Background Dark")
-                .environment(\.colorScheme, .dark)
-            GradientBackgroundWidget()
-                .previewDisplayName("Background")
-                .environment(\.colorScheme, .light)
-        }
-    }
+#Preview {
+    GradientBackgroundWidget()
 }
 #endif
 #endif

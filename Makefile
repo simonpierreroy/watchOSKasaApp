@@ -2,26 +2,18 @@
 GIT_REPO_TOPLEVEL := $(shell git rev-parse --show-toplevel)
 
 # Apple Platform Destinations
-DESTINATION_PLATFORM_IOS_SIMULATOR = "platform=iOS Simulator,name=iPhone 14 Pro Max"
-DESTINATION_PLATFORM_WATCHOS_SIMULATOR = "platform=watchOS Simulator,name=Apple Watch Series 8 (45mm)"
+DESTINATION_PLATFORM_IOS_SIMULATOR = "platform=iOS Simulator,name=iPhone 15 Pro Max"
+DESTINATION_PLATFORM_WATCHOS_SIMULATOR = "platform=watchOS Simulator,name=Apple Watch Series 9 (45mm)"
 
 # Run Results
 IOS_RUN_RESULT_BUNDLE_PATH="$(GIT_REPO_TOPLEVEL)/xcresults/latest_ios_result.xcresult"
 WATCHOS_RUN_RESULT_BUNDLE_PATH="$(GIT_REPO_TOPLEVEL)/xcresults/latest_watchos_result.xcresult"
 
 # Formatting
-SWIFT_FORMAT_VERSION=0.50700.1
+SWIFT_FORMAT_VERSION=509.0.0
 SWIFT_FORMAT_FOLDER="$(GIT_REPO_TOPLEVEL)/swift-format"
 SWIFT_FORMAT_CONFIG_FILE := "$(GIT_REPO_TOPLEVEL)/.swift-format.json"
-FORMAT_PATHS := "$(GIT_REPO_TOPLEVEL)/Kasa WatchKit App" "$(GIT_REPO_TOPLEVEL)/KasaApp" \
-"$(GIT_REPO_TOPLEVEL)/KasaAppWidget" "$(GIT_REPO_TOPLEVEL)/KasaIntentsExtension" \
-"$(GIT_REPO_TOPLEVEL)/AppPackage/Sources" "$(GIT_REPO_TOPLEVEL)/AppPackage/Package.swift" \
-"$(GIT_REPO_TOPLEVEL)/WidgetFeature/Sources" "$(GIT_REPO_TOPLEVEL)/WidgetFeature/Package.swift" \
-"$(GIT_REPO_TOPLEVEL)/Routing/Sources" "$(GIT_REPO_TOPLEVEL)/Routing/Package.swift" \
-"$(GIT_REPO_TOPLEVEL)/DeviceFeature/Sources" "$(GIT_REPO_TOPLEVEL)/DeviceFeature/Package.swift" \
-"$(GIT_REPO_TOPLEVEL)/UserFeature/Sources" "$(GIT_REPO_TOPLEVEL)/UserFeature/Package.swift" \
-"$(GIT_REPO_TOPLEVEL)/KasaCore/Sources" "$(GIT_REPO_TOPLEVEL)/KasaCore/Package.swift" \
-"$(GIT_REPO_TOPLEVEL)/KasaWatchWidgetExtension"
+FORMAT_PATHS := "$(GIT_REPO_TOPLEVEL)"
 
 # Tasks
 

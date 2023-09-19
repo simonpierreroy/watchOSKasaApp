@@ -290,7 +290,7 @@ extension DevicesReducer.State {
             devices: [
                 .init(
                     isLoading: false,
-                    destination: nil,
+                    destination: .info(.init(info: .mock, deviceName: "Nice Device")),
                     id: .init(rawValue: "1"),
                     name: "Nice Device",
                     children: .init(),

@@ -90,14 +90,11 @@ struct LogoutView: View {
 }
 
 #if DEBUG
-struct LogoutView_Previews: PreviewProvider {
-    static var previews: some View {
-        Group {
-            LogoutView(getURL: { _ in return .mock }, staticIntent: false)
-                .previewDisplayName("LogoutView")
-            LogoutView(getURL: { _ in return .mock }, staticIntent: true)
-                .previewDisplayName("LogoutView Static")
-        }
-    }
+#Preview("LogoutView") {
+    LogoutView(getURL: { _ in return .mock }, staticIntent: false)
+}
+
+#Preview("LogoutView Static") {
+    LogoutView(getURL: { _ in return .mock }, staticIntent: true)
 }
 #endif

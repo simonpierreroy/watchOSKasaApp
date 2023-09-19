@@ -156,21 +156,21 @@ precedencegroup ForwardApplication {
     associativity: left
 }
 
-infix operator |>: ForwardApplication
+infix operator |> : ForwardApplication
 
 precedencegroup ForwardComposition {
     associativity: left
     higherThan: ForwardApplication
 }
 
-infix operator >>>: ForwardComposition
+infix operator >>> : ForwardComposition
 
 precedencegroup SingleTypeComposition {
     associativity: left
     higherThan: ForwardApplication
 }
 
-infix operator <>: SingleTypeComposition
+infix operator <> : SingleTypeComposition
 
 public func >>> <A, B, C>(f: @escaping (A) -> B, g: @escaping (B) -> C) -> ((A) -> C) {
     return { a in

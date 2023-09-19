@@ -1,4 +1,5 @@
 import XCTest
+
 @testable import KasaCore
 
 final class KasaCoreTests: XCTestCase {

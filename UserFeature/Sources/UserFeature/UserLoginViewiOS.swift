@@ -27,7 +27,7 @@ public struct UserLoginViewiOS: View {
         WithViewStore(self.store, observe: { $0 }) { viewStore in
             ScrollView {
 
-                Text("Kasa").font(.largeTitle)
+                Text(Strings.kasaName.key, bundle: .module).font(.largeTitle)
                 Image(systemName: "light.max").font(.largeTitle)
                 Spacer(minLength: 32)
                 VStack {
@@ -43,7 +43,7 @@ public struct UserLoginViewiOS: View {
                     }
                     .padding()
                     .background(Color.orange.opacity(0.2))
-                    .cornerRadius(8)
+                    .clipShape(.rect(cornerRadius: 8))
 
                     HStack {
                         Image(systemName: "key.icloud")
@@ -57,7 +57,7 @@ public struct UserLoginViewiOS: View {
                     }
                     .padding()
                     .background(Color.orange.opacity(0.2))
-                    .cornerRadius(8)
+                    .clipShape(.rect(cornerRadius: 8))
 
                     Spacer(minLength: 16)
 
@@ -76,7 +76,7 @@ public struct UserLoginViewiOS: View {
                         .padding()
                     }
                     .background(Color.green.opacity(0.2))
-                    .cornerRadius(32)
+                    .clipShape(.rect(cornerRadius: 32))
                 }
                 .disabled(viewStore.isLoadingUser)
                 .frame(maxWidth: 500).padding()
@@ -137,67 +137,66 @@ extension UserLogoutReducer.Action {
 }
 
 #if DEBUG
-struct UserLoginView_Previews: PreviewProvider {
-    static var previews: some View {
-        Group {
-            UserLoginViewiOS(
-                store:
-                    Store(
-                        initialState: .empty,
-                        reducer: { UserLogoutReducer() }
-                    )
-                    .scope(
-                        state: UserLoginViewiOS.StateView.init(userLogoutState:),
-                        action: UserLogoutReducer.Action.init(userViewAction:)
-                    )
-            )
-            .preferredColorScheme(.dark)
-            .previewDisplayName("Login")
 
-            UserLoginViewiOS(
-                store:
-                    Store(
-                        initialState: .empty,
-                        reducer: {
-                            UserLogoutReducer().dependency(\.userClient, .mockFailed())
-                        }
-                    )
-                    .scope(
-                        state: UserLoginViewiOS.StateView.init(userLogoutState:),
-                        action: UserLogoutReducer.Action.init(userViewAction:)
-                    )
+#Preview("Login") {
+    UserLoginViewiOS(
+        store:
+            Store(
+                initialState: .empty,
+                reducer: { UserLogoutReducer() }
             )
-            .preferredColorScheme(.dark)
-            .previewDisplayName("Login Failed")
+            .scope(
+                state: UserLoginViewiOS.StateView.init(userLogoutState:),
+                action: UserLogoutReducer.Action.init(userViewAction:)
+            )
+    )
+    .preferredColorScheme(.dark)
+}
 
-            UserLoginViewiOS(
-                store:
-                    Store(
-                        initialState: .empty,
-                        reducer: { UserLogoutReducer() }
-                    )
-                    .scope(
-                        state: UserLoginViewiOS.StateView.init(userLogoutState:),
-                        action: UserLogoutReducer.Action.init(userViewAction:)
-                    )
+#Preview("Login Failed") {
+    UserLoginViewiOS(
+        store:
+            Store(
+                initialState: .empty,
+                reducer: {
+                    UserLogoutReducer().dependency(\.userClient, .mockFailed())
+                }
             )
-            .environment(\.locale, .init(identifier: "fr"))
-            .previewDisplayName("Login French")
+            .scope(
+                state: UserLoginViewiOS.StateView.init(userLogoutState:),
+                action: UserLogoutReducer.Action.init(userViewAction:)
+            )
+    )
+    .preferredColorScheme(.dark)
+}
 
-            UserLoginViewiOS(
-                store:
-                    Store(
-                        initialState: .init(email: "", password: "", isLoading: true),
-                        reducer: { UserLogoutReducer() }
-                    )
-                    .scope(
-                        state: UserLoginViewiOS.StateView.init(userLogoutState:),
-                        action: UserLogoutReducer.Action.init(userViewAction:)
-                    )
+#Preview("Login French") {
+    UserLoginViewiOS(
+        store:
+            Store(
+                initialState: .empty,
+                reducer: { UserLogoutReducer() }
             )
-            .previewDisplayName("Loading")
-        }
-    }
+            .scope(
+                state: UserLoginViewiOS.StateView.init(userLogoutState:),
+                action: UserLogoutReducer.Action.init(userViewAction:)
+            )
+    )
+    .environment(\.locale, .init(identifier: "fr"))
+}
+
+#Preview("Loading") {
+    UserLoginViewiOS(
+        store:
+            Store(
+                initialState: .init(email: "", password: "", isLoading: true),
+                reducer: { UserLogoutReducer() }
+            )
+            .scope(
+                state: UserLoginViewiOS.StateView.init(userLogoutState:),
+                action: UserLogoutReducer.Action.init(userViewAction:)
+            )
+    )
 }
 #endif
 #endif

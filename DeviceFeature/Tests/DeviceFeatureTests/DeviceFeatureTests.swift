@@ -1,4 +1,5 @@
 import XCTest
+
 @testable import DeviceFeature
 
 final class DeviceFeatureTests: XCTestCase {

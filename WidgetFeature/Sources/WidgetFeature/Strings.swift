@@ -27,33 +27,3 @@ extension Strings {
         NSLocalizedString(self.rawValue, bundle: .module, comment: "")
     }
 }
-
-#if DEBUG
-import WidgetKit
-
-struct Strings_Previews: PreviewProvider {
-    static var previews: some View {
-        Group {
-            VStack {
-                Text(Strings.notLogged.key, bundle: .module)
-                Text(Strings.noDevice.key, bundle: .module)
-                Text(Strings.descriptionWidget.key, bundle: .module)
-                Text(Strings.turnOff.key, bundle: .module)
-                Text(Strings.deviceGroup.key, bundle: .module)
-                Text(Strings.noDeviceSelected.key, bundle: .module)
-            }
-            .previewDisplayName("English")
-            VStack {
-                Text(Strings.notLogged.key, bundle: .module)
-                Text(Strings.noDevice.key, bundle: .module)
-                Text(Strings.descriptionWidget.key, bundle: .module)
-                Text(Strings.turnOff.key, bundle: .module)
-                Text(Strings.deviceGroup.key, bundle: .module)
-                Text(Strings.noDeviceSelected.key, bundle: .module)
-            }
-            .environment(\.locale, .init(identifier: "fr"))
-            .previewDisplayName("Français")
-        }
-    }
-}
-#endif
