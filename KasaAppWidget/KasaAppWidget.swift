@@ -17,7 +17,6 @@ import WidgetFeature
 import WidgetKit
 
 struct StaticProvider: TimelineProvider {
-
     let config = ProviderConfig()
 
     func placeholder(in context: Context) -> DataDeviceEntry {
@@ -46,70 +45,45 @@ struct StaticProvider: TimelineProvider {
         )
         completion(timeline)
     }
-
 }
 
-extension SelectDevicesIntent {
-    func getIds() -> [FlattenDevice.DoubleID] {
-        guard let selections = self.SelectedDevice else {
-            return []
-        }
-
-        var result: [FlattenDevice.DoubleID] = []
-
-        for selection in selections {
-            guard let pID = selection.deviceId else { break }
-            let cID = selection.childId.map { id in Device.ID.init(rawValue: id) }
-            result.append(
-                .init(parent: .init(rawValue: pID), child: cID)
-            )
-        }
-
-        return result
-    }
-}
-
-struct IntentProvider: IntentTimelineProvider {
-
+struct AppIntentProvider: AppIntentTimelineProvider {
     let config = ProviderConfig()
 
     func placeholder(in context: Context) -> DataDeviceEntry {
         .preview(10)
     }
 
-    func getSnapshot(
-        for configuration: SelectDevicesIntent,
-        in context: Context,
-        completion: @escaping (DataDeviceEntry) -> Void
-    ) {
-        completion(
-            newEntry(
-                cache: .init(loadDevices: config.loadDevices, loadUser: config.loadUser),
-                intentSelection: nil,
-                for: context
-            )
+    func snapshot(
+        for configuration: SelectDevicesWidgetConfigurationIntent,
+        in context: Context
+    ) async -> DataDeviceEntry {
+        return newEntry(
+            cache: .init(loadDevices: config.loadDevices, loadUser: config.loadUser),
+            intentSelection: nil,
+            for: context
         )
     }
 
-    func getTimeline(
-        for configuration: SelectDevicesIntent,
-        in context: Context,
-        completion: @escaping (Timeline<Entry>) -> Void
-    ) {
-        let selection = configuration.getIds()
+    func timeline(
+        for configuration: SelectDevicesWidgetConfigurationIntent,
+        in context: Context
+    ) async -> Timeline<DataDeviceEntry> {
+        let selection = configuration.selectedDevice.map(\.id)
 
         let entry = newEntry(
             cache: .init(loadDevices: config.loadDevices, loadUser: config.loadUser),
             intentSelection: selection,
             for: context
         )
+
         let currentDate = Date()
         let entryDate = Calendar.current.date(byAdding: .hour, value: 24, to: currentDate)!
-        let timeline = Timeline(
+
+        return Timeline(
             entries: [entry],
             policy: .after(entryDate)
         )
-        completion(timeline)
     }
 }
 
@@ -118,20 +92,19 @@ struct KasaAppWidgets: WidgetBundle {
 
     @WidgetBundleBuilder
     var body: some Widget {
-        KasaAppWidgetWithIntent()
+        KasaAppWidgetWithAppIntent()
         KasaAppWidgetStatic()
     }
 }
 
-struct KasaAppWidgetWithIntent: Widget {
-    let kind: String = "KasaAppWidgetWithIntent"
+struct KasaAppWidgetWithAppIntent: Widget {
+    let kind: String = "KasaAppWidgetWithAppIntent"
+    let provider = AppIntentProvider()
 
     var body: some WidgetConfiguration {
-        let provider = IntentProvider()
-
-        return IntentConfiguration(
+        AppIntentConfiguration(
             kind: kind,
-            intent: SelectDevicesIntent.self,
+            intent: SelectDevicesWidgetConfigurationIntent.self,
             provider: provider
         ) { entry in
             KasaAppWidgetEntryView(
@@ -143,17 +116,15 @@ struct KasaAppWidgetWithIntent: Widget {
         .supportedFamilies([.systemExtraLarge, .systemLarge, .systemMedium, .systemSmall])
         .configurationDisplayName("Kasa 1")
         .description(WidgetFeature.Strings.descriptionWidget.string)
-
     }
 }
 
 struct KasaAppWidgetStatic: Widget {
     let kind: String = "KasaAppWidgetStatic"
+    let provider = StaticProvider()
 
     var body: some WidgetConfiguration {
-        let provider = StaticProvider()
-
-        return StaticConfiguration(
+        StaticConfiguration(
             kind: kind,
             provider: provider
         ) { entry in
@@ -171,7 +142,7 @@ struct KasaAppWidgetStatic: Widget {
 }
 
 #Preview(as: .systemMedium) {
-    KasaAppWidgetWithIntent()
+    KasaAppWidgetWithAppIntent()
 } timeline: {
     DataDeviceEntry.previewLogout
     DataDeviceEntry.previewNoDevice

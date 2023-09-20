@@ -6,7 +6,7 @@ import RoutingClient
 import UserClient
 import UserClientLive
 
-public struct ProviderConfig {
+public struct ProviderConfig: Sendable {
 
     public init() {}
 

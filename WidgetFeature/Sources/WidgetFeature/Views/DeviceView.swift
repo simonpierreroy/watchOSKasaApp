@@ -117,7 +117,7 @@ struct DeviceView: View {
             VStack {
                 Image(systemName: "light.max")
                     .font(DeviceView.font(for: widgetFamily).0)
-                Text("\(device.child?.name ?? device.device.name )")
+                Text("\(device.displayName)")
                     .multilineTextAlignment(.center)
                     .font(DeviceView.font(for: widgetFamily).1)
 

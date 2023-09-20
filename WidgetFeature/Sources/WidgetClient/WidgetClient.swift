@@ -18,6 +18,12 @@ public struct WidgetState {
     public let user: User?
     public let device: [Device]
 
+    public func getDevicesIfValidUser() -> [Device] {
+        guard user != nil else {
+            return []
+        }
+        return device
+    }
 }
 
 public struct DataDeviceEntry {

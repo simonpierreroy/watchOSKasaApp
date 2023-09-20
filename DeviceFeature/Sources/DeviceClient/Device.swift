@@ -123,27 +123,28 @@ extension Device {
     )
 }
 
+extension Device {
+    public static func flattenSearch(devices: [Self], identifiers: [FlattenDevice.ID]) -> [FlattenDevice] {
+        let devicesWithId = IdentifiedArray(uniqueElements: devices.flatten())
+        return identifiers.compactMap { devicesWithId[id: $0] }
+    }
+}
+
 public struct FlattenDevice: Equatable, Identifiable {
-    public struct DoubleID: Equatable, Hashable, Identifiable {
+    public struct ID: Equatable, Hashable, Sendable {
 
         public init(
             parent: Device.ID,
             child: Device.ID?
         ) {
-            self.child = child
-            self.parent = parent
+            self.rawValue = child?.rawValue ?? parent.rawValue
         }
 
-        public let parent: Device.ID
-        public let child: Device.ID?
-
-        public var id: String {
-            return parent.rawValue + (child?.rawValue ?? "")
+        public init(rawValue: String) {
+            self.rawValue = rawValue
         }
 
-        public func callAsFunction() -> String {
-            return self.id
-        }
+        public let rawValue: String
     }
 
     public init(
@@ -154,9 +155,13 @@ public struct FlattenDevice: Equatable, Identifiable {
         self.child = child
     }
 
-    public var id: DoubleID { .init(parent: self.device.id, child: self.child?.id) }
+    public var id: ID { .init(parent: self.device.id, child: self.child?.id) }
     public let device: Device
     public let child: Device.DeviceChild?
+
+    public var displayName: String {
+        self.child?.name ?? self.device.name
+    }
 }
 
 extension [Device] {

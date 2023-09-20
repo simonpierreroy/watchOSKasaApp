@@ -25,30 +25,31 @@ public struct WidgetDataCache {
 
 }
 
-public func getCacheState(cache: WidgetDataCache) throws -> WidgetState {
+public func getWidgetState(from cache: WidgetDataCache) throws -> WidgetState {
     let user = try cache.loadUser()
     let devices = try cache.loadDevices()
-    return WidgetState.init(user: user, device: devices)
+    return WidgetState(user: user, device: devices)
 }
 
 extension DataDeviceEntry: TimelineEntry {}
 
 public func newEntry(
     cache: WidgetDataCache,
-    intentSelection: [FlattenDevice.DoubleID]?,
+    intentSelection: [FlattenDevice.ID]?,
     for context: TimelineProviderContext
 ) -> DataDeviceEntry {
-    guard let cache = try? getCacheState(cache: cache) else {
+    guard let state = try? getWidgetState(from: cache) else {
         return DataDeviceEntry(date: Date(), userIsLogged: false, devices: [])
     }
 
-    guard cache.user == nil else {
-        guard let intentSelection else {
-            return DataDeviceEntry(date: Date(), userIsLogged: true, devices: cache.device.flatten())
-        }
-        let devicesWithId = IdentifiedArray(uniqueElements: cache.device.flatten())
-        let foundDevices = intentSelection.compactMap { devicesWithId[id: $0] }
-        return DataDeviceEntry(date: Date(), userIsLogged: true, devices: foundDevices)
+    guard state.user != nil else {
+        return DataDeviceEntry(date: Date(), userIsLogged: false, devices: [])
     }
-    return DataDeviceEntry(date: Date(), userIsLogged: false, devices: [])
+
+    guard let intentSelection else {
+        return DataDeviceEntry(date: Date(), userIsLogged: true, devices: state.device.flatten())
+    }
+
+    let foundDevices = Device.flattenSearch(devices: state.device, identifiers: intentSelection)
+    return DataDeviceEntry(date: Date(), userIsLogged: true, devices: foundDevices)
 }
