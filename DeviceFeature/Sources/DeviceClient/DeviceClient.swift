@@ -5,7 +5,7 @@ import KasaCore
 import Tagged
 import XCTestDynamicOverlay
 
-public struct DevicesClient {
+public struct DevicesClient: Sendable {
 
     public typealias ToggleEffect = @Sendable (Token, Device.ID, Device.ID?) async throws -> RelayIsOn
 

@@ -2,7 +2,7 @@ import Foundation
 import KasaCore
 import Tagged
 
-public struct User: Equatable, Codable {
+public struct User: Equatable, Codable, Sendable {
     public enum RefreshTokenTag {}
     public typealias RefreshToken = Tagged<RefreshTokenTag, String>
 
@@ -21,7 +21,7 @@ public struct User: Equatable, Codable {
         public let password: String
     }
 
-    public struct TokenInfo: Equatable, Codable {
+    public struct TokenInfo: Equatable, Codable, Sendable {
 
         public init(
             token: Token,

@@ -5,7 +5,7 @@ import KasaCore
 import Tagged
 import XCTestDynamicOverlay
 
-public struct DevicesCache {
+public struct DevicesCache: Sendable {
     public enum Failure: Error {
         case dataConversion
     }

@@ -4,7 +4,7 @@ import KasaCore
 import Tagged
 import XCTestDynamicOverlay
 
-public struct UserClient {
+public struct UserClient: Sendable {
 
     public init(
         login: @escaping @Sendable (User.Credential) async throws -> User,
