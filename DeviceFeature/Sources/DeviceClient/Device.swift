@@ -4,9 +4,9 @@ import Foundation
 import KasaCore
 import Tagged
 
-public struct Device: Equatable, Identifiable, Codable {
+public struct Device: Equatable, Identifiable, Codable, Sendable {
 
-    public struct Info: Equatable, Codable {
+    public struct Info: Equatable, Codable, Sendable {
 
         public init(
             softwareVersion: SoftwareVersion,
@@ -36,7 +36,7 @@ public struct Device: Equatable, Identifiable, Codable {
         public let macAddress: Mac
     }
 
-    public struct DeviceChild: Equatable, Identifiable, Codable {
+    public struct DeviceChild: Equatable, Identifiable, Codable, Sendable {
         public init(
             id: Id,
             name: String,
@@ -66,7 +66,7 @@ public struct Device: Equatable, Identifiable, Codable {
 
     public typealias Id = Tagged<Device, String>
 
-    public struct Failed: Equatable, Codable {
+    public struct Failed: Equatable, Codable, Sendable {
         public init(
             code: Int,
             message: String
@@ -78,7 +78,7 @@ public struct Device: Equatable, Identifiable, Codable {
         public let message: String
     }
 
-    public enum State: Equatable, Codable {
+    public enum State: Equatable, Codable, Sendable {
         case status(relay: RelayIsOn, info: Info)
         case noRelay(info: Info)
         case failed(Failed)
@@ -130,7 +130,7 @@ extension Device {
     }
 }
 
-public struct FlattenDevice: Equatable, Identifiable {
+public struct FlattenDevice: Equatable, Identifiable, Sendable {
     public struct ID: Equatable, Hashable, Sendable {
 
         public init(

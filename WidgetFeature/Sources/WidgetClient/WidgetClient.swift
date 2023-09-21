@@ -26,7 +26,7 @@ public struct WidgetState {
     }
 }
 
-public struct DataDeviceEntry {
+public struct DataDeviceEntry: Sendable {
 
     public init(
         date: Date,
