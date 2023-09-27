@@ -36,6 +36,7 @@
 		B358E4852A0313DA00B72F6D /* KasaWatchWidgetExtensionExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = B358E4772A0313DA00B72F6D /* KasaWatchWidgetExtensionExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		B358E48B2A0318DB00B72F6D /* WidgetPackage in Frameworks */ = {isa = PBXBuildFile; productRef = B358E48A2A0318DB00B72F6D /* WidgetPackage */; };
 		B3D4044029B83BCF00CA1E8C /* KasaAppMain.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3D4043F29B83BCF00CA1E8C /* KasaAppMain.swift */; };
+		B3DDD5F52ABE95C7006410F3 /* ToggleAppIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3DDD5F42ABE95C7006410F3 /* ToggleAppIntent.swift */; };
 		B3F109BD2ABAAB8400074BEA /* WidgetConfigurationIntent .swift in Sources */ = {isa = PBXBuildFile; fileRef = B36C769A2ABAAB1A002F5851 /* WidgetConfigurationIntent .swift */; };
 		B3F109BE2ABAAB8800074BEA /* SelectedDeviceAppEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = B36C76992ABAAB1A002F5851 /* SelectedDeviceAppEntity.swift */; };
 		B3F109C02ABAAD2D00074BEA /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = B3F109BF2ABAAD2D00074BEA /* Localizable.xcstrings */; };
@@ -174,6 +175,7 @@
 		B36C769A2ABAAB1A002F5851 /* WidgetConfigurationIntent .swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WidgetConfigurationIntent .swift"; sourceTree = "<group>"; };
 		B3A1D47C2AB1706000858529 /* mul */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; name = mul; path = mul.lproj/LaunchScreen.xcstrings; sourceTree = "<group>"; };
 		B3D4043F29B83BCF00CA1E8C /* KasaAppMain.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KasaAppMain.swift; sourceTree = "<group>"; };
+		B3DDD5F42ABE95C7006410F3 /* ToggleAppIntent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ToggleAppIntent.swift; sourceTree = "<group>"; };
 		B3F109BF2ABAAD2D00074BEA /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -234,6 +236,7 @@
 		32213C7E25283032009F42FD /* KasaAppWidget */ = {
 			isa = PBXGroup;
 			children = (
+				B3DDD5F42ABE95C7006410F3 /* ToggleAppIntent.swift */,
 				B36C76982ABAAB1A002F5851 /* WidgetConfigurationIntent */,
 				32213C7F25283032009F42FD /* KasaAppWidget.swift */,
 				32213C8125283032009F42FD /* Assets.xcassets */,
@@ -643,6 +646,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				B3F109BD2ABAAB8400074BEA /* WidgetConfigurationIntent .swift in Sources */,
+				B3DDD5F52ABE95C7006410F3 /* ToggleAppIntent.swift in Sources */,
 				32213C8025283032009F42FD /* KasaAppWidget.swift in Sources */,
 				B3F109BE2ABAAB8800074BEA /* SelectedDeviceAppEntity.swift in Sources */,
 			);

@@ -6,6 +6,7 @@
 //  Copyright © 2023 Simon. All rights reserved.
 //
 
+import AppIntents
 import Intents
 import SwiftUI
 import WidgetClient
@@ -58,8 +59,9 @@ struct KasaWatchWidgetExtension: Widget {
         ) { entry in
             KasaAppWidgetEntryView(
                 entry: entry,
+                newIntent: { _ in EmptyIntent() },
                 getURL: provider.config.render(link:),
-                staticIntent: true
+                mode: .turnOffAllDevices
             )
         }
         .configurationDisplayName("Kasa")

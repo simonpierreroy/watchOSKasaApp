@@ -109,8 +109,9 @@ struct KasaAppWidgetWithAppIntent: Widget {
         ) { entry in
             KasaAppWidgetEntryView(
                 entry: entry,
+                newIntent: ToggleAppIntent.init(flattenDevice:),
                 getURL: provider.config.render(link:),
-                staticIntent: false
+                mode: .selectableMultiDevices
             )
         }
         .supportedFamilies([.systemExtraLarge, .systemLarge, .systemMedium, .systemSmall])
@@ -130,8 +131,9 @@ struct KasaAppWidgetStatic: Widget {
         ) { entry in
             KasaAppWidgetEntryView(
                 entry: entry,
+                newIntent: ToggleAppIntent.init(flattenDevice:),
                 getURL: provider.config.render(link:),
-                staticIntent: true
+                mode: .turnOffAllDevices
             )
         }
         .supportedFamilies([.systemSmall, .accessoryCircular, .accessoryInline, .accessoryRectangular])

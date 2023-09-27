@@ -5,30 +5,20 @@
 //  Created by Simon-Pierre Roy on 2/6/21.
 //
 
+import AppIntents
 import DeviceClient
 import RoutingClient
 import SwiftUI
 import WidgetClient
 import WidgetKit
 
-public struct WidgetView: View {
-
-    public init(
-        logged: Bool,
-        devices: [FlattenDevice],
-        getURL: @escaping (AppLink) -> URL,
-        staticIntent: Bool
-    ) {
-        self.logged = logged
-        self.devices = devices
-        self.getURL = getURL
-        self.staticIntent = staticIntent
-    }
+struct WidgetView<I: AppIntent>: View {
 
     let logged: Bool
     let devices: [FlattenDevice]
+    let newIntent: (FlattenDevice?) -> I
     let getURL: (AppLink) -> URL
-    let staticIntent: Bool
+    let mode: WidgetEntryMode
 
     @Environment(\.widgetFamily) var widgetFamily
 
@@ -53,9 +43,9 @@ public struct WidgetView: View {
     public var body: some View {
         VStack {
             if logged {
-                StackList(devices: devices, getURL: getURL, staticIntent: staticIntent)
+                StackList(devices: devices, newIntent: newIntent, getURL: getURL, mode: mode)
             } else {
-                LogoutView(getURL: getURL, staticIntent: staticIntent)
+                LogoutView(getURL: getURL, mode: mode)
             }
         }
         .containerBackground(for: .widget) {
@@ -64,28 +54,37 @@ public struct WidgetView: View {
     }
 }
 
-public struct KasaAppWidgetEntryView: View {
+public enum WidgetEntryMode {
+    case selectableMultiDevices
+    case turnOffAllDevices
+}
+
+public struct KasaAppWidgetEntryView<I: AppIntent>: View {
 
     public init(
         entry: DataDeviceEntry,
+        newIntent: @escaping (FlattenDevice?) -> I,
         getURL: @escaping (AppLink) -> URL,
-        staticIntent: Bool
+        mode: WidgetEntryMode
     ) {
         self.entry = entry
+        self.newIntent = newIntent
         self.getURL = getURL
-        self.staticIntent = staticIntent
+        self.mode = mode
     }
 
     public let entry: DataDeviceEntry
+    public let newIntent: (FlattenDevice?) -> I
+    public let mode: WidgetEntryMode
     public let getURL: (AppLink) -> URL
-    public let staticIntent: Bool
 
     public var body: some View {
         WidgetView(
             logged: entry.userIsLogged,
             devices: entry.devices,
+            newIntent: newIntent,
             getURL: getURL,
-            staticIntent: staticIntent
+            mode: mode
         )
     }
 }

@@ -19,11 +19,8 @@ func styleFor(relay: RelayIsOn) -> (image: String, tint: Color) {
 
 func styleFor(details: Device.State) -> (image: String, tint: Color) {
     switch details {
-    case .status(let relay, _):
-        return styleFor(relay: relay)
-    case .noRelay:
-        return ("", .gray)
-    case .failed:
-        return ("wifi.slash", .gray)
+    case .status(let relay, _): styleFor(relay: relay)
+    case .noRelay: ("", .gray)
+    case .failed: ("wifi.slash", .gray)
     }
 }

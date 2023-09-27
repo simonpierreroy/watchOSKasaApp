@@ -41,6 +41,9 @@
         }
       }
     },
+    "ERROR" : {
+
+    },
     "no_device" : {
       "extractionState" : "migrated",
       "localizations" : {

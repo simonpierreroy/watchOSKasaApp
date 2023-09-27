@@ -1,7 +1,24 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "description_intent" : {
+    "child_toggle_app_intent" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "child device (id)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "appareil descendant (id)"
+          }
+        }
+      }
+    },
+    "description_select_devices_intent" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -18,7 +35,24 @@
         }
       }
     },
-    "devices_intent" : {
+    "description_toggle_app_intent" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open or close lights quickly"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ouvre ou ferme des lumières rapidement"
+          }
+        }
+      }
+    },
+    "list_for_select_devices_intent" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -31,6 +65,57 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Appareils"
+          }
+        }
+      }
+    },
+    "parent_toggle_app_intent" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "device (id)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "appareil (id)"
+          }
+        }
+      }
+    },
+    "title_intent_select_devices_intent" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select devices"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sélection d'appareils "
+          }
+        }
+      }
+    },
+    "title_toggle_app_intent" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toggle lights superfast"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrir les lumières rapidement"
           }
         }
       }

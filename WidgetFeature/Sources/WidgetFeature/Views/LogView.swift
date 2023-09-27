@@ -17,66 +17,61 @@ struct LogoutView: View {
         .flatten()
 
     let getURL: (AppLink) -> URL
-    let staticIntent: Bool
+    let mode: WidgetEntryMode
 
     @Environment(\.widgetFamily) var widgetFamily
 
     static func showBackground(for widgetFamily: WidgetFamily) -> Bool {
         switch widgetFamily {
-        case .accessoryInline, .accessoryRectangular, .accessoryCircular, .accessoryCorner:
-            return false
-        case .systemMedium, .systemSmall, .systemLarge, .systemExtraLarge:
-            return true
-        @unknown default:
-            return false
+        case .accessoryInline, .accessoryRectangular, .accessoryCircular, .accessoryCorner: false
+        case .systemMedium, .systemSmall, .systemLarge, .systemExtraLarge: true
+        @unknown default: false
         }
     }
 
     static func showText(for widgetFamily: WidgetFamily) -> Bool {
         switch widgetFamily {
-        case .accessoryCircular, .accessoryCorner:
-            return false
-        case .systemMedium, .systemSmall, .systemLarge, .systemExtraLarge, .accessoryInline, .accessoryRectangular:
-            return true
-        @unknown default:
-            return false
+        case .accessoryCircular, .accessoryCorner: false
+        case .systemMedium, .systemSmall, .systemLarge, .systemExtraLarge, .accessoryInline, .accessoryRectangular: true
+        @unknown default: false
         }
     }
 
     static func imageFont(for widgetFamily: WidgetFamily) -> Font {
         switch widgetFamily {
-        case .accessoryRectangular:
-            return .body
+        case .accessoryRectangular: .body
         case .systemMedium, .systemSmall, .systemLarge, .systemExtraLarge, .accessoryInline, .accessoryCircular,
             .accessoryCorner:
-            return .largeTitle
-        @unknown default:
-            return .largeTitle
+            .largeTitle
+        @unknown default: .largeTitle
         }
     }
 
     static func showWidgetText(for widgetFamily: WidgetFamily) -> Bool {
         switch widgetFamily {
-        case .accessoryCorner:
-            return true
+        case .accessoryCorner: true
         case .accessoryInline, .systemMedium, .systemSmall,
             .systemLarge, .systemExtraLarge, .accessoryRectangular, .accessoryCircular:
-            return false
-        @unknown default:
-            return false
+            false
+        @unknown default: false
         }
     }
 
     var body: some View {
         ZStack {
             if LogoutView.showBackground(for: widgetFamily) {
-                StackList(devices: LogoutView.logoutDevicesPreview, getURL: getURL, staticIntent: staticIntent)
-                    .blur(radius: 4.0)
+                StackList(
+                    devices: LogoutView.logoutDevicesPreview,
+                    newIntent: { _ in return EmptyIntent() },
+                    getURL: getURL,
+                    mode: mode
+                )
+                .disabled(true).blur(radius: 4.0)
             }
             VStack {
                 Image(systemName: "person.crop.circle.badge.exclamationmark")
                     .font(LogoutView.imageFont(for: widgetFamily))
-                    .widgetLabelOptional(active: TurnOffView.showWidgetText(for: widgetFamily)) {
+                    .widgetLabelOptional(active: Self.showWidgetText(for: widgetFamily)) {
                         Text(Strings.notLogged.key, bundle: .module).widgetAccentable(true)
 
                     }
@@ -91,10 +86,10 @@ struct LogoutView: View {
 
 #if DEBUG
 #Preview("LogoutView") {
-    LogoutView(getURL: { _ in return .mock }, staticIntent: false)
+    LogoutView(getURL: { _ in return .mock }, mode: .selectableMultiDevices)
 }
 
 #Preview("LogoutView Static") {
-    LogoutView(getURL: { _ in return .mock }, staticIntent: true)
+    LogoutView(getURL: { _ in return .mock }, mode: .turnOffAllDevices)
 }
 #endif

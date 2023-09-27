@@ -10,11 +10,11 @@ import AppIntents
 import Foundation
 
 struct SelectDevicesWidgetConfigurationIntent: WidgetConfigurationIntent {
-    static var title: LocalizedStringResource = "SelectDevices"
-    static var description = IntentDescription("description_intent")
+    static var title: LocalizedStringResource = "title_intent_select_devices_intent"
+    static var description = IntentDescription("description_select_devices_intent")
 
     @Parameter(
-        title: "devices_intent",
+        title: "list_for_select_devices_intent",
         default: [],
         size: [
             .systemSmall: 1,

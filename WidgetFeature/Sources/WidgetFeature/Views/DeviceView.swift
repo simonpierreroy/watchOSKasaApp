@@ -5,6 +5,7 @@
 //  Created by Simon-Pierre Roy on 2/6/21.
 //
 
+import AppIntents
 import DeviceClient
 import RoutingClient
 import SwiftUI
@@ -24,75 +25,74 @@ extension View {
 struct NoDevicesView: View {
 
     @Environment(\.widgetFamily) var widgetFamily
-    let staticIntent: Bool
+    let mode: WidgetEntryMode
 
     static func showText(for widgetFamily: WidgetFamily) -> Bool {
         switch widgetFamily {
         case .accessoryInline, .systemMedium, .systemSmall,
             .systemLarge, .systemExtraLarge, .accessoryRectangular:
-            return true
-        case .accessoryCircular, .accessoryCorner:
-            return false
-        @unknown default:
-            return false
+            true
+        case .accessoryCircular, .accessoryCorner: false
+        @unknown default: false
         }
     }
 
     static func font(for widgetFamily: WidgetFamily) -> Font {
         switch widgetFamily {
-        case .accessoryRectangular:
-            return .callout
+        case .accessoryRectangular: .callout
         case .systemMedium, .systemSmall, .systemLarge,
             .systemExtraLarge, .accessoryInline, .accessoryCircular, .accessoryCorner:
-            return .largeTitle
-        @unknown default:
-            return .largeTitle
+            .largeTitle
+        @unknown default: .largeTitle
         }
     }
 
     static func showWidgetText(for widgetFamily: WidgetFamily) -> Bool {
         switch widgetFamily {
-        case .accessoryCorner:
-            return true
+        case .accessoryCorner: true
         case .accessoryInline, .systemMedium, .systemSmall,
             .systemLarge, .systemExtraLarge, .accessoryRectangular, .accessoryCircular:
-            return false
-        @unknown default:
-            return false
+            false
+        @unknown default: false
+        }
+    }
+
+    static func imageName(for mode: WidgetEntryMode) -> String {
+        switch mode {
+        case .selectableMultiDevices: "square.and.pencil.circle"
+        case .turnOffAllDevices: "lightbulb.slash.fill"
+        }
+    }
+
+    static func text(for mode: WidgetEntryMode) -> LocalizedStringKey {
+        switch mode {
+        case .selectableMultiDevices: Strings.noDeviceSelected.key
+        case .turnOffAllDevices: Strings.noDevice.key
         }
     }
 
     var body: some View {
         VStack {
-            Image(
-                systemName:
-                    staticIntent ? "lightbulb.slash.fill" : "square.and.pencil.circle"
-            )
-            .font(NoDevicesView.font(for: widgetFamily))
-            .widgetLabelOptional(active: TurnOffView.showWidgetText(for: widgetFamily)) {
-                Text(
-                    staticIntent ? Strings.noDevice.key : Strings.noDeviceSelected.key,
-                    bundle: .module
-                )
-                .widgetAccentable(true)
-            }
+            Image(systemName: NoDevicesView.imageName(for: mode))
+                .font(NoDevicesView.font(for: widgetFamily))
+                .widgetLabelOptional(active: Self.showWidgetText(for: widgetFamily)) {
+                    Text(NoDevicesView.text(for: mode), bundle: .module)
+                        .widgetAccentable(true)
+                }
             if NoDevicesView.showText(for: widgetFamily) {
-                Text(
-                    staticIntent ? Strings.noDevice.key : Strings.noDeviceSelected.key,
-                    bundle: .module
-                )
+                Text(NoDevicesView.text(for: mode), bundle: .module)
             }
         }
     }
 }
 
 #if os(iOS)
-struct DeviceView: View {
+struct DeviceView<I: AppIntent>: View {
 
     @Environment(\.widgetFamily) var widgetFamily
 
     let device: FlattenDevice
-    let getURL: (AppLink) -> URL
+    let newIntent: (FlattenDevice) -> I
 
     static func font(for family: WidgetFamily) -> (Font, Font) {
 
@@ -113,7 +113,7 @@ struct DeviceView: View {
     }
 
     var body: some View {
-        Link(destination: getURL(getLink())) {
+        Button(intent: newIntent(self.device)) {
             VStack {
                 Image(systemName: "light.max")
                     .font(DeviceView.font(for: widgetFamily).0)
@@ -124,40 +124,32 @@ struct DeviceView: View {
             }
             .padding()
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
-            .frame(maxWidth: .infinity)
             .background(Color.button.opacity(0.2))
             .clipShape(.rect(cornerRadius: 16))
         }
-        .widgetURL(getURL(getLink()))  // widgetURL when is small view
-    }
-
-    func getLink() -> AppLink {
-        guard let child = device.child else {
-            return .devices(.device(device.device.id, .toggle))
-        }
-        return .devices(.device(device.device.id, .child(child.id, .toggle)))
+        .buttonStyle(.plain).invalidatableContent()
     }
 }
 
-struct DeviceRowMaybe: View {
+struct DeviceRowMaybe<I: AppIntent>: View {
     let devices: (FlattenDevice?, FlattenDevice?)
-    let getURL: (AppLink) -> URL
+    let newIntent: (FlattenDevice?) -> I
 
     var body: some View {
         HStack {
-            DeviceViewMaybe(device: devices.0, getURL: getURL)
-            DeviceViewMaybe(device: devices.1, getURL: getURL)
+            DeviceViewMaybe(device: devices.0, newIntent: newIntent)
+            DeviceViewMaybe(device: devices.1, newIntent: newIntent)
         }
     }
 }
 
-struct DeviceViewMaybe: View {
+struct DeviceViewMaybe<I: AppIntent>: View {
     let device: FlattenDevice?
-    let getURL: (AppLink) -> URL
+    let newIntent: (FlattenDevice?) -> I
 
     var body: some View {
         if let device = device {
-            DeviceView(device: device, getURL: getURL)
+            DeviceView(device: device, newIntent: newIntent)
         } else {
             EmptyView()
         }
@@ -165,49 +157,45 @@ struct DeviceViewMaybe: View {
 }
 #endif
 
-struct TurnOffView: View {
+struct TurnOffView<I: AppIntent>: View {
+    let newIntent: () -> I
     let getURL: (AppLink) -> URL
     let toltalNumberDevices: Int
+
     @Environment(\.widgetFamily) var widgetFamily
 
     static func showText(for widgetFamily: WidgetFamily) -> Bool {
         switch widgetFamily {
         case .accessoryInline, .systemMedium, .systemSmall,
             .systemLarge, .systemExtraLarge, .accessoryRectangular:
-            return true
-        case .accessoryCircular, .accessoryCorner:
-            return false
-        @unknown default:
-            return false
+            true
+        case .accessoryCircular, .accessoryCorner: false
+        @unknown default: false
         }
     }
 
     static func showWidgetText(for widgetFamily: WidgetFamily) -> Bool {
         switch widgetFamily {
-        case .accessoryCorner:
-            return true
+        case .accessoryCorner: true
         case .accessoryInline, .systemMedium, .systemSmall,
             .systemLarge, .systemExtraLarge, .accessoryRectangular, .accessoryCircular:
-            return false
-        @unknown default:
-            return false
+            false
+        @unknown default: false
         }
     }
 
     static func font(for widgetFamily: WidgetFamily) -> Font {
         switch widgetFamily {
-        case .accessoryRectangular:
-            return .callout
+        case .accessoryRectangular: .callout
         case .systemMedium, .systemSmall, .systemLarge,
             .systemExtraLarge, .accessoryInline, .accessoryCircular, .accessoryCorner:
-            return .largeTitle
-        @unknown default:
-            return .largeTitle
+            .largeTitle
+        @unknown default: .largeTitle
         }
     }
 
     var body: some View {
-        Link(destination: getURL(.devices(.turnOffAllDevices))) {
+        Button(intent: newIntent()) {
             VStack {
                 Image(systemName: "moon.zzz.fill")
                     .font(TurnOffView.font(for: widgetFamily))
@@ -220,78 +208,90 @@ struct TurnOffView: View {
                 }
             }
             .widgetAccentable(widgetFamily == .accessoryRectangular)
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
         }
-        .widgetURL(getURL(.devices(.turnOffAllDevices)))  // for small views
+        .buttonStyle(.plain).invalidatableContent()
+        .widgetURL(getURL(.devices(.turnOffAllDevices)))
+        //  vs Link(destination: getURL(.devices(.turnOffAllDevices)))
     }
 }
 
-struct StackList: View {
+struct StackList<I: AppIntent>: View {
     @Environment(\.widgetFamily) var widgetFamily
     let devices: [FlattenDevice]
+    let newIntent: (FlattenDevice?) -> I
     let getURL: (AppLink) -> URL
-    let staticIntent: Bool
+    let mode: WidgetEntryMode
 
     var body: some View {
         if devices.count > 0 {
             VStack {
-                switch widgetFamily {
-                case .systemSmall, .accessoryCircular, .accessoryInline, .accessoryRectangular, .accessoryCorner:
-                    if staticIntent {
-                        TurnOffView(
-                            getURL: getURL,
-                            toltalNumberDevices: devices.count
-                        )
-                    } else {
-                        #if os(iOS)
-                        DeviceViewMaybe(device: devices[safeIndex: 0], getURL: getURL)
-                        #endif
-                    }
+                switch (widgetFamily, mode) {
+                case (_, .turnOffAllDevices):
+                    TurnOffView(
+                        newIntent: { newIntent(nil) },
+                        getURL: getURL,
+                        toltalNumberDevices: devices.count
+                    )
                 #if os(iOS)
-                case .systemMedium:
+                case (.systemSmall, .selectableMultiDevices), (.accessoryCircular, .selectableMultiDevices),
+                    (.accessoryInline, .selectableMultiDevices), (.accessoryRectangular, .selectableMultiDevices),
+                    (.accessoryCorner, .selectableMultiDevices):
+                    DeviceViewMaybe(device: devices[safeIndex: 0], newIntent: newIntent)
+
+                case (.systemMedium, .selectableMultiDevices):
                     VStack {
-                        DeviceRowMaybe(devices: (devices[safeIndex: 0], devices[safeIndex: 1]), getURL: getURL)
-                        DeviceRowMaybe(devices: (devices[safeIndex: 2], devices[safeIndex: 3]), getURL: getURL)
+                        DeviceRowMaybe(devices: (devices[safeIndex: 0], devices[safeIndex: 1]), newIntent: newIntent)
+                        DeviceRowMaybe(devices: (devices[safeIndex: 2], devices[safeIndex: 3]), newIntent: newIntent)
                     }
-                case .systemLarge:
+                case (.systemLarge, .selectableMultiDevices):
                     VStack {
-                        DeviceRowMaybe(devices: (devices[safeIndex: 0], devices[safeIndex: 1]), getURL: getURL)
-                        DeviceRowMaybe(devices: (devices[safeIndex: 2], devices[safeIndex: 3]), getURL: getURL)
-                        DeviceRowMaybe(devices: (devices[safeIndex: 4], devices[safeIndex: 5]), getURL: getURL)
+                        DeviceRowMaybe(devices: (devices[safeIndex: 0], devices[safeIndex: 1]), newIntent: newIntent)
+                        DeviceRowMaybe(devices: (devices[safeIndex: 2], devices[safeIndex: 3]), newIntent: newIntent)
+                        DeviceRowMaybe(devices: (devices[safeIndex: 4], devices[safeIndex: 5]), newIntent: newIntent)
                     }
-                case .systemExtraLarge:
+                case (.systemExtraLarge, .selectableMultiDevices):
                     VStack {
-                        DeviceRowMaybe(devices: (devices[safeIndex: 0], devices[safeIndex: 1]), getURL: getURL)
-                        DeviceRowMaybe(devices: (devices[safeIndex: 2], devices[safeIndex: 3]), getURL: getURL)
-                        DeviceRowMaybe(devices: (devices[safeIndex: 4], devices[safeIndex: 5]), getURL: getURL)
-                        DeviceRowMaybe(devices: (devices[safeIndex: 6], devices[safeIndex: 7]), getURL: getURL)
+                        DeviceRowMaybe(devices: (devices[safeIndex: 0], devices[safeIndex: 1]), newIntent: newIntent)
+                        DeviceRowMaybe(devices: (devices[safeIndex: 2], devices[safeIndex: 3]), newIntent: newIntent)
+                        DeviceRowMaybe(devices: (devices[safeIndex: 4], devices[safeIndex: 5]), newIntent: newIntent)
+                        DeviceRowMaybe(devices: (devices[safeIndex: 6], devices[safeIndex: 7]), newIntent: newIntent)
                     }
+                #endif
+                #if os(watchOS)
+                case (.accessoryCircular, .selectableMultiDevices), (.accessoryCorner, .selectableMultiDevices),
+                    (.accessoryInline, .selectableMultiDevices), (.accessoryRectangular, .selectableMultiDevices):
+                    Text("ERROR")
                 #endif
                 @unknown default:
                     EmptyView()
                 }
             }
         } else {
-            NoDevicesView(staticIntent: staticIntent)
+            NoDevicesView(mode: mode)
         }
     }
 }
 
 #if DEBUG
+
 let previewDevices = (1...10)
     .map { i in Device.init(id: "\(i)", name: "Preview no \(i)", details: .status(relay: false, info: .mock)) }
 #Preview("StackList") {
     StackList(
         devices: previewDevices.flatten(),
+        newIntent: { _ in return EmptyIntent() },
         getURL: { _ in return .mock },
-        staticIntent: false
+        mode: .selectableMultiDevices
     )
 }
 
 #Preview("StackList Static") {
     StackList(
         devices: previewDevices.flatten(),
+        newIntent: { _ in return EmptyIntent() },
         getURL: { _ in return .mock },
-        staticIntent: true
+        mode: .turnOffAllDevices
     )
 }
 #endif
