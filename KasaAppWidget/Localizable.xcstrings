@@ -1,23 +1,6 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "child_toggle_app_intent" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "child device (id)"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "appareil descendant (id)"
-          }
-        }
-      }
-    },
     "description_select_devices_intent" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -46,8 +29,25 @@
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Ouvre ou ferme des lumières rapidement"
+          }
+        }
+      }
+    },
+    "device_toggle_app_intent" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "device"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "appareil"
           }
         }
       }
@@ -69,19 +69,19 @@
         }
       }
     },
-    "parent_toggle_app_intent" : {
+    "selected_device_entity_representation" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "device (id)"
+            "value" : "A device from the Kasa App"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "appareil (id)"
+            "value" : "Un appareil de l'app Kasa"
           }
         }
       }
@@ -115,7 +115,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ouvrir les lumières rapidement"
+            "value" : "Ouvrir ou fermer les lumières rapidement"
           }
         }
       }

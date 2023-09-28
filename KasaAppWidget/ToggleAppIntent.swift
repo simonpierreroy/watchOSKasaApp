@@ -24,27 +24,26 @@ struct ToggleAppIntent: AppIntent {
     init() {}
 
     init(flattenDevice: FlattenDevice?) {
-        self.parentId = flattenDevice?.device.id.rawValue
-        self.childId = flattenDevice?.child?.id.rawValue
+        self.deviceEntity = flattenDevice.map(SelectedDeviceAppEntity.init(flattenDevice:))
     }
 
-    @Parameter(title: "parent_toggle_app_intent")
-    var parentId: String?
-
-    @Parameter(title: "child_toggle_app_intent")
-    var childId: String?
+    @Parameter(title: "device_toggle_app_intent")
+    var deviceEntity: SelectedDeviceAppEntity?
 
     func perform() async throws -> some IntentResult {
-        guard let user = try? await self.loadUser() else { return .result() }
+        guard let user = try? await self.loadUser(),
+            let devices = try? await self.loadDevices()
+        else { return .result() }
 
-        if let parentId {
+        if let deviceEntity {
+            let foundDevices = Device.flattenSearch(devices: devices, identifiers: [deviceEntity.id])
+            guard foundDevices.count == 1, let foundDevice = foundDevices.first else { return .result() }
             _ = try? await self.toggleDeviceRelayState(
                 user.tokenInfo.token,
-                .init(parentId),
-                childId.map(Device.Id.init(rawValue:))
+                foundDevice.device.id,
+                foundDevice.child?.id
             )
         } else {
-            guard let devices = try? await self.loadDevices() else { return .result() }
             let flattenList = devices.flatten()
             for device in flattenList {
                 _ = try? await self.changeDeviceRelayState(

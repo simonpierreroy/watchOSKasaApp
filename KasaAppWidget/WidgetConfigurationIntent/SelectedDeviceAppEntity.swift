@@ -25,11 +25,21 @@ extension FlattenDevice.ID: EntityIdentifierConvertible {
 }
 
 struct SelectedDeviceAppEntity: AppEntity {
-    static var typeDisplayRepresentation: TypeDisplayRepresentation = "Selected Device"
+    static var typeDisplayRepresentation: TypeDisplayRepresentation = "selected_device_entity_representation"
     static var defaultQuery = SelectedDeviceAppEntityQuery()
 
     let id: FlattenDevice.ID
     let displayString: String
+
+    init(id: FlattenDevice.ID, displayString: String) {
+        self.id = id
+        self.displayString = displayString
+    }
+
+    init(flattenDevice: FlattenDevice) {
+        self.id = flattenDevice.id
+        self.displayString = flattenDevice.displayName
+    }
 
     var displayRepresentation: DisplayRepresentation {
         DisplayRepresentation(title: "\(displayString)")
@@ -54,13 +64,7 @@ struct SelectedDeviceAppEntityQuery: EntityQuery {
 
     func suggestedEntities() async throws -> [SelectedDeviceAppEntity] {
         let state = try getWidgetState(from: .init(loadDevices: config.loadDevices, loadUser: config.loadUser))
-        return state.getDevicesIfValidUser().flatten()
-            .map {
-                SelectedDeviceAppEntity(
-                    id: $0.id,
-                    displayString: $0.displayName
-                )
-            }
+        return state.getDevicesIfValidUser().flatten().map(SelectedDeviceAppEntity.init(flattenDevice:))
     }
 
     func defaultResult() async -> SelectedDeviceAppEntity? {
