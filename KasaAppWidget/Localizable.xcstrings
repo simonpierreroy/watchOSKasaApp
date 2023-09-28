@@ -18,23 +18,6 @@
         }
       }
     },
-    "description_toggle_app_intent" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Open or close lights quickly"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ouvre ou ferme des lumières rapidement"
-          }
-        }
-      }
-    },
     "device_toggle_app_intent" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -116,6 +99,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ouvrir ou fermer les lumières rapidement"
+          }
+        }
+      }
+    },
+    "Toggle ${deviceEntity}" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toggle ${deviceEntity}"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrir ou fermer ${deviceEntity}"
           }
         }
       }
