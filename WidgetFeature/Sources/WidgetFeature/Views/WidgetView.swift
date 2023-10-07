@@ -23,12 +23,10 @@ struct WidgetView<I: AppIntent>: View {
     @Environment(\.widgetFamily) var widgetFamily
 
     @ViewBuilder
-    static func getBackground(for widgetFamily: WidgetFamily) -> some View {
+    static func getContainerBackground(for widgetFamily: WidgetFamily) -> some View {
         Group {
             switch widgetFamily {
-            case .accessoryCircular, .accessoryInline:
-                AccessoryWidgetBackground()
-            case .accessoryRectangular, .accessoryCorner:
+            case .accessoryCircular, .accessoryCorner, .accessoryRectangular, .accessoryInline:
                 EmptyView()
             #if os(iOS)
             case .systemMedium, .systemSmall, .systemLarge, .systemExtraLarge:
@@ -39,9 +37,30 @@ struct WidgetView<I: AppIntent>: View {
             }
         }
     }
+    
+    @ViewBuilder
+    static func getStackBackground(for widgetFamily: WidgetFamily) -> some View {
+        Group {
+            switch widgetFamily {
+            case .accessoryCircular:
+                AccessoryWidgetBackground().clipShape(.circle)
+            case .accessoryRectangular:
+                AccessoryWidgetBackground().clipShape(.rect(cornerRadius: 8))
+            case .accessoryCorner, .accessoryInline:
+                EmptyView()
+            #if os(iOS)
+            case .systemMedium, .systemSmall, .systemLarge, .systemExtraLarge:
+                EmptyView()
+            #endif
+            @unknown default:
+                EmptyView()
+            }
+        }
+    }
 
     public var body: some View {
-        VStack {
+        ZStack {
+            WidgetView.getStackBackground(for: widgetFamily)
             if logged {
                 StackList(devices: devices, newIntent: newIntent, getURL: getURL, mode: mode)
             } else {
@@ -49,7 +68,7 @@ struct WidgetView<I: AppIntent>: View {
             }
         }
         .containerBackground(for: .widget) {
-            WidgetView.getBackground(for: widgetFamily)
+            WidgetView.getContainerBackground(for: widgetFamily)
         }
     }
 }
