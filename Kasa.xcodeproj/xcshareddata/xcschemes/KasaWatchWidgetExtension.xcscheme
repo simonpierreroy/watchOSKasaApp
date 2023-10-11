@@ -70,8 +70,9 @@
       debugServiceExtension = "internal"
       allowLocationSimulation = "YES"
       launchAutomaticallySubstyle = "2">
-      <BuildableProductRunnable
-         runnableDebuggingMode = "0">
+      <RemoteRunnable
+         runnableDebuggingMode = "2"
+         BundleIdentifier = "com.apple.Carousel">
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "B358E4762A0313DA00B72F6D"
@@ -79,7 +80,7 @@
             BlueprintName = "KasaWatchWidgetExtensionExtension"
             ReferencedContainer = "container:Kasa.xcodeproj">
          </BuildableReference>
-      </BuildableProductRunnable>
+      </RemoteRunnable>
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"

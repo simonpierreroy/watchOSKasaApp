@@ -7,7 +7,6 @@
 
 import SwiftUI
 
-#if os(iOS)
 struct GradientBackgroundWidget: View {
 
     var body: some View {
@@ -28,5 +27,4 @@ struct GradientBackgroundWidget: View {
 #Preview {
     GradientBackgroundWidget()
 }
-#endif
 #endif

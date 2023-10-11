@@ -77,5 +77,4 @@ struct KasaWatchWidgetExtension: Widget {
     DataDeviceEntry.previewNoDevice
     DataDeviceEntry.preview(1)
     DataDeviceEntry.preview(3)
-    DataDeviceEntry.preview(10)
 }

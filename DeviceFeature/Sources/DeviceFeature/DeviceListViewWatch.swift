@@ -50,7 +50,7 @@ public struct DeviceListViewWatch: View {
                             }
                         }
                     }
-                    .foregroundColor(Color.moon).listRowPlatterColor(Color.moon.opacity(0.17))
+                    .foregroundColor(Color.moon).listItemTint(Color.moon.opacity(0.17))
 
                     Button {
                         viewStore.send(.tappedRefreshButton, animation: .default)
@@ -62,7 +62,7 @@ public struct DeviceListViewWatch: View {
                             }
                         }
                     }
-                    .foregroundColor(Color.valid).listRowPlatterColor(Color.valid.opacity(0.14))
+                    .foregroundColor(Color.valid).listItemTint(Color.valid.opacity(0.14))
                 }
                 .disabled(viewStore.state.isInFlight)
 
@@ -72,7 +72,7 @@ public struct DeviceListViewWatch: View {
                     Text(Strings.logoutApp.key, bundle: .module)
                         .foregroundColor(Color.logout)
                 }
-                .listRowPlatterColor(Color.logout.opacity(0.17))
+                .listItemTint(Color.logout.opacity(0.17))
 
             }
             .alert(

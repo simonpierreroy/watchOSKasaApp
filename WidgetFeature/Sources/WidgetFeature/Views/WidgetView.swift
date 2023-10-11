@@ -26,8 +26,15 @@ struct WidgetView<I: AppIntent>: View {
     static func getContainerBackground(for widgetFamily: WidgetFamily) -> some View {
         Group {
             switch widgetFamily {
-            case .accessoryCircular, .accessoryCorner, .accessoryRectangular, .accessoryInline:
+            case .accessoryCircular, .accessoryCorner, .accessoryInline:
                 EmptyView()
+            case .accessoryRectangular:
+                #if os(iOS)
+                EmptyView()
+                #elseif os(watchOS)
+                GradientBackgroundWidget()
+                #endif
+
             #if os(iOS)
             case .systemMedium, .systemSmall, .systemLarge, .systemExtraLarge:
                 GradientBackgroundWidget()
@@ -37,7 +44,7 @@ struct WidgetView<I: AppIntent>: View {
             }
         }
     }
-    
+
     @ViewBuilder
     static func getStackBackground(for widgetFamily: WidgetFamily) -> some View {
         Group {
