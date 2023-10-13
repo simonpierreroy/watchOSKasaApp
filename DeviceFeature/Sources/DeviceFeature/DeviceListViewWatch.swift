@@ -102,20 +102,14 @@ struct DeviceDetailDataViewWatch: View {
             action()
         } label: {
             HStack {
-                Image(systemName: style.image).font(.title3)
-                    .foregroundColor(style.tint)
+                StateImageView(state: style, isActive: isLoading)
                 Text(name)
                     .multilineTextAlignment(.center)
                 Spacer()
             }
         }
         .frame(maxWidth: .infinity)
-        .overlay(alignment: .center) {
-            HStack {
-                if isLoading { ProgressView() }
-            }
-        }
-        .disabled(isDisabled)
+        .disabled(isLoading || isDisabled)
     }
 }
 
@@ -140,7 +134,7 @@ struct DeviceDetailViewWatch: View {
                             animation: .default
                         )
                     },
-                    style: styleFor(relay: viewStore.state.relay),
+                    style: StateImageView.styleFor(relay: viewStore.state.relay),
                     isLoading: viewStore.state.isLoading,
                     isDisabled: false,
                     name: viewStore.state.name
@@ -158,7 +152,7 @@ struct DeviceDetailViewWatch: View {
                     action: {
                         viewStore.send(.tapped, animation: .default)
                     },
-                    style: styleFor(details: viewStore.device.details),
+                    style: StateImageView.styleFor(details: viewStore.device.details),
                     isLoading: viewStore.device.isLoading,
                     isDisabled: isDisabled(viewStore.device),
                     name: viewStore.device.name

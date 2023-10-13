@@ -244,10 +244,12 @@ public struct DeviceRelayFailedViewiOS: View {
 
     public var body: some View {
         WithViewStore(self.store, observe: { $0 }) { viewStore in
-            let style = styleFor(details: viewStore.details)
             VStack {
-                Image(systemName: style.image).font(.title3)
-                Text(viewStore.name).multilineTextAlignment(.center).foregroundColor(style.tint)
+                StateImageView(
+                    details: viewStore.details,
+                    isActive: viewStore.isLoading
+                )
+                Text(viewStore.name).multilineTextAlignment(.center)
             }
             .frame(maxWidth: .infinity).padding()
         }
@@ -374,10 +376,12 @@ public struct DeviceNoChildViewiOS: View {
                 viewStore.send(.tapped, animation: .default)
             } label: {
                 VStack {
-                    let style = styleFor(details: viewStore.details)
-                    Image(systemName: style.image).font(.title3).tint(style.tint)
+                    StateImageView(
+                        details: viewStore.details,
+                        isActive: viewStore.isLoading
+                    )
+
                     Text(viewStore.name).multilineTextAlignment(.center)
-                    if viewStore.isLoading { ProgressView() }
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .padding()
@@ -404,8 +408,6 @@ public struct DeviceChildGroupViewiOS: View {
                     Text(Strings.deviceGroup.key, bundle: .module)
                 }
                 .frame(maxWidth: .infinity).padding()
-                if viewStore.state { ProgressView() }
-                Spacer()
                 ForEachStore(
                     self.store.scope(
                         state: \.children,
@@ -432,14 +434,15 @@ public struct DeviceChildViewiOS: View {
                     viewStore.send(.toggleChild, animation: .default)
                 } label: {
                     HStack {
-                        let style = styleFor(relay: viewStore.relay)
-                        Image(systemName: style.image).font(.title3).tint(style.tint)
+                        StateImageView(
+                            relay: viewStore.relay,
+                            isActive: viewStore.isLoading
+                        )
                         Text(viewStore.name)
                     }
                     .frame(maxWidth: .infinity)
                     .padding([.leading, .trailing])
                 }
-                if viewStore.isLoading { ProgressView() }
             }
             .disabled(viewStore.isLoading)
             .alert(
