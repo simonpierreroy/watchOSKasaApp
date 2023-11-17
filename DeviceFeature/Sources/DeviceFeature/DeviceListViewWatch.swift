@@ -17,12 +17,15 @@ import SwiftUI
 #if os(watchOS)
 public struct DeviceListViewWatch: View {
 
-    private let store: Store<StateView, Action>
+    private let store: Store<StateView, DevicesReducer.Action>
 
     public init(
-        store: Store<StateView, Action>
+        store: StoreOf<DevicesReducer>
     ) {
-        self.store = store
+        self.store = store.scope(
+            state: DeviceListViewWatch.StateView.init(devices:),
+            action: { $0 }
+        )
     }
 
     public var body: some View {
@@ -33,15 +36,17 @@ public struct DeviceListViewWatch: View {
                     ForEachStore(
                         self.store.scope(
                             state: \.devicesToDisplay,
-                            action: { index, action in
-                                Action.tappedDevice(index: index.parent, action: action)
+                            action: { action in
+                                DevicesReducer.Action.deviceDetail(
+                                    .element(id: action.id.parent, action: action.action)
+                                )
                             }
                         ),
                         content: DeviceDetailViewWatch.init(store:)
                     )
 
                     Button {
-                        viewStore.send(.tappedTurnOffAll, animation: .default)
+                        viewStore.send(.turnOffAllDevices, animation: .default)
                     } label: {
                         LoadingView(.constant(viewStore.state == .closingAll)) {
                             HStack {
@@ -53,7 +58,7 @@ public struct DeviceListViewWatch: View {
                     .foregroundColor(Color.moon).listItemTint(Color.moon.opacity(0.17))
 
                     Button {
-                        viewStore.send(.tappedRefreshButton, animation: .default)
+                        viewStore.send(.fetchFromRemote, animation: .default)
                     } label: {
                         HStack {
                             LoadingView(.constant(viewStore.state == .loadingDevices)) {
@@ -67,7 +72,7 @@ public struct DeviceListViewWatch: View {
                 .disabled(viewStore.state.isInFlight)
 
                 Button {
-                    viewStore.send(.tappedLogout, animation: .default)
+                    viewStore.send(.delegate(.logout), animation: .default)
                 } label: {
                     Text(Strings.logoutApp.key, bundle: .module)
                         .foregroundColor(Color.logout)
@@ -83,7 +88,7 @@ public struct DeviceListViewWatch: View {
             )
             .onAppear {
                 if case .neverLoaded = viewStore.state {
-                    viewStore.send(.viewAppearReload)
+                    viewStore.send(.fetchFromRemote)
                 }
             }
         }
@@ -115,14 +120,7 @@ struct DeviceDetailDataViewWatch: View {
 
 struct DeviceDetailViewWatch: View {
 
-    let store: Store<ListEntry, DeviceListViewWatch.Action.DeviceAction>
-
-    func isDisabled(_ device: DeviceReducer.State) -> Bool {
-        switch device.details {
-        case .failed: return true
-        case .noRelay, .status: return false
-        }
-    }
+    let store: Store<ListEntry, DeviceReducer.Action>
 
     var body: some View {
         IfLetStore(self.store.scope(state: \.child, action: { $0 })) { childStore in
@@ -130,7 +128,7 @@ struct DeviceDetailViewWatch: View {
                 DeviceDetailDataViewWatch(
                     action: {
                         viewStore.send(
-                            .tappedDeviceChild(index: viewStore.state.id, action: .toggleChild),
+                            .deviceChild(.element(id: viewStore.state.id, action: .toggleChild)),
                             animation: .default
                         )
                     },
@@ -142,7 +140,7 @@ struct DeviceDetailViewWatch: View {
                 .alert(
                     store: childStore.scope(
                         state: \.$alert,
-                        action: { .tappedDeviceChild(index: viewStore.state.id, action: .alert($0)) }
+                        action: { .deviceChild(.element(id: viewStore.state.id, action: .alert($0))) }
                     )
                 )
             }
@@ -150,16 +148,16 @@ struct DeviceDetailViewWatch: View {
             WithViewStore(self.store, observe: { $0 }) { viewStore in
                 DeviceDetailDataViewWatch(
                     action: {
-                        viewStore.send(.tapped, animation: .default)
+                        viewStore.send(.toggle, animation: .default)
                     },
                     style: StateImageView.styleFor(details: viewStore.device.details),
                     isLoading: viewStore.device.isLoading,
-                    isDisabled: isDisabled(viewStore.device),
+                    isDisabled: viewStore.device.details.is(\.failed),
                     name: viewStore.device.name
                 )
                 .alert(
                     store: self.store.scope(state: \.device.$destination, action: { .destination($0) }),
-                    state: /DeviceReducer.Destination.State.alert,
+                    state: \.alert,
                     action: DeviceReducer.Destination.Action.alert
                 )
             }
@@ -188,7 +186,7 @@ public struct ListEntry: Equatable, Identifiable {
 
 extension DeviceListViewWatch {
 
-    public struct StateView: Equatable {
+    struct StateView: Equatable {
         public init(
             alert: AlertState<DevicesReducer.Action.Alert>?,
             isRefreshingDevices: DevicesReducer.State.Loading,
@@ -203,41 +201,10 @@ extension DeviceListViewWatch {
         let isRefreshingDevices: DevicesReducer.State.Loading
         let devicesToDisplay: IdentifiedArrayOf<ListEntry>
     }
-
-    public enum Action {
-
-        public enum DeviceAction {
-            case destination(PresentationAction<DeviceReducer.Destination.Action>)
-            case tapped
-            case tappedDeviceChild(index: DeviceChildReducer.State.ID, action: DeviceChildReducer.Action)
-        }
-
-        case alert(PresentationAction<DevicesReducer.Action.Alert>)
-        case tappedTurnOffAll
-        case tappedLogout
-        case viewAppearReload
-        case tappedRefreshButton
-        case tappedDevice(index: DeviceReducer.State.ID, action: DeviceAction)
-    }
-}
-
-extension DeviceReducer.Action {
-    public init(
-        viewDetailAction: DeviceListViewWatch.Action.DeviceAction
-    ) {
-        switch viewDetailAction {
-        case .tapped:
-            self = .toggle
-        case .destination(let destination):
-            self = .destination(destination)
-        case .tappedDeviceChild(index: let id, let action):
-            self = .deviceChild(index: id, action: action)
-        }
-    }
 }
 
 extension DeviceListViewWatch.StateView {
-    public init(
+    init(
         devices: DevicesReducer.State
     ) {
         self.alert = devices.alert
@@ -256,26 +223,6 @@ extension DeviceListViewWatch.StateView {
     }
 }
 
-extension DevicesReducer.Action {
-    public init(
-        deviceAction: DeviceListViewWatch.Action
-    ) {
-        switch deviceAction {
-        case .tappedDevice(index: let idx, let action):
-            let deviceDetailAction = DeviceReducer.Action.init(viewDetailAction: action)
-            self = .deviceDetail(index: idx, action: deviceDetailAction)
-        case .tappedLogout:
-            self = .delegate(.logout)
-        case .tappedRefreshButton, .viewAppearReload:
-            self = .fetchFromRemote
-        case .tappedTurnOffAll:
-            self = .turnOffAllDevices
-        case .alert(let action):
-            self = .alert(action)
-        }
-    }
-}
-
 #if DEBUG
 
 #Preview("List") {
@@ -283,10 +230,6 @@ extension DevicesReducer.Action {
         store: Store(
             initialState: .emptyLogged,
             reducer: { DevicesReducer() }
-        )
-        .scope(
-            state: DeviceListViewWatch.StateView.init(devices:),
-            action: DevicesReducer.Action.init(deviceAction:)
         )
     )
 }
@@ -296,10 +239,6 @@ extension DevicesReducer.Action {
         store: Store(
             initialState: .emptyLoading,
             reducer: { DevicesReducer() }
-        )
-        .scope(
-            state: DeviceListViewWatch.StateView.init(devices:),
-            action: DevicesReducer.Action.init(deviceAction:)
         )
     )
     .previewDisplayName("Loading")
@@ -311,10 +250,6 @@ extension DevicesReducer.Action {
             initialState: .emptyNeverLoaded,
             reducer: { DevicesReducer() }
         )
-        .scope(
-            state: DeviceListViewWatch.StateView.init(devices:),
-            action: DevicesReducer.Action.init(deviceAction:)
-        )
     )
 }
 
@@ -323,10 +258,6 @@ extension DevicesReducer.Action {
         store: Store(
             initialState: .oneDeviceLoaded,
             reducer: { DevicesReducer() }
-        )
-        .scope(
-            state: DeviceListViewWatch.StateView.init(devices:),
-            action: DevicesReducer.Action.init(deviceAction:)
         )
     )
     .preferredColorScheme(.dark)
@@ -339,10 +270,6 @@ extension DevicesReducer.Action {
             initialState: .nDeviceLoaded(n: 5, indexFailed: [2, 4]),
             reducer: { DevicesReducer() }
         )
-        .scope(
-            state: DeviceListViewWatch.StateView.init(devices:),
-            action: DevicesReducer.Action.init(deviceAction:)
-        )
     )
     .preferredColorScheme(.dark)
     .previewDisplayName("5 items")
@@ -354,10 +281,6 @@ extension DevicesReducer.Action {
             initialState: .nDeviceLoaded(n: 5, childrenCount: 3, indexFailed: [2]),
             reducer: { DevicesReducer() }
         )
-        .scope(
-            state: DeviceListViewWatch.StateView.init(devices:),
-            action: DevicesReducer.Action.init(deviceAction:)
-        )
     )
     .preferredColorScheme(.dark)
 }
@@ -367,10 +290,6 @@ extension DevicesReducer.Action {
         store: Store(
             initialState: .oneDeviceLoaded,
             reducer: { DevicesReducer() }
-        )
-        .scope(
-            state: DeviceListViewWatch.StateView.init(devices:),
-            action: DevicesReducer.Action.init(deviceAction:)
         )
     )
     .environment(\.locale, .init(identifier: "fr"))
@@ -392,10 +311,6 @@ extension DevicesReducer.Action {
                         )
                     )
             }
-        )
-        .scope(
-            state: DeviceListViewWatch.StateView.init(devices:),
-            action: DevicesReducer.Action.init(deviceAction:)
         )
     )
     .preferredColorScheme(.dark)

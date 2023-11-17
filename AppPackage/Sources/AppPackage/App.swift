@@ -19,7 +19,8 @@ import UserClient
 import UserClientLive
 import UserFeature
 
-public struct AppReducer: Reducer {
+@Reducer
+public struct AppReducer {
 
     public init() {}
 
@@ -57,10 +58,10 @@ public struct AppReducer: Reducer {
     }
 
     public var body: some ReducerOf<Self> {
-        Scope(state: \State.userState, action: /Action.userAction) {
+        Scope(state: \.userState, action: \.userAction) {
             UserReducer()
         }
-        Scope(state: \State.devicesState, action: /Action.devicesAction) {
+        Scope(state: \.devicesState, action: \.devicesAction) {
             DevicesReducer()
         }
         GlueFeatures()

@@ -8,7 +8,8 @@
 import ComposableArchitecture
 import Foundation
 
-struct GlueFeatures: Reducer {
+@Reducer
+struct GlueFeatures {
     typealias State = AppReducer.State
     typealias Action = AppReducer.Action
 

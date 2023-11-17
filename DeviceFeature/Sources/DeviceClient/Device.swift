@@ -1,3 +1,4 @@
+import CasePaths
 import Combine
 import ComposableArchitecture
 import Foundation
@@ -78,6 +79,8 @@ public struct Device: Equatable, Identifiable, Codable, Sendable {
         public let message: String
     }
 
+    @CasePathable
+    @dynamicMemberLookup
     public enum State: Equatable, Codable, Sendable {
         case status(relay: RelayIsOn, info: Info)
         case noRelay(info: Info)

@@ -11,7 +11,8 @@ import DeviceClient
 import Foundation
 import UserClient
 
-struct AppDelegateReducer: Reducer {
+@Reducer
+struct AppDelegateReducer {
     typealias State = AppReducer.State
     typealias Action = AppReducer.Action
 

@@ -14,8 +14,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/swift-case-paths",
       "state" : {
-        "revision" : "5da6989aae464f324eef5c5b52bdb7974725ab81",
-        "version" : "1.0.0"
+        "revision" : "40773cbaf8d71ed5357f297b1ba4073f5b24faaa",
+        "version" : "1.1.0"
       }
     },
     {
@@ -41,8 +41,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/swift-composable-architecture.git",
       "state" : {
-        "revision" : "a7c1f799b55ecb418f85094b142565834f7ee7c7",
-        "version" : "1.2.0"
+        "revision" : "57e804f1cc2e17e306620f77deaf36b9f38b0df5",
+        "version" : "1.4.0"
       }
     },
     {
@@ -50,8 +50,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/swift-concurrency-extras",
       "state" : {
-        "revision" : "ea631ce892687f5432a833312292b80db238186a",
-        "version" : "1.0.0"
+        "revision" : "bb5059bde9022d69ac516803f4f227d8ac967f71",
+        "version" : "1.1.0"
       }
     },
     {
@@ -91,6 +91,15 @@
       }
     },
     {
+      "identity" : "swift-syntax",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/apple/swift-syntax",
+      "state" : {
+        "revision" : "6ad4ea24b01559dde0773e3d091f1b9e36175036",
+        "version" : "509.0.2"
+      }
+    },
+    {
       "identity" : "swift-tagged",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/swift-tagged.git",
@@ -104,8 +113,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/swiftui-navigation",
       "state" : {
-        "revision" : "f5bcdac5b6bb3f826916b14705f37a3937c2fd34",
-        "version" : "1.0.0"
+        "revision" : "a3aa5d46e8bf174d773d23b030f1c103999398ac",
+        "version" : "1.1.0"
       }
     },
     {

@@ -5,7 +5,8 @@ import KasaCore
 import Tagged
 import UserClient
 
-public struct UserReducer: Reducer {
+@Reducer
+public struct UserReducer {
 
     public init() {}
 
@@ -33,16 +34,17 @@ public struct UserReducer: Reducer {
                 return .none
             }
         }
-        .ifCaseLet(/State.logout, action: /Action.logoutUser) {
+        .ifCaseLet(\.logout, action: \.logoutUser) {
             UserLogoutReducer()
         }
-        .ifCaseLet(/State.logged, action: /Action.loggedUser) {
+        .ifCaseLet(\.logged, action: \.loggedUser) {
             UserLoggedReducer()
         }
     }
 }
 
-public struct UserLoggedReducer: Reducer {
+@Reducer
+public struct UserLoggedReducer {
     public struct State: Equatable {
         public var user: User
     }
@@ -75,26 +77,22 @@ public struct UserLoggedReducer: Reducer {
     }
 }
 
-public struct UserLogoutReducer: Reducer {
+@Reducer
+public struct UserLogoutReducer {
 
     public struct State {
         public static let empty = State(email: "", password: "", isLoading: false, alert: nil)
 
-        public var email: String
-        public var password: String
+        @BindingState public var email: String
+        @BindingState public var password: String
         public var isLoading: Bool
         @PresentationState public var alert: AlertState<Action.Alert>?
     }
 
-    public enum Action {
+    public enum Action: BindableAction {
 
         public enum Delegate {
             case setUser(User)
-        }
-
-        public enum Bind: Equatable {
-            case setEmail(String)
-            case setPassword(String)
         }
 
         public enum Alert: Equatable {}
@@ -105,7 +103,7 @@ public struct UserLogoutReducer: Reducer {
         case setError(Error)
         case alert(PresentationAction<Alert>)
         case delegate(Delegate)
-        case bind(Bind)
+        case binding(BindingAction<State>)
     }
 
     @Dependency(\.userClient) var client
@@ -158,14 +156,11 @@ public struct UserLogoutReducer: Reducer {
                 return .none
             case .alert:
                 return .none
-            case .bind(.setEmail(let email)):
-                state.email = email
-                return .none
-            case .bind(.setPassword(let password)):
-                state.password = password
+            case .binding:
                 return .none
             }
         }
-        .ifLet(\.$alert, action: /Action.alert)
+        .ifLet(\.$alert, action: \.alert)
+        BindingReducer()
     }
 }

@@ -19,9 +19,9 @@ public struct DeviceListViewiOS: View {
 
     @Environment(\.horizontalSizeClass) var horizontalSizeClass: UserInterfaceSizeClass?
 
-    private let store: Store<StateView, Action>
+    private let store: StoreOf<DevicesReducer>
     public init(
-        store: Store<StateView, Action>
+        store: StoreOf<DevicesReducer>
     ) {
         self.store = store
     }
@@ -35,7 +35,7 @@ public struct DeviceListViewiOS: View {
                             .toolbar {
                                 ToolbarItem(placement: .navigationBarTrailing) {
                                     Button {
-                                        viewStore.send(.tappedLogout, animation: .default)
+                                        viewStore.send(.delegate(.logout), animation: .default)
                                     } label: {
                                         Text(Strings.logoutApp.key, bundle: .module)
                                             .foregroundColor(Color.logout)
@@ -76,9 +76,9 @@ private struct DeviceListViewSideBar: View {
         }
     }
 
-    private let store: Store<DeviceListViewiOS.StateView, DeviceListViewiOS.Action>
+    private let store: StoreOf<DevicesReducer>
     init(
-        store: Store<DeviceListViewiOS.StateView, DeviceListViewiOS.Action>
+        store: StoreOf<DevicesReducer>
     ) {
         self.store = store
     }
@@ -88,12 +88,12 @@ private struct DeviceListViewSideBar: View {
     }
 
     public var body: some View {
-        WithViewStore(self.store, observe: \.isRefreshingDevices) { viewStore in
+        WithViewStore(self.store, observe: \.isLoading) { viewStore in
             List(ListSideBar.allCases) { tab in
                 switch tab {
                 case .refresh:
                     Button {
-                        viewStore.send(.tappedRefreshButton, animation: .default)
+                        viewStore.send(.fetchFromRemote, animation: .default)
                     } label: {
                         LoadingView(.constant(viewStore.state == .loadingDevices)) {
                             HStack {
@@ -105,7 +105,7 @@ private struct DeviceListViewSideBar: View {
                     }
                 case .logout:
                     Button {
-                        viewStore.send(.tappedLogout, animation: .default)
+                        viewStore.send(.delegate(.logout), animation: .default)
                     } label: {
                         HStack {
                             Image(systemName: "book.closed.fill")
@@ -115,7 +115,7 @@ private struct DeviceListViewSideBar: View {
                     }
                 case .turnOffAll:
                     Button {
-                        viewStore.send(.tappedTurnOffAll, animation: .default)
+                        viewStore.send(.turnOffAllDevices, animation: .default)
                     } label: {
                         LoadingView(.constant(viewStore.state == .closingAll)) {
                             HStack {
@@ -138,10 +138,10 @@ private struct DeviceListViewBase: View {
 
     @Environment(\.horizontalSizeClass) var horizontalSizeClass: UserInterfaceSizeClass?
 
-    private let store: Store<DeviceListViewiOS.StateView, DeviceListViewiOS.Action>
+    private let store: StoreOf<DevicesReducer>
 
     public init(
-        store: Store<DeviceListViewiOS.StateView, DeviceListViewiOS.Action>
+        store: StoreOf<DevicesReducer>
     ) {
         self.store = store
     }
@@ -151,13 +151,13 @@ private struct DeviceListViewBase: View {
         GridItem(.flexible()),
     ]
     public var body: some View {
-        WithViewStore(self.store, observe: \.isRefreshingDevices) { viewStore in
+        WithViewStore(self.store, observe: \.isLoading) { viewStore in
             ScrollView {
                 LazyVGrid(columns: columns, spacing: 10) {
                     ForEachStore(
                         self.store.scope(
-                            state: \.devicesToDisplay,
-                            action: DeviceListViewiOS.Action.tappedDevice(index:action:)
+                            state: \.devices,
+                            action: DevicesReducer.Action.deviceDetail
                         ),
                         content: {
                             DeviceDetailViewiOS(store: $0)
@@ -170,7 +170,7 @@ private struct DeviceListViewBase: View {
 
                     if horizontalSizeClass == .compact {
                         Button {
-                            viewStore.send(.tappedTurnOffAll, animation: .default)
+                            viewStore.send(.turnOffAllDevices, animation: .default)
                         } label: {
                             LoadingView(.constant(viewStore.state == .closingAll)) {
                                 Image(systemName: "moon.fill")
@@ -180,7 +180,7 @@ private struct DeviceListViewBase: View {
                         .modifier(ContentStyle(isLoading: viewStore.state.isInFlight))
 
                         Button {
-                            viewStore.send(.tappedRefreshButton, animation: .default)
+                            viewStore.send(.fetchFromRemote, animation: .default)
                         } label: {
                             LoadingView(.constant(viewStore.state == .loadingDevices)) {
                                 Image(systemName: "arrow.clockwise.circle.fill")
@@ -195,7 +195,7 @@ private struct DeviceListViewBase: View {
             }
             .onAppear {
                 if case .neverLoaded = viewStore.state {
-                    viewStore.send(.viewAppearReload)
+                    viewStore.send(.fetchFromRemote)
                 }
             }
         }
@@ -203,44 +203,8 @@ private struct DeviceListViewBase: View {
     }
 }
 
-extension DeviceListViewiOS {
-
-    public struct StateView: Equatable {
-        public init(
-            alert: AlertState<DevicesReducer.Action.Alert>?,
-            isRefreshingDevices: DevicesReducer.State.Loading,
-            devicesToDisplay: IdentifiedArrayOf<DeviceReducer.State>
-        ) {
-            self.alert = alert
-            self.isRefreshingDevices = isRefreshingDevices
-            self.devicesToDisplay = devicesToDisplay
-        }
-
-        @PresentationState var alert: AlertState<DevicesReducer.Action.Alert>?
-        let isRefreshingDevices: DevicesReducer.State.Loading
-        let devicesToDisplay: IdentifiedArrayOf<DeviceReducer.State>
-    }
-
-    public enum Action {
-
-        public enum DeviceAction {
-            case destination(PresentationAction<DeviceReducer.Destination.Action>)
-            case tapped
-            case tappedShowInfo
-            case tappedDeviceChild(index: DeviceChildReducer.State.ID, action: DeviceChildReducer.Action)
-        }
-
-        case alert(PresentationAction<DevicesReducer.Action.Alert>)
-        case tappedTurnOffAll
-        case tappedLogout
-        case viewAppearReload
-        case tappedRefreshButton
-        case tappedDevice(index: DeviceReducer.State.ID, action: DeviceAction)
-    }
-}
-
 public struct DeviceRelayFailedViewiOS: View {
-    let store: Store<DeviceReducer.State, DeviceListViewiOS.Action.DeviceAction>
+    let store: StoreOf<DeviceReducer>
 
     public var body: some View {
         WithViewStore(self.store, observe: { $0 }) { viewStore in
@@ -258,7 +222,7 @@ public struct DeviceRelayFailedViewiOS: View {
 
 public struct DeviceDetailViewiOS: View {
 
-    let store: Store<DeviceReducer.State, DeviceListViewiOS.Action.DeviceAction>
+    let store: StoreOf<DeviceReducer>
     @Environment(\.horizontalSizeClass) var horizontalSizeClass: UserInterfaceSizeClass?
 
     public var body: some View {
@@ -274,7 +238,7 @@ public struct DeviceDetailViewiOS: View {
                 }
                 if viewStore.details.info != nil {
                     let button = Button {
-                        viewStore.send(.tappedShowInfo, animation: .default)
+                        viewStore.send(.presentInfo, animation: .default)
                     } label: {
                         Image(systemName: "info.bubble.fill")
                             .frame(maxWidth: .infinity)
@@ -283,7 +247,7 @@ public struct DeviceDetailViewiOS: View {
                     if horizontalSizeClass == .compact {
                         button.navigationDestination(
                             store: self.store.scope(state: \.$destination, action: { .destination($0) }),
-                            state: /DeviceReducer.Destination.State.info,
+                            state: \DeviceReducer.Destination.State.info,
                             action: DeviceReducer.Destination.Action.info
                         ) { store in
                             DeviceInfoViewiOS(store: store)
@@ -292,7 +256,7 @@ public struct DeviceDetailViewiOS: View {
                     } else {
                         button.sheet(
                             store: self.store.scope(state: \.$destination, action: { .destination($0) }),
-                            state: /DeviceReducer.Destination.State.info,
+                            state: \DeviceReducer.Destination.State.info,
                             action: DeviceReducer.Destination.Action.info
                         ) { store in
                             DeviceInfoViewiOS(store: store)
@@ -308,7 +272,7 @@ public struct DeviceDetailViewiOS: View {
 
 public struct DeviceInfoViewiOS: View {
 
-    let store: Store<DeviceInfoReducer.State, DeviceInfoReducer.Action>
+    let store: StoreOf<DeviceInfoReducer>
     @Environment(\.horizontalSizeClass) var horizontalSizeClass: UserInterfaceSizeClass?
 
     public var body: some View {
@@ -368,12 +332,12 @@ public struct DeviceInfoEntryiOS: View {
 
 public struct DeviceNoChildViewiOS: View {
 
-    let store: Store<DeviceReducer.State, DeviceListViewiOS.Action.DeviceAction>
+    let store: StoreOf<DeviceReducer>
 
     public var body: some View {
         WithViewStore(self.store, observe: { $0 }) { viewStore in
             Button {
-                viewStore.send(.tapped, animation: .default)
+                viewStore.send(.toggle, animation: .default)
             } label: {
                 VStack {
                     StateImageView(
@@ -388,7 +352,7 @@ public struct DeviceNoChildViewiOS: View {
             }
             .alert(
                 store: self.store.scope(state: \.$destination, action: { .destination($0) }),
-                state: /DeviceReducer.Destination.State.alert,
+                state: \DeviceReducer.Destination.State.alert,
                 action: DeviceReducer.Destination.Action.alert
             )
         }
@@ -397,7 +361,7 @@ public struct DeviceNoChildViewiOS: View {
 
 public struct DeviceChildGroupViewiOS: View {
 
-    let store: Store<DeviceReducer.State, DeviceListViewiOS.Action.DeviceAction>
+    let store: StoreOf<DeviceReducer>
 
     public var body: some View {
         WithViewStore(self.store, observe: { $0.isLoading }) { viewStore in
@@ -411,7 +375,7 @@ public struct DeviceChildGroupViewiOS: View {
                 ForEachStore(
                     self.store.scope(
                         state: \.children,
-                        action: DeviceListViewiOS.Action.DeviceAction.tappedDeviceChild(index:action:)
+                        action: DeviceReducer.Action.deviceChild
                     ),
                     content: { store in
                         DeviceChildViewiOS(store: store)
@@ -425,7 +389,7 @@ public struct DeviceChildGroupViewiOS: View {
 
 public struct DeviceChildViewiOS: View {
 
-    let store: Store<DeviceChildReducer.State, DeviceChildReducer.Action>
+    let store: StoreOf<DeviceChildReducer>
 
     public var body: some View {
         WithViewStore(self.store, observe: { $0 }) { viewStore in
@@ -466,53 +430,6 @@ struct ContentStyle: ViewModifier {
     }
 }
 
-extension DeviceReducer.Action {
-    public init(
-        viewDetailAction: DeviceListViewiOS.Action.DeviceAction
-    ) {
-        switch viewDetailAction {
-        case .tapped:
-            self = .toggle
-        case .tappedShowInfo:
-            self = .presentInfo
-        case .destination(let destination):
-            self = .destination(destination)
-        case .tappedDeviceChild(index: let id, let action):
-            self = .deviceChild(index: id, action: action)
-        }
-    }
-}
-
-extension DeviceListViewiOS.StateView {
-    public init(
-        devices: DevicesReducer.State
-    ) {
-        self.alert = devices.alert
-        self.devicesToDisplay = devices.devices
-        self.isRefreshingDevices = devices.isLoading
-    }
-}
-
-extension DevicesReducer.Action {
-    public init(
-        deviceAction: DeviceListViewiOS.Action
-    ) {
-        switch deviceAction {
-        case .tappedDevice(index: let idx, let action):
-            let deviceDetailAction = DeviceReducer.Action.init(viewDetailAction: action)
-            self = .deviceDetail(index: idx, action: deviceDetailAction)
-        case .alert(let state):
-            self = .alert(state)
-        case .tappedRefreshButton, .viewAppearReload:
-            self = .fetchFromRemote
-        case .tappedTurnOffAll:
-            self = .turnOffAllDevices
-        case .tappedLogout:
-            self = .delegate(.logout)
-        }
-    }
-}
-
 #if DEBUG
 
 #Preview("Empty") {
@@ -520,10 +437,6 @@ extension DevicesReducer.Action {
         store: Store(
             initialState: .emptyNeverLoaded,
             reducer: { DevicesReducer() }
-        )
-        .scope(
-            state: DeviceListViewiOS.StateView.init(devices:),
-            action: DevicesReducer.Action.init(deviceAction:)
         )
     )
     .previewDisplayName("empty")
@@ -534,10 +447,6 @@ extension DevicesReducer.Action {
         store: Store(
             initialState: .emptyLoggedLink,
             reducer: { DevicesReducer() }
-        )
-        .scope(
-            state: DeviceListViewiOS.StateView.init(devices:),
-            action: DevicesReducer.Action.init(deviceAction:)
         )
     )
 }
@@ -551,10 +460,6 @@ extension DevicesReducer.Action {
             ),
             reducer: { DevicesReducer() }
         )
-        .scope(
-            state: DeviceListViewiOS.StateView.init(devices:),
-            action: DevicesReducer.Action.init(deviceAction:)
-        )
     )
 }
 
@@ -564,10 +469,6 @@ extension DevicesReducer.Action {
             initialState: .nDeviceLoaded(n: 5, indexFailed: [1, 4]),
             reducer: { DevicesReducer() }
         )
-        .scope(
-            state: DeviceListViewiOS.StateView.init(devices:),
-            action: DevicesReducer.Action.init(deviceAction:)
-        )
     )
 }
 
@@ -576,10 +477,6 @@ extension DevicesReducer.Action {
         store: Store(
             initialState: .nDeviceLoaded(n: 5, childrenCount: 4, indexFailed: [3]),
             reducer: { DevicesReducer() }
-        )
-        .scope(
-            state: DeviceListViewiOS.StateView.init(devices:),
-            action: DevicesReducer.Action.init(deviceAction:)
         )
     )
 }
@@ -602,10 +499,6 @@ extension DevicesReducer.Action {
                     ._printChanges()
             }
         )
-        .scope(
-            state: DeviceListViewiOS.StateView.init(devices:),
-            action: DevicesReducer.Action.init(deviceAction:)
-        )
     )
     .preferredColorScheme(.dark)
 }
@@ -615,10 +508,6 @@ extension DevicesReducer.Action {
         store: Store(
             initialState: .deviceWithInfo(),
             reducer: { DevicesReducer() }
-        )
-        .scope(
-            state: DeviceListViewiOS.StateView.init(devices:),
-            action: DevicesReducer.Action.init(deviceAction:)
         )
     )
 }

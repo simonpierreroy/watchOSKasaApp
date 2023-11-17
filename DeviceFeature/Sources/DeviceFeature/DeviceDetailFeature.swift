@@ -5,9 +5,11 @@ import Foundation
 import KasaCore
 import Tagged
 
-public struct DeviceReducer: Reducer {
+@Reducer
+public struct DeviceReducer {
 
-    public struct Destination: Reducer {
+    @Reducer
+    public struct Destination {
 
         public enum State: Equatable {
             case alert(AlertState<Action.Alert>)
@@ -21,7 +23,7 @@ public struct DeviceReducer: Reducer {
         }
 
         public var body: some ReducerOf<Self> {
-            Scope(state: /State.info, action: /Action.info) {
+            Scope(state: \.info, action: \Action.Cases.info) {
                 DeviceInfoReducer()
             }
         }
@@ -74,7 +76,7 @@ public struct DeviceReducer: Reducer {
         case toggle
         case setError(Error)
         case didToggle(state: RelayIsOn, info: Device.Info)
-        case deviceChild(index: DeviceChildReducer.State.ID, action: DeviceChildReducer.Action)
+        case deviceChild(IdentifiedActionOf<DeviceChildReducer>)
         case destination(PresentationAction<Destination.Action>)
         case presentInfo
     }
@@ -109,24 +111,23 @@ public struct DeviceReducer: Reducer {
                 return .none
             case .presentInfo:
                 guard let info = state.details.info else { return .none }
-                state.destination = .info(
-                    DeviceInfoReducer.State(info: info, deviceName: state.name)
-                )
+                state.destination = .info(.init(info: info, deviceName: state.name))
                 return .none
             case .destination:
                 return .none
             }
         }
-        .ifLet(\.$destination, action: /Action.destination) {
+        .ifLet(\.$destination, action: \.destination) {
             Destination()
         }
-        .forEach(\.children, action: /Action.deviceChild(index:action:)) {
+        .forEach(\.children, action: \.deviceChild) {
             DeviceChildReducer()
         }
     }
 }
 
-public struct DeviceChildReducer: Reducer {
+@Reducer
+public struct DeviceChildReducer {
 
     public enum Action {
         case didToggleChild(relay: RelayIsOn)
@@ -178,6 +179,6 @@ public struct DeviceChildReducer: Reducer {
                 return .none
             }
         }
-        .ifLet(\.$alert, action: /Action.alert)
+        .ifLet(\.$alert, action: \.alert)
     }
 }

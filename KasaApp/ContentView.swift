@@ -35,14 +35,7 @@ struct ContentView: View {
             switch userState {
             case .logout:
                 CaseLet(/UserReducer.State.logout, action: UserReducer.Action.logoutUser) { logoutStore in
-                    UserLoginViewiOS(
-                        store:
-                            logoutStore
-                            .scope(
-                                state: UserLoginViewiOS.StateView.init(userLogoutState:),
-                                action: UserLogoutReducer.Action.init(userViewAction:)
-                            )
-                    )
+                    UserLoginViewiOS(store: logoutStore)
                 }
             case .logged:
                 CaseLet(/UserReducer.State.logged, action: UserReducer.Action.loggedUser) { _ in
@@ -51,10 +44,6 @@ struct ContentView: View {
                             .scope(
                                 state: \.devicesState,
                                 action: AppReducer.Action.devicesAction
-                            )
-                            .scope(
-                                state: DeviceListViewiOS.StateView.init(devices:),
-                                action: DevicesReducer.Action.init(deviceAction:)
                             )
                     )
                 }

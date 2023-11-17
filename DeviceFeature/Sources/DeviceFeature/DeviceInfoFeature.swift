@@ -13,7 +13,8 @@ import Foundation
 import KasaCore
 import Tagged
 
-public struct DeviceInfoReducer: Reducer {
+@Reducer
+public struct DeviceInfoReducer {
 
     @Dependency(\.dismiss) var dismiss
     public struct State: Equatable {

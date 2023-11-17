@@ -15,18 +15,15 @@ import UserClient
 #if os(iOS)
 public struct UserLoginViewiOS: View {
 
-    public init(
-        store: Store<StateView, Action>
-    ) {
+    public init(store: StoreOf<UserLogoutReducer>) {
         self.store = store
     }
 
-    private let store: Store<StateView, Action>
+    private let store: StoreOf<UserLogoutReducer>
 
     public var body: some View {
-        WithViewStore(self.store, observe: { $0 }) { viewStore in
+        WithViewStore(self.store, observe: StateView.init(userLogoutState:)) { viewStore in
             ScrollView {
-
                 Text(Strings.kasaName.key, bundle: .module).font(.largeTitle)
                 Image(systemName: "light.max").font(.largeTitle)
                 Spacer(minLength: 32)
@@ -36,7 +33,7 @@ public struct UserLoginViewiOS: View {
                             .font(.title2)
                         TextField(
                             Strings.logEmail.string,
-                            text: viewStore.binding(get: \.email, send: { .bind(.setEmail($0)) })
+                            text: viewStore.$email
                         )
                         .textContentType(.emailAddress)
 
@@ -51,7 +48,7 @@ public struct UserLoginViewiOS: View {
 
                         SecureField(
                             Strings.logPassword.string,
-                            text: viewStore.binding(get: \.password, send: { .bind(.setPassword($0)) })
+                            text: viewStore.$password
                         )
                         .textContentType(.password)
                     }
@@ -62,7 +59,7 @@ public struct UserLoginViewiOS: View {
                     Spacer(minLength: 16)
 
                     Button {
-                        viewStore.send(.tappedLoginButton)
+                        viewStore.send(.login)
                     } label: {
                         LoadingView(.constant(viewStore.isLoadingUser)) {
                             HStack {
@@ -98,41 +95,20 @@ extension UserLoginViewiOS {
 
     public struct StateView: Equatable {
         let isLoadingUser: Bool
-        let email: String
-        let password: String
+        @BindingViewState var email: String
+        @BindingViewState var password: String
         @PresentationState var alert: AlertState<UserLogoutReducer.Action.Alert>?
-    }
-
-    public enum Action: Equatable {
-        case tappedLoginButton
-        case bind(UserLogoutReducer.Action.Bind)
-        case alert(PresentationAction<UserLogoutReducer.Action.Alert>)
     }
 }
 
 extension UserLoginViewiOS.StateView {
     public init(
-        userLogoutState: UserLogoutReducer.State
+        userLogoutState: BindingViewStore<UserLogoutReducer.State>
     ) {
         self.isLoadingUser = userLogoutState.isLoading
-        self.password = userLogoutState.password
-        self.email = userLogoutState.email
+        self._password = userLogoutState.$password
+        self._email = userLogoutState.$email
         self.alert = userLogoutState.alert
-    }
-}
-
-extension UserLogoutReducer.Action {
-    public init(
-        userViewAction: UserLoginViewiOS.Action
-    ) {
-        switch userViewAction {
-        case .alert(let action):
-            self = .alert(action)
-        case .tappedLoginButton:
-            self = .login
-        case .bind(let bindingAction):
-            self = .bind(bindingAction)
-        }
     }
 }
 
@@ -144,10 +120,6 @@ extension UserLogoutReducer.Action {
             Store(
                 initialState: .empty,
                 reducer: { UserLogoutReducer() }
-            )
-            .scope(
-                state: UserLoginViewiOS.StateView.init(userLogoutState:),
-                action: UserLogoutReducer.Action.init(userViewAction:)
             )
     )
     .preferredColorScheme(.dark)
@@ -162,10 +134,6 @@ extension UserLogoutReducer.Action {
                     UserLogoutReducer().dependency(\.userClient, .mockFailed())
                 }
             )
-            .scope(
-                state: UserLoginViewiOS.StateView.init(userLogoutState:),
-                action: UserLogoutReducer.Action.init(userViewAction:)
-            )
     )
     .preferredColorScheme(.dark)
 }
@@ -177,10 +145,6 @@ extension UserLogoutReducer.Action {
                 initialState: .empty,
                 reducer: { UserLogoutReducer() }
             )
-            .scope(
-                state: UserLoginViewiOS.StateView.init(userLogoutState:),
-                action: UserLogoutReducer.Action.init(userViewAction:)
-            )
     )
     .environment(\.locale, .init(identifier: "fr"))
 }
@@ -191,10 +155,6 @@ extension UserLogoutReducer.Action {
             Store(
                 initialState: .init(email: "", password: "", isLoading: true),
                 reducer: { UserLogoutReducer() }
-            )
-            .scope(
-                state: UserLoginViewiOS.StateView.init(userLogoutState:),
-                action: UserLogoutReducer.Action.init(userViewAction:)
             )
     )
 }

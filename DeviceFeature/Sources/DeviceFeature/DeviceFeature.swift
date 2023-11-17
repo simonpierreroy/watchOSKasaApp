@@ -12,7 +12,8 @@ import Foundation
 import KasaCore
 import Tagged
 
-public struct DevicesReducer: Reducer {
+@Reducer
+public struct DevicesReducer {
 
     public init() {}
 
@@ -20,7 +21,7 @@ public struct DevicesReducer: Reducer {
         case set(to: IdentifiedArrayOf<DeviceReducer.State>)
         case fetchFromRemote
         case setError(Error)
-        case deviceDetail(index: DeviceReducer.State.ID, action: DeviceReducer.Action)
+        case deviceDetail(IdentifiedActionOf<DeviceReducer>)
         case turnOffAllDevices
         case doneTurnOffAll
         case saveDevicesToCache
@@ -107,13 +108,12 @@ public struct DevicesReducer: Reducer {
                 case .turnOffAllDevices: return .send(.turnOffAllDevices)
                 case .device(let id, .toggle):
                     guard state.devices[id: id] != nil else { return .none }
-                    return .send(.deviceDetail(index: id, action: .toggle))
+                    return .send(.deviceDetail(.element(id: id, action: .toggle)))
                 case .device(let id, .child(let childId, .toggle)):
                     guard let device = state.devices[id: id], device.children[id: childId] != nil else { return .none }
                     return .send(
                         .deviceDetail(
-                            index: id,
-                            action: .deviceChild(index: childId, action: .toggleChild)
+                            .element(id: id, action: .deviceChild(.element(id: childId, action: .toggleChild)))
                         )
                     )
                 }
@@ -167,8 +167,8 @@ public struct DevicesReducer: Reducer {
                 return .send(.saveDevicesToCache)  // Will be provide by an other feature
             }
         }
-        .ifLet(\.$alert, action: /Action.alert)
-        .forEach(\.devices, action: /Action.deviceDetail(index:action:)) {
+        .ifLet(\.$alert, action: \.alert)
+        .forEach(\.devices, action: \.deviceDetail) {
             DeviceReducer()
         }
     }
@@ -219,90 +219,3 @@ extension Device {
         )
     }
 }
-
-#if DEBUG
-extension DevicesReducer.State {
-    static let emptyLogged = Self(devices: [], isLoading: .neverLoaded, alert: nil, token: "logged")
-    static let emptyLoggedLink = Self(
-        devices: [],
-        isLoading: .neverLoaded,
-        alert: nil,
-        token: "logged",
-        link: .device(Device.debug1.id, .toggle)
-    )
-    static let emptyLoading = Self(devices: [], isLoading: .loadingDevices, alert: nil, token: "logged")
-    static let emptyNeverLoaded = Self(devices: [], isLoading: .neverLoaded, alert: nil, token: "logged")
-    static let oneDeviceLoaded = Self(
-        devices: [.init(device: .debug1)],
-        isLoading: .loaded,
-        alert: nil,
-        token: "logged"
-    )
-    static func multiRoutes(parentError: String?, childError: String?) -> Self {
-        Self(
-            devices: [
-                .init(
-                    isLoading: false,
-                    destination: childError.map { .alert(.init(title: TextState($0))) },
-                    id: .init(rawValue: "1"),
-                    name: "1",
-                    children: .init(),
-                    details: .noRelay(info: .mock)
-                )
-            ],
-            isLoading: .loaded,
-            alert: parentError.map { .init(title: TextState($0)) },
-            token: "logged",
-            link: nil
-        )
-    }
-
-    static func nDeviceLoaded(n: Int, childrenCount: Int = 0, indexFailed: [Int] = []) -> Self {
-        var children: [Device.DeviceChild] = []
-        var state: Device.State = .status(relay: false, info: .mock)
-
-        if childrenCount >= 1 {
-            children = (1...childrenCount)
-                .map { Device.DeviceChild(id: "child \($0)", name: "child \($0)", state: true) }
-            state = .noRelay(info: .mock)
-        }
-
-        return Self(
-            devices: (1...n)
-                .map {
-                    DeviceReducer.State(
-                        device: .init(
-                            id: "\($0)",
-                            name: "Test device number \($0)",
-                            children: children,
-                            details: indexFailed.contains($0) ? .failed(.init(code: -1, message: "Error")) : state
-                        )
-                    )
-                },
-            isLoading: .loaded,
-            alert: nil,
-            token: "logged"
-        )
-    }
-
-    static func deviceWithInfo() -> Self {
-        Self(
-            devices: [
-                .init(
-                    isLoading: false,
-                    destination: .info(.init(info: .mock, deviceName: "Nice Device")),
-                    id: .init(rawValue: "1"),
-                    name: "Nice Device",
-                    children: .init(),
-                    details: .noRelay(info: .mock),
-                    info: .init(info: .mock, deviceName: "Nice Device")
-                )
-            ],
-            isLoading: .loaded,
-            alert: nil,
-            token: "logged",
-            link: nil
-        )
-    }
-}
-#endif
