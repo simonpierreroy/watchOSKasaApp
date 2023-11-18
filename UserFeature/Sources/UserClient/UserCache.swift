@@ -1,24 +1,15 @@
 import Dependencies
+import DependenciesMacros
 import Foundation
 import KasaCore
 import Tagged
 import XCTestDynamicOverlay
 
+@DependencyClient
 public struct UserCache: Sendable {
 
     public enum Failure: Error {
         case dataConversion
-    }
-
-    public init(
-        save: @escaping @Sendable (User?) async throws -> Void,
-        load: @escaping @Sendable () async throws -> User?,
-        loadBlocking: @escaping @Sendable () throws -> User?
-
-    ) {
-        self.save = save
-        self.load = load
-        self.loadBlocking = loadBlocking
     }
 
     public let save: @Sendable (User?) async throws -> Void
@@ -27,12 +18,7 @@ public struct UserCache: Sendable {
 }
 
 extension UserCache: TestDependencyKey {
-    public static let testValue = Self(
-        save: XCTUnimplemented("\(Self.self).save"),
-        load: XCTUnimplemented("\(Self.self).load", placeholder: nil),
-        loadBlocking: XCTUnimplemented("\(Self.self).loadBlocking", placeholder: nil)
-    )
-
+    public static let testValue = Self()
     public static let previewValue: UserCache = .mock
 }
 

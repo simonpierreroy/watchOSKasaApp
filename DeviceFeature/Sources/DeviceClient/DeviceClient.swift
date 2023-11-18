@@ -1,42 +1,21 @@
 import Combine
 import ComposableArchitecture
+import DependenciesMacros
 import Foundation
 import KasaCore
 import Tagged
 import XCTestDynamicOverlay
 
+@DependencyClient
 public struct DevicesClient: Sendable {
-
-    public typealias ToggleEffect = @Sendable (Token, Device.ID, Device.ID?) async throws -> RelayIsOn
-
-    public init(
-        loadDevices: @escaping @Sendable (Token) async throws -> [Device],
-        toggleDeviceRelayState: @escaping ToggleEffect,
-        getDeviceRelayState: @escaping @Sendable (Token, Device.ID, Device.ID?) async throws -> RelayIsOn,
-        changeDeviceRelayState: @escaping @Sendable (Token, Device.ID, Device.ID?, RelayIsOn) async throws -> RelayIsOn
-    ) {
-
-        self.loadDevices = loadDevices
-        self.toggleDeviceRelayState = toggleDeviceRelayState
-        self.getDeviceRelayState = getDeviceRelayState
-        self.changeDeviceRelayState = changeDeviceRelayState
-
-    }
-
     public let loadDevices: @Sendable (Token) async throws -> [Device]
-    public let toggleDeviceRelayState: ToggleEffect
+    public let toggleDeviceRelayState: @Sendable (Token, Device.ID, Device.ID?) async throws -> RelayIsOn
     public let getDeviceRelayState: @Sendable (Token, Device.ID, Device.ID?) async throws -> RelayIsOn
     public let changeDeviceRelayState: @Sendable (Token, Device.ID, Device.ID?, RelayIsOn) async throws -> RelayIsOn
 }
 
 extension DevicesClient: TestDependencyKey {
-    public static let testValue = DevicesClient(
-        loadDevices: XCTUnimplemented("\(Self.self).loadDevices", placeholder: [.debug1]),
-        toggleDeviceRelayState: XCTUnimplemented("\(Self.self).toggleDeviceRelayState", placeholder: true),
-        getDeviceRelayState: XCTUnimplemented("\(Self.self).getDeviceRelayState", placeholder: true),
-        changeDeviceRelayState: XCTUnimplemented("\(Self.self).changeDeviceRelayState", placeholder: true)
-    )
-
+    public static let testValue = DevicesClient()
     public static let previewValue = DevicesClient.mock()
 }
 

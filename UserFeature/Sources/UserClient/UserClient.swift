@@ -1,30 +1,18 @@
 import Dependencies
+import DependenciesMacros
 import Foundation
 import KasaCore
 import Tagged
 import XCTestDynamicOverlay
 
+@DependencyClient
 public struct UserClient: Sendable {
-
-    public init(
-        login: @escaping @Sendable (User.Credential) async throws -> User,
-        refreshToken: @escaping @Sendable (User.RefreshToken, User.TerminalId) async throws -> Token
-    ) {
-        self.login = login
-        self.refreshToken = refreshToken
-    }
-
     public let login: @Sendable (User.Credential) async throws -> User
     public let refreshToken: @Sendable (User.RefreshToken, User.TerminalId) async throws -> Token
-
 }
 
 extension UserClient: TestDependencyKey {
-    public static let testValue = Self(
-        login: XCTUnimplemented("\(Self.self).login", placeholder: .mock),
-        refreshToken: XCTUnimplemented("\(Self.self).refreshToken", placeholder: "1-refreshed")
-    )
-
+    public static let testValue = Self()
     public static let previewValue: UserClient = .mock()
 }
 

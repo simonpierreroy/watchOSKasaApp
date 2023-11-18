@@ -6,6 +6,7 @@
 //
 
 import Dependencies
+import DependenciesMacros
 import DeviceClient
 import Foundation
 import KasaCore
@@ -15,24 +16,14 @@ public enum AppLink {
     case devices(DevicesLink)
 }
 
+@DependencyClient
 public struct URLRouter {
-    public init(
-        parse: @escaping @Sendable (URL) throws -> AppLink,
-        print: @escaping @Sendable (AppLink) throws -> URL
-    ) {
-        self.parse = parse
-        self.print = print
-    }
     public let parse: @Sendable (URL) throws -> AppLink
     public let print: @Sendable (AppLink) throws -> URL
 }
 
 extension URLRouter: TestDependencyKey {
-    public static var testValue = URLRouter(
-        parse: XCTUnimplemented("\(Self.self).parse", placeholder: .devices(.turnOffAllDevices)),
-        print: XCTUnimplemented("\(Self.self).print", placeholder: .mock)
-    )
-
+    public static var testValue = URLRouter()
     public static let previewValue = URLRouter.mock(link: .devices(.turnOffAllDevices), print: nil)
 }
 
