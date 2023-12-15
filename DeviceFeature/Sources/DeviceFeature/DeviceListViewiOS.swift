@@ -56,7 +56,7 @@ public struct DeviceListViewiOS: View {
             .alert(
                 store: self.store.scope(
                     state: \.$alert,
-                    action: { .alert($0) }
+                    action: \.alert
                 )
             )
 
@@ -157,7 +157,7 @@ private struct DeviceListViewBase: View {
                     ForEachStore(
                         self.store.scope(
                             state: \.devices,
-                            action: DevicesReducer.Action.deviceDetail
+                            action: \.deviceDetail
                         ),
                         content: {
                             DeviceDetailViewiOS(store: $0)
@@ -246,18 +246,14 @@ public struct DeviceDetailViewiOS: View {
                     }
                     if horizontalSizeClass == .compact {
                         button.navigationDestination(
-                            store: self.store.scope(state: \.$destination, action: { .destination($0) }),
-                            state: \DeviceReducer.Destination.State.info,
-                            action: DeviceReducer.Destination.Action.info
+                            store: self.store.scope(state: \.$destination.info, action: \.destination.info)
                         ) { store in
                             DeviceInfoViewiOS(store: store)
                         }
 
                     } else {
                         button.sheet(
-                            store: self.store.scope(state: \.$destination, action: { .destination($0) }),
-                            state: \DeviceReducer.Destination.State.info,
-                            action: DeviceReducer.Destination.Action.info
+                            store: self.store.scope(state: \.$destination.info, action: \.destination.info)
                         ) { store in
                             DeviceInfoViewiOS(store: store)
                         }
@@ -351,9 +347,7 @@ public struct DeviceNoChildViewiOS: View {
                 .padding()
             }
             .alert(
-                store: self.store.scope(state: \.$destination, action: { .destination($0) }),
-                state: \DeviceReducer.Destination.State.alert,
-                action: DeviceReducer.Destination.Action.alert
+                store: self.store.scope(state: \.$destination.alert, action: \.destination.alert)
             )
         }
     }
@@ -375,7 +369,7 @@ public struct DeviceChildGroupViewiOS: View {
                 ForEachStore(
                     self.store.scope(
                         state: \.children,
-                        action: DeviceReducer.Action.deviceChild
+                        action: \.deviceChild
                     ),
                     content: { store in
                         DeviceChildViewiOS(store: store)
@@ -412,7 +406,7 @@ public struct DeviceChildViewiOS: View {
             .alert(
                 store: self.store.scope(
                     state: \.$alert,
-                    action: { .alert($0) }
+                    action: \.alert
                 )
             )
         }

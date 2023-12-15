@@ -83,7 +83,7 @@ public struct DeviceListViewWatch: View {
             .alert(
                 store: self.store.scope(
                     state: \.$alert,
-                    action: { .alert($0) }
+                    action: \.alert
                 )
             )
             .onAppear {
@@ -156,9 +156,7 @@ struct DeviceDetailViewWatch: View {
                     name: viewStore.device.name
                 )
                 .alert(
-                    store: self.store.scope(state: \.device.$destination, action: { .destination($0) }),
-                    state: \.alert,
-                    action: DeviceReducer.Destination.Action.alert
+                    store: self.store.scope(state: \.device.$destination.alert, action: \.destination.alert)
                 )
             }
         }

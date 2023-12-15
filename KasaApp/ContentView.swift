@@ -29,7 +29,7 @@ struct ContentView: View {
             self.globalStore
                 .scope(
                     state: \.userState,
-                    action: AppReducer.Action.userAction
+                    action: \.userAction
                 )
         ) { userState in
             switch userState {
@@ -43,7 +43,7 @@ struct ContentView: View {
                         store: self.globalStore
                             .scope(
                                 state: \.devicesState,
-                                action: AppReducer.Action.devicesAction
+                                action: \.devicesAction
                             )
                     )
                 }
