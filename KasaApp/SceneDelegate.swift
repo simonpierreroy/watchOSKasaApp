@@ -15,11 +15,15 @@ import KasaCore
 import SwiftUI
 import UIKit
 
+extension AppReducer.State {
+    fileprivate var emptyState: Void { return }
+}
+
 final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     private static let viewStore: ViewStore<Void, AppReducer.Action> = {
         ViewStore(
-            AppDelegate.store.scope(state: always, action: { $0 }),
+            AppDelegate.store.scope(state: \.emptyState, action: \.self),
             observe: { return },
             removeDuplicates: { _, _ in true }
         )

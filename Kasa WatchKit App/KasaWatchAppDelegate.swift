@@ -16,6 +16,10 @@ import UserClient
 import UserClientLive
 import WatchKit
 
+extension AppReducer.State {
+    fileprivate var emptyState: Void { return }
+}
+
 final class KasaWatchAppDelegate: NSObject, WKApplicationDelegate {
 
     static let store = StoreOf<AppReducer>(
@@ -25,7 +29,7 @@ final class KasaWatchAppDelegate: NSObject, WKApplicationDelegate {
 
     private static let viewStore: ViewStore<Void, AppReducer.Action> = {
         ViewStore(
-            KasaWatchAppDelegate.store.scope(state: always, action: { $0 }),
+            KasaWatchAppDelegate.store.scope(state: \.emptyState, action: \.self),
             observe: { return },
             removeDuplicates: { _, _ in true }
         )
