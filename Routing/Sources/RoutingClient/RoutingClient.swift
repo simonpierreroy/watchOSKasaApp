@@ -18,8 +18,8 @@ public enum AppLink {
 
 @DependencyClient
 public struct URLRouter {
-    public let parse: @Sendable (URL) throws -> AppLink
-    public let print: @Sendable (AppLink) throws -> URL
+    public var parse: @Sendable (URL) throws -> AppLink
+    public var print: @Sendable (AppLink) throws -> URL
 }
 
 extension URLRouter: TestDependencyKey {

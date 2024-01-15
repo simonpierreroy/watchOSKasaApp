@@ -12,9 +12,9 @@ public struct DevicesCache: Sendable {
         case dataConversion
     }
 
-    public let save: @Sendable ([Device]) async throws -> Void
-    public let load: @Sendable () async throws -> [Device]
-    public let loadBlocking: @Sendable () throws -> [Device]
+    public var save: @Sendable ([Device]) async throws -> Void
+    public var load: @Sendable () async throws -> [Device]
+    public var loadBlocking: @Sendable () throws -> [Device]
 
 }
 

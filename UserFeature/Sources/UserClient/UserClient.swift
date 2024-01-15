@@ -7,8 +7,8 @@ import XCTestDynamicOverlay
 
 @DependencyClient
 public struct UserClient: Sendable {
-    public let login: @Sendable (User.Credential) async throws -> User
-    public let refreshToken: @Sendable (User.RefreshToken, User.TerminalId) async throws -> Token
+    public var login: @Sendable (User.Credential) async throws -> User
+    public var refreshToken: @Sendable (User.RefreshToken, User.TerminalId) async throws -> Token
 }
 
 extension UserClient: TestDependencyKey {

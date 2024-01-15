@@ -12,9 +12,9 @@ public struct UserCache: Sendable {
         case dataConversion
     }
 
-    public let save: @Sendable (User?) async throws -> Void
-    public let load: @Sendable () async throws -> User?
-    public let loadBlocking: @Sendable () throws -> User?
+    public var save: @Sendable (User?) async throws -> Void
+    public var load: @Sendable () async throws -> User?
+    public var loadBlocking: @Sendable () throws -> User?
 }
 
 extension UserCache: TestDependencyKey {

@@ -8,10 +8,10 @@ import XCTestDynamicOverlay
 
 @DependencyClient
 public struct DevicesClient: Sendable {
-    public let loadDevices: @Sendable (Token) async throws -> [Device]
-    public let toggleDeviceRelayState: @Sendable (Token, Device.ID, Device.ID?) async throws -> RelayIsOn
-    public let getDeviceRelayState: @Sendable (Token, Device.ID, Device.ID?) async throws -> RelayIsOn
-    public let changeDeviceRelayState: @Sendable (Token, Device.ID, Device.ID?, RelayIsOn) async throws -> RelayIsOn
+    public var loadDevices: @Sendable (Token) async throws -> [Device]
+    public var toggleDeviceRelayState: @Sendable (Token, Device.ID, Device.ID?) async throws -> RelayIsOn
+    public var getDeviceRelayState: @Sendable (Token, Device.ID, Device.ID?) async throws -> RelayIsOn
+    public var changeDeviceRelayState: @Sendable (Token, Device.ID, Device.ID?, RelayIsOn) async throws -> RelayIsOn
 }
 
 extension DevicesClient: TestDependencyKey {
