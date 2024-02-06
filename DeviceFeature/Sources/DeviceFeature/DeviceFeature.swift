@@ -36,6 +36,7 @@ public struct DevicesReducer {
         }
     }
 
+    @ObservableState
     public struct State {
         public static let empty = Self(devices: [], isLoading: .neverLoaded, alert: nil, token: nil)
 
@@ -69,6 +70,7 @@ public struct DevicesReducer {
             }
         }
 
+        @ObservationStateIgnored
         private var _devices: IdentifiedArrayOf<DeviceReducer.State>
         public var devices: IdentifiedArrayOf<DeviceReducer.State> {
             get {
@@ -83,9 +85,10 @@ public struct DevicesReducer {
             set { self._devices = newValue }
         }
 
+        @ObservationStateIgnored
         public var token: Token?
         public var isLoading: Loading
-        @PresentationState public var alert: AlertState<Action.Alert>?
+        @Presents public var alert: AlertState<Action.Alert>?
         public var linkToComplete: DevicesLink?
     }
 

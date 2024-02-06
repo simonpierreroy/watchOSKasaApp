@@ -9,15 +9,15 @@
 import SwiftUI
 
 public struct LoadingView<Content: View>: View {
-    @Binding var loading: Bool
+    let loading: Bool
     let content: () -> Content
 
     public init(
-        _ loading: Binding<Bool>,
+        _ loading: Bool,
         @ViewBuilder content: @escaping () -> Content
     ) {
         self.content = content
-        self._loading = loading
+        self.loading = loading
     }
 
     public var body: some View {
@@ -31,6 +31,6 @@ public struct LoadingView<Content: View>: View {
 
 #if DEBUG
 #Preview {
-    LoadingView(.constant(true)) { Text("test") }
+    LoadingView(true) { Text("test") }
 }
 #endif

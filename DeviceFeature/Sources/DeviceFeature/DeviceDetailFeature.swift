@@ -11,6 +11,7 @@ public struct DeviceReducer {
     @Reducer
     public struct Destination {
 
+        @ObservableState
         public enum State: Equatable {
             case alert(AlertState<Action.Alert>)
             case info(DeviceInfoReducer.State)
@@ -29,6 +30,7 @@ public struct DeviceReducer {
         }
     }
 
+    @ObservableState
     public struct State: Equatable, Identifiable {
 
         init(
@@ -53,10 +55,12 @@ public struct DeviceReducer {
         public let name: String
         public var details: Device.State
 
-        @PresentationState public var destination: Destination.State?
+        @Presents public var destination: Destination.State?
 
+        @ObservationStateIgnored
         public var token: Token? = nil
 
+        @ObservationStateIgnored
         private var _children: IdentifiedArrayOf<DeviceChildReducer.State>
         public var children: IdentifiedArrayOf<DeviceChildReducer.State> {
             get {
@@ -139,6 +143,7 @@ public struct DeviceChildReducer {
 
     }
 
+    @ObservableState
     public struct State: Equatable, Identifiable {
 
         public var relay: RelayIsOn
@@ -146,9 +151,10 @@ public struct DeviceChildReducer {
         public let id: Device.Id
         public var isLoading: Bool = false
         public let name: String
+        @ObservationStateIgnored
         public var token: Token? = nil
 
-        @PresentationState public var alert: AlertState<Action.Alert>?
+        @Presents public var alert: AlertState<Action.Alert>?
     }
 
     @Dependency(\.devicesClient.toggleDeviceRelayState) var toggleDeviceRelayState

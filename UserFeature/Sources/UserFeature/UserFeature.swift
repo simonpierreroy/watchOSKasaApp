@@ -15,6 +15,7 @@ public struct UserReducer {
         case logoutUser(UserLogoutReducer.Action)
     }
 
+    @ObservableState
     public enum State {
         public static let empty = Self.logout(.empty)
         case logged(UserLoggedReducer.State)
@@ -45,6 +46,8 @@ public struct UserReducer {
 
 @Reducer
 public struct UserLoggedReducer {
+
+    @ObservableState
     public struct State: Equatable {
         public var user: User
     }
@@ -80,13 +83,14 @@ public struct UserLoggedReducer {
 @Reducer
 public struct UserLogoutReducer {
 
+    @ObservableState
     public struct State {
         public static let empty = State(email: "", password: "", isLoading: false, alert: nil)
 
-        @BindingState public var email: String
-        @BindingState public var password: String
+        public var email: String
+        public var password: String
         public var isLoading: Bool
-        @PresentationState public var alert: AlertState<Action.Alert>?
+        @Presents public var alert: AlertState<Action.Alert>?
     }
 
     public enum Action: BindableAction {

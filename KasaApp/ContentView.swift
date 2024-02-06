@@ -25,29 +25,17 @@ struct ContentView: View {
     }
 
     var body: some View {
-        SwitchStore(
-            self.globalStore
-                .scope(
-                    state: \.userState,
-                    action: \.userAction
-                )
-        ) { userState in
-            switch userState {
-            case .logout:
-                CaseLet(/UserReducer.State.logout, action: UserReducer.Action.logoutUser) { logoutStore in
-                    UserLoginViewiOS(store: logoutStore)
-                }
-            case .logged:
-                CaseLet(/UserReducer.State.logged, action: UserReducer.Action.loggedUser) { _ in
-                    DeviceListViewiOS(
-                        store: self.globalStore
-                            .scope(
-                                state: \.devicesState,
-                                action: \.devicesAction
-                            )
-                    )
-                }
+        switch globalStore.state.userState {
+        case .logout:
+            if let store = globalStore.scope(
+                state: \.userState.logout,
+                action: \.userAction.logoutUser
+            ) {
+                UserLoginViewiOS(store: store)
             }
+        case .logged:
+            let store = globalStore.scope(state: \.devicesState, action: \.devicesAction)
+            DeviceListViewiOS(store: store)
         }
     }
 }

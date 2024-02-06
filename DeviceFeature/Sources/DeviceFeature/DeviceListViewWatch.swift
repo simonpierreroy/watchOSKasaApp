@@ -17,79 +17,64 @@ import SwiftUI
 #if os(watchOS)
 public struct DeviceListViewWatch: View {
 
-    private let store: Store<StateView, DevicesReducer.Action>
+    @Bindable private var store: StoreOf<DevicesReducer>
 
     public init(
         store: StoreOf<DevicesReducer>
     ) {
-        self.store = store.scope(
-            state: DeviceListViewWatch.StateView.init(devices:),
-            action: { $0 }
-        )
+        self.store = store
     }
 
     public var body: some View {
-        WithViewStore(self.store, observe: \.isRefreshingDevices) { viewStore in
-            List {
-                Group {
-
-                    ForEachStore(
-                        self.store.scope(
-                            state: \.devicesToDisplay,
-                            action: { action in
-                                DevicesReducer.Action.deviceDetail(
-                                    .element(id: action.id.parent, action: action.action)
-                                )
-                            }
-                        ),
-                        content: DeviceDetailViewWatch.init(store:)
-                    )
-
-                    Button {
-                        viewStore.send(.turnOffAllDevices, animation: .default)
-                    } label: {
-                        LoadingView(.constant(viewStore.state == .closingAll)) {
-                            HStack {
-                                Image(systemName: "moon.fill")
-                                Text(Strings.turnOff.key, bundle: .module)
-                            }
-                        }
-                    }
-                    .foregroundColor(Color.moon).listItemTint(Color.moon.opacity(0.17))
-
-                    Button {
-                        viewStore.send(.fetchFromRemote, animation: .default)
-                    } label: {
-                        HStack {
-                            LoadingView(.constant(viewStore.state == .loadingDevices)) {
-                                Image(systemName: "arrow.clockwise.circle.fill")
-                                Text(Strings.refreshList.key, bundle: .module)
-                            }
-                        }
-                    }
-                    .foregroundColor(Color.valid).listItemTint(Color.valid.opacity(0.14))
+        List {
+            Group {
+                ForEach(
+                    self.store.scope(state: \.devices, action: \.deviceDetail)
+                ) {
+                    DeviceDetailViewWatch(store: $0)
                 }
-                .disabled(viewStore.state.isInFlight)
 
                 Button {
-                    viewStore.send(.delegate(.logout), animation: .default)
+                    store.send(.turnOffAllDevices, animation: .default)
                 } label: {
-                    Text(Strings.logoutApp.key, bundle: .module)
-                        .foregroundColor(Color.logout)
+                    LoadingView(store.isLoading == .closingAll) {
+                        HStack {
+                            Image(systemName: "moon.fill")
+                            Text(Strings.turnOff.key, bundle: .module)
+                        }
+                    }
                 }
-                .listItemTint(Color.logout.opacity(0.17))
+                .foregroundColor(Color.moon).listItemTint(Color.moon.opacity(0.17))
 
-            }
-            .alert(
-                store: self.store.scope(
-                    state: \.$alert,
-                    action: \.alert
-                )
-            )
-            .onAppear {
-                if case .neverLoaded = viewStore.state {
-                    viewStore.send(.fetchFromRemote)
+                Button {
+                    store.send(.fetchFromRemote, animation: .default)
+                } label: {
+                    HStack {
+                        LoadingView(store.isLoading == .loadingDevices) {
+                            Image(systemName: "arrow.clockwise.circle.fill")
+                            Text(Strings.refreshList.key, bundle: .module)
+                        }
+                    }
                 }
+                .foregroundColor(Color.valid).listItemTint(Color.valid.opacity(0.14))
+            }
+            .disabled(store.isLoading.isInFlight)
+
+            Button {
+                store.send(.delegate(.logout), animation: .default)
+            } label: {
+                Text(Strings.logoutApp.key, bundle: .module)
+                    .foregroundColor(Color.logout)
+            }
+            .listItemTint(Color.logout.opacity(0.17))
+
+        }
+        .alert(
+            $store.scope(state: \.alert, action: \.alert)
+        )
+        .onAppear {
+            if case .neverLoaded = store.isLoading {
+                store.send(.fetchFromRemote)
             }
         }
     }
@@ -120,104 +105,39 @@ struct DeviceDetailDataViewWatch: View {
 
 struct DeviceDetailViewWatch: View {
 
-    let store: Store<ListEntry, DeviceReducer.Action>
+    init(store: StoreOf<DeviceReducer>) {
+        self.store = store
+    }
+
+    @Bindable private var store: StoreOf<DeviceReducer>
 
     var body: some View {
-        IfLetStore(self.store.scope(state: \.child, action: { $0 })) { childStore in
-            WithViewStore(childStore, observe: { $0 }) { viewStore in
+        if store.children.count > 0 {
+            ForEach(
+                store.scope(state: \.children, action: \.deviceChild)
+            ) {
+                @Bindable var childStore = $0
                 DeviceDetailDataViewWatch(
                     action: {
-                        viewStore.send(
-                            .deviceChild(.element(id: viewStore.state.id, action: .toggleChild)),
-                            animation: .default
-                        )
+                        childStore.send(.toggleChild, animation: .default)
                     },
-                    style: StateImageView.styleFor(relay: viewStore.state.relay),
-                    isLoading: viewStore.state.isLoading,
+                    style: StateImageView.styleFor(relay: childStore.relay),
+                    isLoading: childStore.isLoading,
                     isDisabled: false,
-                    name: viewStore.state.name
+                    name: childStore.name
                 )
-                .alert(
-                    store: childStore.scope(
-                        state: \.$alert,
-                        action: { .deviceChild(.element(id: viewStore.state.id, action: .alert($0))) }
-                    )
-                )
+                .alert($childStore.scope(state: \.alert, action: \.alert))
             }
-        } else: {
-            WithViewStore(self.store, observe: { $0 }) { viewStore in
-                DeviceDetailDataViewWatch(
-                    action: {
-                        viewStore.send(.toggle, animation: .default)
-                    },
-                    style: StateImageView.styleFor(details: viewStore.device.details),
-                    isLoading: viewStore.device.isLoading,
-                    isDisabled: viewStore.device.details.is(\.failed),
-                    name: viewStore.device.name
-                )
-                .alert(
-                    store: self.store.scope(state: \.device.$destination.alert, action: \.destination.alert)
-                )
-            }
+        } else {
+            DeviceDetailDataViewWatch(
+                action: { store.send(.toggle, animation: .default) },
+                style: StateImageView.styleFor(details: store.details),
+                isLoading: store.isLoading,
+                isDisabled: store.details.is(\.failed),
+                name: store.name
+            )
+            .alert($store.scope(state: \.destination?.alert, action: \.destination.alert))
         }
-    }
-}
-
-public struct ListEntry: Equatable, Identifiable {
-    public struct DoubleID: Equatable, Hashable {
-        let parent: Device.ID
-        let child: Device.ID?
-    }
-
-    public init(
-        device: DeviceReducer.State,
-        child: DeviceChildReducer.State?
-    ) {
-        self.device = device
-        self.child = child
-    }
-
-    public var id: DoubleID { .init(parent: self.device.id, child: self.child?.id) }
-    let device: DeviceReducer.State
-    let child: DeviceChildReducer.State?
-}
-
-extension DeviceListViewWatch {
-
-    struct StateView: Equatable {
-        public init(
-            alert: AlertState<DevicesReducer.Action.Alert>?,
-            isRefreshingDevices: DevicesReducer.State.Loading,
-            devicesToDisplay: IdentifiedArrayOf<ListEntry>
-        ) {
-            self.alert = alert
-            self.isRefreshingDevices = isRefreshingDevices
-            self.devicesToDisplay = devicesToDisplay
-        }
-
-        @PresentationState var alert: AlertState<DevicesReducer.Action.Alert>?
-        let isRefreshingDevices: DevicesReducer.State.Loading
-        let devicesToDisplay: IdentifiedArrayOf<ListEntry>
-    }
-}
-
-extension DeviceListViewWatch.StateView {
-    init(
-        devices: DevicesReducer.State
-    ) {
-        self.alert = devices.alert
-
-        var entries: [ListEntry] = []
-        for device in devices.devices {
-            if device.children.isEmpty {
-                entries.append(ListEntry(device: device, child: nil))
-            } else {
-                entries.append(contentsOf: device.children.map { ListEntry(device: device, child: $0) })
-            }
-        }
-
-        self.devicesToDisplay = .init(uniqueElements: entries)
-        self.isRefreshingDevices = devices.isLoading
     }
 }
 

@@ -21,14 +21,6 @@ extension AppReducer.State {
 
 final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
-    private static let viewStore: ViewStore<Void, AppReducer.Action> = {
-        ViewStore(
-            AppDelegate.store.scope(state: \.emptyState, action: \.self),
-            observe: { return },
-            removeDuplicates: { _, _ in true }
-        )
-    }()
-
     var window: UIWindow?
 
     func scene(
@@ -54,7 +46,7 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     }
 
     static func parse(context URLContexts: Set<UIOpenURLContext>) {
-        SceneDelegate.viewStore.send(
+        AppDelegate.store.send(
             .delegate(
                 .openURLContexts(
                     URLContexts.map(\.url)

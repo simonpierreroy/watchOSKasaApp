@@ -27,19 +27,11 @@ final class KasaWatchAppDelegate: NSObject, WKApplicationDelegate {
         reducer: { AppReducer()._printChanges() }
     )
 
-    private static let viewStore: ViewStore<Void, AppReducer.Action> = {
-        ViewStore(
-            KasaWatchAppDelegate.store.scope(state: \.emptyState, action: \.self),
-            observe: { return },
-            removeDuplicates: { _, _ in true }
-        )
-    }()
-
     func applicationDidFinishLaunching() {
-        KasaWatchAppDelegate.viewStore.send(.delegate(.applicationDidFinishLaunching))
+        KasaWatchAppDelegate.store.send(.delegate(.applicationDidFinishLaunching))
     }
 
     func applicationWillResignActive() {
-        KasaWatchAppDelegate.viewStore.send(.delegate(.applicationWillResignActive))
+        KasaWatchAppDelegate.store.send(.delegate(.applicationWillResignActive))
     }
 }

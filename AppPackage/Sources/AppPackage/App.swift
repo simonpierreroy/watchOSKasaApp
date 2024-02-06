@@ -24,10 +24,13 @@ public struct AppReducer {
 
     public init() {}
 
+    @ObservableState
     public struct State {
         public static let empty = Self(userState: .empty, _devicesState: .empty)
 
         public var userState: UserReducer.State
+
+        @ObservationStateIgnored
         private var _devicesState: DevicesReducer.State
 
         public var devicesState: DevicesReducer.State {

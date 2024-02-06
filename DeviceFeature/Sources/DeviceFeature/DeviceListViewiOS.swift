@@ -6,6 +6,7 @@
 //
 
 import BaseUI
+import CasePaths
 import Combine
 import ComposableArchitecture
 import DeviceClient
@@ -19,7 +20,8 @@ public struct DeviceListViewiOS: View {
 
     @Environment(\.horizontalSizeClass) var horizontalSizeClass: UserInterfaceSizeClass?
 
-    private let store: StoreOf<DevicesReducer>
+    @Bindable private var store: StoreOf<DevicesReducer>
+
     public init(
         store: StoreOf<DevicesReducer>
     ) {
@@ -27,40 +29,31 @@ public struct DeviceListViewiOS: View {
     }
 
     public var body: some View {
-        WithViewStore(self.store, observe: always, removeDuplicates: { _, _ in true }) { viewStore in
-            Group {
-                if horizontalSizeClass == .compact {
-                    NavigationStack {
-                        DeviceListViewBase(store: store)
-                            .toolbar {
-                                ToolbarItem(placement: .navigationBarTrailing) {
-                                    Button {
-                                        viewStore.send(.delegate(.logout), animation: .default)
-                                    } label: {
-                                        Text(Strings.logoutApp.key, bundle: .module)
-                                            .foregroundColor(Color.logout)
-                                    }
+        Group {
+            if horizontalSizeClass == .compact {
+                NavigationStack {
+                    DeviceListViewBase(store: store)
+                        .toolbar {
+                            ToolbarItem(placement: .navigationBarTrailing) {
+                                Button {
+                                    store.send(.delegate(.logout), animation: .default)
+                                } label: {
+                                    Text(Strings.logoutApp.key, bundle: .module)
+                                        .foregroundColor(Color.logout)
                                 }
                             }
+                        }
 
-                    }
-                } else {
-                    NavigationSplitView {
-                        DeviceListViewSideBar(store: store)
-
-                    } detail: {
-                        DeviceListViewBase(store: store)
-                    }
+                }
+            } else {
+                NavigationSplitView {
+                    DeviceListViewSideBar(store: store)
+                } detail: {
+                    DeviceListViewBase(store: store)
                 }
             }
-            .alert(
-                store: self.store.scope(
-                    state: \.$alert,
-                    action: \.alert
-                )
-            )
-
         }
+        .alert($store.scope(state: \.alert, action: \.alert))
     }
 }
 
@@ -88,49 +81,47 @@ private struct DeviceListViewSideBar: View {
     }
 
     public var body: some View {
-        WithViewStore(self.store, observe: \.isLoading) { viewStore in
-            List(ListSideBar.allCases) { tab in
-                switch tab {
-                case .refresh:
-                    Button {
-                        viewStore.send(.fetchFromRemote, animation: .default)
-                    } label: {
-                        LoadingView(.constant(viewStore.state == .loadingDevices)) {
-                            HStack {
-                                Image(systemName: "arrow.clockwise.circle.fill")
-                                    .foregroundColor(imageColor(viewStore.state.isInFlight))
-                                Text(Strings.refreshList.key, bundle: .module)
-                            }
-                        }
-                    }
-                case .logout:
-                    Button {
-                        viewStore.send(.delegate(.logout), animation: .default)
-                    } label: {
+        List(ListSideBar.allCases) { tab in
+            switch tab {
+            case .refresh:
+                Button {
+                    store.send(.fetchFromRemote, animation: .default)
+                } label: {
+                    LoadingView(store.isLoading == .loadingDevices) {
                         HStack {
-                            Image(systemName: "book.closed.fill")
-                                .foregroundColor(imageColor(viewStore.state.isInFlight))
-                            Text(Strings.logoutApp.key, bundle: .module)
+                            Image(systemName: "arrow.clockwise.circle.fill")
+                                .foregroundColor(imageColor(store.isLoading.isInFlight))
+                            Text(Strings.refreshList.key, bundle: .module)
                         }
                     }
-                case .turnOffAll:
-                    Button {
-                        viewStore.send(.turnOffAllDevices, animation: .default)
-                    } label: {
-                        LoadingView(.constant(viewStore.state == .closingAll)) {
-                            HStack {
-                                Image(systemName: "moon.fill")
-                                    .foregroundColor(imageColor(viewStore.state.isInFlight))
-                                Text(Strings.turnOff.key, bundle: .module)
-                            }
+                }
+            case .logout:
+                Button {
+                    store.send(.delegate(.logout), animation: .default)
+                } label: {
+                    HStack {
+                        Image(systemName: "book.closed.fill")
+                            .foregroundColor(imageColor(store.isLoading.isInFlight))
+                        Text(Strings.logoutApp.key, bundle: .module)
+                    }
+                }
+            case .turnOffAll:
+                Button {
+                    store.send(.turnOffAllDevices, animation: .default)
+                } label: {
+                    LoadingView(store.isLoading == .closingAll) {
+                        HStack {
+                            Image(systemName: "moon.fill")
+                                .foregroundColor(imageColor(store.isLoading.isInFlight))
+                            Text(Strings.turnOff.key, bundle: .module)
                         }
                     }
                 }
             }
-            .listStyle(SidebarListStyle())
-            .disabled(viewStore.state.isInFlight)
-            .navigationTitle(Text(Strings.kasaName.key, bundle: .module))
         }
+        .listStyle(SidebarListStyle())
+        .disabled(store.isLoading.isInFlight)
+        .navigationTitle(Text(Strings.kasaName.key, bundle: .module))
     }
 }
 
@@ -151,118 +142,111 @@ private struct DeviceListViewBase: View {
         GridItem(.flexible()),
     ]
     public var body: some View {
-        WithViewStore(self.store, observe: \.isLoading) { viewStore in
-            ScrollView {
-                LazyVGrid(columns: columns, spacing: 10) {
-                    ForEachStore(
-                        self.store.scope(
-                            state: \.devices,
-                            action: \.deviceDetail
-                        ),
-                        content: {
-                            DeviceDetailViewiOS(store: $0)
-                                .modifier(
-                                    ContentStyle(isLoading: viewStore.state.isInFlight)
-                                )
+        ScrollView {
+            LazyVGrid(columns: columns, spacing: 10) {
+                ForEach(
+                    // Create stores on the main thread since lazy grid can be rendered on background
+                    Array(self.store.scope(state: \.devices, action: \.deviceDetail))
+                ) {
+                    DeviceDetailViewiOS(store: $0)
+                        .modifier(ContentStyle())
+                }
 
+                if horizontalSizeClass == .compact {
+                    Button {
+                        store.send(.turnOffAllDevices, animation: .default)
+                    } label: {
+                        LoadingView(store.isLoading == .closingAll) {
+                            Image(systemName: "moon.fill")
+                            Text(Strings.turnOff.key, bundle: .module)
                         }
-                    )
-
-                    if horizontalSizeClass == .compact {
-                        Button {
-                            viewStore.send(.turnOffAllDevices, animation: .default)
-                        } label: {
-                            LoadingView(.constant(viewStore.state == .closingAll)) {
-                                Image(systemName: "moon.fill")
-                                Text(Strings.turnOff.key, bundle: .module)
-                            }
-                        }
-                        .modifier(ContentStyle(isLoading: viewStore.state.isInFlight))
-
-                        Button {
-                            viewStore.send(.fetchFromRemote, animation: .default)
-                        } label: {
-                            LoadingView(.constant(viewStore.state == .loadingDevices)) {
-                                Image(systemName: "arrow.clockwise.circle.fill")
-                                Text(Strings.refreshList.key, bundle: .module)
-                            }
-                        }
-                        .modifier(ContentStyle(isLoading: viewStore.state.isInFlight))
                     }
+                    .modifier(ContentStyle())
 
+                    Button {
+                        store.send(.fetchFromRemote, animation: .default)
+                    } label: {
+                        LoadingView(store.isLoading == .loadingDevices) {
+                            Image(systemName: "arrow.clockwise.circle.fill")
+                            Text(Strings.refreshList.key, bundle: .module)
+                        }
+                    }
+                    .modifier(ContentStyle())
                 }
-                .disabled(viewStore.state.isInFlight).padding()
+
             }
-            .onAppear {
-                if case .neverLoaded = viewStore.state {
-                    viewStore.send(.fetchFromRemote)
-                }
+            .disabled(store.isLoading.isInFlight).padding()
+        }
+        .onAppear {
+            if case .neverLoaded = store.isLoading {
+                store.send(.fetchFromRemote)
             }
         }
         .navigationBarTitle(Text(Strings.kasaName.key, bundle: .module))
     }
+
 }
 
 public struct DeviceRelayFailedViewiOS: View {
     let store: StoreOf<DeviceReducer>
 
     public var body: some View {
-        WithViewStore(self.store, observe: { $0 }) { viewStore in
-            VStack {
-                StateImageView(
-                    details: viewStore.details,
-                    isActive: viewStore.isLoading
-                )
-                Text(viewStore.name).multilineTextAlignment(.center)
-            }
-            .frame(maxWidth: .infinity).padding()
+        VStack {
+            StateImageView(
+                details: store.details,
+                isActive: store.isLoading
+            )
+            Text(store.name).multilineTextAlignment(.center)
         }
+        .frame(maxWidth: .infinity).padding()
     }
 }
 
 public struct DeviceDetailViewiOS: View {
 
-    let store: StoreOf<DeviceReducer>
+    init(store: StoreOf<DeviceReducer>) {
+        self.store = store
+    }
+
+    @Bindable private var store: StoreOf<DeviceReducer>
     @Environment(\.horizontalSizeClass) var horizontalSizeClass: UserInterfaceSizeClass?
 
     public var body: some View {
-        WithViewStore(self.store, observe: { $0 }) { viewStore in
-            VStack {
-                switch viewStore.details {
-                case .status:
-                    DeviceNoChildViewiOS(store: self.store)
-                case .noRelay:
-                    DeviceChildGroupViewiOS(store: self.store)
-                case .failed:
-                    DeviceRelayFailedViewiOS(store: self.store)
+        VStack {
+            switch store.details {
+            case .status:
+                DeviceNoChildViewiOS(store: self.store)
+            case .noRelay:
+                DeviceChildGroupViewiOS(store: self.store)
+            case .failed:
+                DeviceRelayFailedViewiOS(store: self.store)
+            }
+            if store.details.info != nil {
+                let button = Button {
+                    store.send(.presentInfo, animation: .default)
+                } label: {
+                    Image(systemName: "info.bubble.fill")
+                        .frame(maxWidth: .infinity)
+                        .padding([.bottom])
                 }
-                if viewStore.details.info != nil {
-                    let button = Button {
-                        viewStore.send(.presentInfo, animation: .default)
-                    } label: {
-                        Image(systemName: "info.bubble.fill")
-                            .frame(maxWidth: .infinity)
-                            .padding([.bottom])
+                if horizontalSizeClass == .compact {
+                    button.navigationDestination(
+                        item: $store.scope(state: \.destination?.info, action: \.destination.info)
+                    ) { store in
+                        DeviceInfoViewiOS(store: store)
                     }
-                    if horizontalSizeClass == .compact {
-                        button.navigationDestination(
-                            store: self.store.scope(state: \.$destination.info, action: \.destination.info)
-                        ) { store in
-                            DeviceInfoViewiOS(store: store)
-                        }
 
-                    } else {
-                        button.sheet(
-                            store: self.store.scope(state: \.$destination.info, action: \.destination.info)
-                        ) { store in
-                            DeviceInfoViewiOS(store: store)
-                        }
+                } else {
+                    button.sheet(
+                        item: $store.scope(state: \.destination?.info, action: \.destination.info)
+                    ) { store in
+                        DeviceInfoViewiOS(store: store)
                     }
                 }
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .disabled(viewStore.isLoading)
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .disabled(store.isLoading)
     }
 }
 
@@ -272,44 +256,43 @@ public struct DeviceInfoViewiOS: View {
     @Environment(\.horizontalSizeClass) var horizontalSizeClass: UserInterfaceSizeClass?
 
     public var body: some View {
-        WithViewStore(self.store, observe: { $0 }) { viewStore in
-            NavigationStack {
-                List {
-                    let info = viewStore.info
-                    DeviceInfoEntryiOS(settingName: .model, value: info.model.rawValue, imageName: "poweroutlet.type.b")
-                    DeviceInfoEntryiOS(
-                        settingName: .hardwareVersion,
-                        value: info.hardwareVersion.rawValue,
-                        imageName: "hammer"
-                    )
-                    DeviceInfoEntryiOS(
-                        settingName: .softwareVersion,
-                        value: info.softwareVersion.rawValue,
-                        imageName: "gear.badge"
-                    )
-                    DeviceInfoEntryiOS(
-                        settingName: .macAddress,
-                        value: info.macAddress.rawValue,
-                        imageName: "network"
-                    )
+        NavigationStack {
+            List {
+                let info = store.info
+                DeviceInfoEntryiOS(settingName: .model, value: info.model.rawValue, imageName: "poweroutlet.type.b")
+                DeviceInfoEntryiOS(
+                    settingName: .hardwareVersion,
+                    value: info.hardwareVersion.rawValue,
+                    imageName: "hammer"
+                )
+                DeviceInfoEntryiOS(
+                    settingName: .softwareVersion,
+                    value: info.softwareVersion.rawValue,
+                    imageName: "gear.badge"
+                )
+                DeviceInfoEntryiOS(
+                    settingName: .macAddress,
+                    value: info.macAddress.rawValue,
+                    imageName: "network"
+                )
+            }
+            .toolbar {
+                ToolbarItem(placement: .principal) {
+                    Text(store.deviceName).font(.headline)
                 }
-                .toolbar {
-                    ToolbarItem(placement: .principal) {
-                        Text(viewStore.deviceName).font(.headline)
-                    }
-                    if horizontalSizeClass != .compact {
-                        ToolbarItem(placement: .navigationBarTrailing) {
-                            Button {
-                                viewStore.send(.dismiss)
-                            } label: {
-                                Text(Strings.doneAction.key, bundle: .module)
-                            }
+                if horizontalSizeClass != .compact {
+                    ToolbarItem(placement: .navigationBarTrailing) {
+                        Button {
+                            store.send(.dismiss)
+                        } label: {
+                            Text(Strings.doneAction.key, bundle: .module)
                         }
                     }
                 }
             }
         }
     }
+
 }
 
 public struct DeviceInfoEntryiOS: View {
@@ -328,28 +311,28 @@ public struct DeviceInfoEntryiOS: View {
 
 public struct DeviceNoChildViewiOS: View {
 
-    let store: StoreOf<DeviceReducer>
+    @Bindable private var store: StoreOf<DeviceReducer>
+
+    init(store: StoreOf<DeviceReducer>) {
+        self.store = store
+    }
 
     public var body: some View {
-        WithViewStore(self.store, observe: { $0 }) { viewStore in
-            Button {
-                viewStore.send(.toggle, animation: .default)
-            } label: {
-                VStack {
-                    StateImageView(
-                        details: viewStore.details,
-                        isActive: viewStore.isLoading
-                    )
+        Button {
+            store.send(.toggle, animation: .default)
+        } label: {
+            VStack {
+                StateImageView(
+                    details: store.details,
+                    isActive: store.isLoading
+                )
 
-                    Text(viewStore.name).multilineTextAlignment(.center)
-                }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .padding()
+                Text(store.name).multilineTextAlignment(.center)
             }
-            .alert(
-                store: self.store.scope(state: \.$destination.alert, action: \.destination.alert)
-            )
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .padding()
         }
+        .alert($store.scope(state: \.destination?.alert, action: \.destination.alert))
     }
 }
 
@@ -358,63 +341,53 @@ public struct DeviceChildGroupViewiOS: View {
     let store: StoreOf<DeviceReducer>
 
     public var body: some View {
-        WithViewStore(self.store, observe: { $0.isLoading }) { viewStore in
 
-            VStack(alignment: .center) {
-                HStack {
-                    Image(systemName: "rectangle.3.group.fill")
-                    Text(Strings.deviceGroup.key, bundle: .module)
-                }
-                .frame(maxWidth: .infinity).padding()
-                ForEachStore(
-                    self.store.scope(
-                        state: \.children,
-                        action: \.deviceChild
-                    ),
-                    content: { store in
-                        DeviceChildViewiOS(store: store)
-                    }
-                )
+        VStack(alignment: .center) {
+            HStack {
+                Image(systemName: "rectangle.3.group.fill")
+                Text(Strings.deviceGroup.key, bundle: .module)
             }
-            .padding([.bottom])
+            .frame(maxWidth: .infinity).padding()
+            ForEach(
+                store.scope(state: \.children, action: \.deviceChild)
+            ) { store in
+                DeviceChildViewiOS(store: store)
+            }
         }
+        .padding([.bottom])
     }
 }
 
 public struct DeviceChildViewiOS: View {
 
-    let store: StoreOf<DeviceChildReducer>
+    init(store: StoreOf<DeviceChildReducer>) {
+        self.store = store
+    }
+
+    @Bindable private var store: StoreOf<DeviceChildReducer>
 
     public var body: some View {
-        WithViewStore(self.store, observe: { $0 }) { viewStore in
-            VStack {
-                Button {
-                    viewStore.send(.toggleChild, animation: .default)
-                } label: {
-                    HStack {
-                        StateImageView(
-                            relay: viewStore.relay,
-                            isActive: viewStore.isLoading
-                        )
-                        Text(viewStore.name)
-                    }
-                    .frame(maxWidth: .infinity)
-                    .padding([.leading, .trailing])
+        VStack {
+            Button {
+                store.send(.toggleChild, animation: .default)
+            } label: {
+                HStack {
+                    StateImageView(
+                        relay: store.relay,
+                        isActive: store.isLoading
+                    )
+                    Text(store.name)
                 }
+                .frame(maxWidth: .infinity)
+                .padding([.leading, .trailing])
             }
-            .disabled(viewStore.isLoading)
-            .alert(
-                store: self.store.scope(
-                    state: \.$alert,
-                    action: \.alert
-                )
-            )
         }
+        .disabled(store.isLoading)
+        .alert($store.scope(state: \.alert, action: \.alert))
     }
 }
 
 struct ContentStyle: ViewModifier {
-    let isLoading: Bool
     func body(content: Content) -> some View {
         content
             .frame(maxWidth: .infinity)
@@ -470,7 +443,7 @@ struct ContentStyle: ViewModifier {
     DeviceListViewiOS(
         store: Store(
             initialState: .nDeviceLoaded(n: 5, childrenCount: 4, indexFailed: [3]),
-            reducer: { DevicesReducer() }
+            reducer: { DevicesReducer()._printChanges() }
         )
     )
 }

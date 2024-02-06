@@ -27,19 +27,11 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
         reducer: { AppReducer()._printChanges() }
     )
 
-    private static let viewStore: ViewStore<Void, AppReducer.Action> = {
-        ViewStore(
-            AppDelegate.store.scope(state: \.emptyState, action: \.self),
-            observe: { return },
-            removeDuplicates: { _, _ in true }
-        )
-    }()
-
     func application(
         _ application: UIApplication,
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
     ) -> Bool {
-        AppDelegate.viewStore.send(.delegate(.applicationDidFinishLaunching))
+        AppDelegate.store.send(.delegate(.applicationDidFinishLaunching))
         return true
     }
 
@@ -61,6 +53,6 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 
     func applicationWillTerminate(_ application: UIApplication) {
-        AppDelegate.viewStore.send(.delegate(.applicationWillTerminate))
+        AppDelegate.store.send(.delegate(.applicationWillTerminate))
     }
 }

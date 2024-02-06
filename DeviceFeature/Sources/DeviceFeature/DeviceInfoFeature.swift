@@ -17,6 +17,8 @@ import Tagged
 public struct DeviceInfoReducer {
 
     @Dependency(\.dismiss) var dismiss
+
+    @ObservableState
     public struct State: Equatable {
         let info: Device.Info
         let deviceName: String

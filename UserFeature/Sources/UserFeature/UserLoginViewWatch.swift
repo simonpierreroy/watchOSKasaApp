@@ -19,68 +19,41 @@ public struct UserLoginViewWatch: View {
         self.store = store
     }
 
-    private let store: StoreOf<UserLogoutReducer>
+    @Bindable private var store: StoreOf<UserLogoutReducer>
 
     public var body: some View {
-        WithViewStore(self.store, observe: StateView.init(userLogoutState:)) { viewStore in
-            ScrollView {
-                Image(systemName: "person.circle")
-                    .font(.title)
-                    .foregroundColor(Color.orange)
-                    .padding()
+        ScrollView {
+            Image(systemName: "person.circle")
+                .font(.title)
+                .foregroundColor(Color.orange)
+                .padding()
 
-                Group {
-                    TextField(
-                        Strings.logEmail.string,
-                        text: viewStore.$email
-                    )
-                    .textContentType(.emailAddress)
-                    SecureField(
-                        Strings.logPassword.string,
-                        text: viewStore.$password
-                    )
-                    .textContentType(.password)
+            Group {
+                TextField(
+                    Strings.logEmail.string,
+                    text: $store.email
+                )
+                .textContentType(.emailAddress)
+                SecureField(
+                    Strings.logPassword.string,
+                    text: $store.password
+                )
+                .textContentType(.password)
 
-                    Button {
-                        viewStore.send(.login)
-                    } label: {
-                        LoadingView(.constant(viewStore.isLoadingUser)) {
-                            HStack {
-                                Image(systemName: "arrow.right.square")
-                                Text(Strings.loginApp.key, bundle: .module)
-                            }
+                Button {
+                    store.send(.login)
+                } label: {
+                    LoadingView(store.isLoading) {
+                        HStack {
+                            Image(systemName: "arrow.right.square")
+                            Text(Strings.loginApp.key, bundle: .module)
                         }
                     }
                 }
-                .disabled(viewStore.isLoadingUser)
             }
-            .alert(
-                store: self.store.scope(
-                    state: \.$alert,
-                    action: \.alert
-                )
-            )
+            .disabled(store.isLoading)
         }
-    }
-}
-
-extension UserLoginViewWatch {
-    public struct StateView: Equatable {
-        let isLoadingUser: Bool
-        @BindingViewState var email: String
-        @BindingViewState var password: String
-        @PresentationState var alert: AlertState<UserLogoutReducer.Action.Alert>?
-    }
-}
-
-extension UserLoginViewWatch.StateView {
-    public init(
-        userLogoutState: BindingViewStore<UserLogoutReducer.State>
-    ) {
-        self.isLoadingUser = userLogoutState.isLoading
-        self._password = userLogoutState.$password
-        self._email = userLogoutState.$email
-        self.alert = userLogoutState.alert
+        .alert($store.scope(state: \.alert, action: \.alert))
     }
 }
 
