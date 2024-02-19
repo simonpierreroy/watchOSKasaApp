@@ -8,26 +8,11 @@ import Tagged
 @Reducer
 public struct DeviceReducer {
 
-    @Reducer
-    public struct Destination {
-
-        @ObservableState
-        public enum State: Equatable {
-            case alert(AlertState<Action.Alert>)
-            case info(DeviceInfoReducer.State)
-        }
-
-        public enum Action {
-            public enum Alert: Equatable {}
-            case alert(Alert)
-            case info(DeviceInfoReducer.Action)
-        }
-
-        public var body: some ReducerOf<Self> {
-            Scope(state: \.info, action: \Action.Cases.info) {
-                DeviceInfoReducer()
-            }
-        }
+    @Reducer(state: .equatable)
+    public enum Destination {
+        case alert(AlertState<Alert>)
+        case info(DeviceInfoReducer)
+        public enum Alert: Equatable {}
     }
 
     @ObservableState
@@ -121,9 +106,7 @@ public struct DeviceReducer {
                 return .none
             }
         }
-        .ifLet(\.$destination, action: \.destination) {
-            Destination()
-        }
+        .ifLet(\.$destination, action: \.destination)
         .forEach(\.children, action: \.deviceChild) {
             DeviceChildReducer()
         }
