@@ -13,7 +13,7 @@ import UserClient
 
 struct ToggleAppIntent: AppIntent {
 
-    static var title: LocalizedStringResource = "title_toggle_app_intent"
+    static let title: LocalizedStringResource = "title_toggle_app_intent"
 
     static var parameterSummary: some ParameterSummary {
         Summary("Toggle \(\.$deviceEntity)")

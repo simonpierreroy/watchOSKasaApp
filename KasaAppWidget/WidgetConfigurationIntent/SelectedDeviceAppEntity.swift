@@ -25,8 +25,8 @@ extension FlattenDevice.ID: EntityIdentifierConvertible {
 }
 
 struct SelectedDeviceAppEntity: AppEntity {
-    static var typeDisplayRepresentation: TypeDisplayRepresentation = "selected_device_entity_representation"
-    static var defaultQuery = SelectedDeviceAppEntityQuery()
+    static let typeDisplayRepresentation: TypeDisplayRepresentation = "selected_device_entity_representation"
+    static let defaultQuery = SelectedDeviceAppEntityQuery()
 
     let id: FlattenDevice.ID
     let displayString: String
