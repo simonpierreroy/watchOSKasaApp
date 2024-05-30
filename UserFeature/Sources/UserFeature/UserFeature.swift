@@ -16,29 +16,46 @@ public struct UserReducer {
     }
 
     @ObservableState
-    public enum State {
-        public static let empty = Self.logout(.empty)
-        case logged(UserLoggedReducer.State)
-        case logout(UserLogoutReducer.State)
+    public struct State {
+        public static func empty(with broadcastToken: Shared<Token?>) -> Self {
+            .init(userLogState: .logout(.empty), broadcastToken: broadcastToken)
+        }
+
+        @CasePathable @dynamicMemberLookup
+        public enum UserLogState {
+            case logged(UserLoggedReducer.State)
+            case logout(UserLogoutReducer.State)
+        }
+
+        public var userLogState: UserLogState
+        @Shared var broadcastToken: Token?
     }
 
     public var body: some ReducerOf<Self> {
         Reduce { state, action in
             switch action {
             case .loggedUser(.delegate(.logout)):
-                state = .logout(.empty)
+                state = .empty(with: state.$broadcastToken)
                 return .none
             case .logoutUser(.delegate(.setUser(let user))):
-                state = .logged(.init(user: user))
+                state = .init(
+                    userLogState: .logged(
+                        .init(
+                            user: user,
+                            broadcastToken: state.$broadcastToken
+                        )
+                    ),
+                    broadcastToken: state.$broadcastToken
+                )
                 return .send(.loggedUser(.save))
             case .logoutUser, .loggedUser:
                 return .none
             }
         }
-        .ifCaseLet(\.logout, action: \.logoutUser) {
+        .ifLet(\.userLogState.logout, action: \.logoutUser) {
             UserLogoutReducer()
         }
-        .ifCaseLet(\.logged, action: \.loggedUser) {
+        .ifLet(\.userLogState.logged, action: \.loggedUser) {
             UserLoggedReducer()
         }
     }
@@ -49,7 +66,15 @@ public struct UserLoggedReducer {
 
     @ObservableState
     public struct State: Equatable {
+
+        init(user: User, broadcastToken: Shared<Token?>) {
+            self.user = user
+            self._broadcastToken = broadcastToken
+            broadcastToken.wrappedValue = user.tokenInfo.token
+        }
+
         public var user: User
+        @Shared var broadcastToken: Token?
     }
 
     public enum Action {
@@ -72,6 +97,7 @@ public struct UserLoggedReducer {
                 await reloadAppExtensions()
             }
         case .delegate(.logout):
+            state.broadcastToken = nil
             return .run { send in
                 try await userCache.save(nil)
                 await reloadAppExtensions()

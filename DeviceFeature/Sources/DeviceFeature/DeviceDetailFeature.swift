@@ -25,40 +25,25 @@ public struct DeviceReducer {
             name: String,
             children: [DeviceChildReducer.State],
             details: Device.State,
-            info: DeviceInfoReducer.State? = nil
+            info: DeviceInfoReducer.State? = nil,
+            token: Shared<Token?>
         ) {
             self.isLoading = isLoading
             self.id = id
             self.name = name
             self.details = details
-            self._children = .init(uniqueElements: children)
+            self.children = .init(uniqueElements: children)
             self.destination = destination
+            self._token = token
         }
 
         public var isLoading: Bool
         public let id: Device.Id
         public let name: String
         public var details: Device.State
-
+        public var children: IdentifiedArrayOf<DeviceChildReducer.State>
         @Presents public var destination: Destination.State?
-
-        @ObservationStateIgnored
-        public var token: Token? = nil
-
-        @ObservationStateIgnored
-        private var _children: IdentifiedArrayOf<DeviceChildReducer.State>
-        public var children: IdentifiedArrayOf<DeviceChildReducer.State> {
-            get {
-                return .init(
-                    uniqueElements: _children.map {
-                        var copy = $0
-                        copy.token = self.token
-                        return copy
-                    }
-                )
-            }
-            set { self._children = newValue }
-        }
+        @Shared public var token: Token?
     }
 
     public enum Action {
@@ -134,9 +119,7 @@ public struct DeviceChildReducer {
         public let id: Device.Id
         public var isLoading: Bool = false
         public let name: String
-        @ObservationStateIgnored
-        public var token: Token? = nil
-
+        @Shared public var token: Token?
         @Presents public var alert: AlertState<Action.Alert>?
     }
 

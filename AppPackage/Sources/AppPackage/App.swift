@@ -26,26 +26,16 @@ public struct AppReducer {
 
     @ObservableState
     public struct State {
-        public static let empty = Self(userState: .empty, _devicesState: .empty)
+        public static func empty() -> Self {
+            let sharedToken: Shared<Token?> = .init(nil)
+            return Self(
+                userState: .empty(with: sharedToken),
+                devicesState: .empty(with: sharedToken)
+            )
+        }
 
         public var userState: UserReducer.State
-
-        @ObservationStateIgnored
-        private var _devicesState: DevicesReducer.State
-
-        public var devicesState: DevicesReducer.State {
-            get {
-                var copy = self._devicesState
-                switch userState {
-                case .logout:
-                    copy.token = nil
-                case .logged(let userState):
-                    copy.token = userState.user.tokenInfo.token
-                }
-                return copy
-            }
-            set { self._devicesState = newValue }
-        }
+        public var devicesState: DevicesReducer.State
     }
 
     public enum Action {

@@ -146,7 +146,7 @@ struct DeviceDetailViewWatch: View {
 #Preview("List") {
     DeviceListViewWatch(
         store: Store(
-            initialState: .emptyLogged,
+            initialState: .emptyWithLink,
             reducer: { DevicesReducer() }
         )
     )
@@ -221,12 +221,7 @@ struct DeviceDetailViewWatch: View {
                 DevicesReducer()
                     .dependency(
                         \.devicesClient,
-                        .devicesEnvError(
-                            loadError: "loadError",
-                            toggleError: "toggleError",
-                            getDevicesError: "getDevicesError",
-                            changeDevicesError: "changeDevicesError"
-                        )
+                        .devicesEnvErrorWithDefaults()
                     )
             }
         )

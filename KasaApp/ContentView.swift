@@ -25,10 +25,10 @@ struct ContentView: View {
     }
 
     var body: some View {
-        switch globalStore.state.userState {
+        switch globalStore.state.userState.userLogState {
         case .logout:
             if let store = globalStore.scope(
-                state: \.userState.logout,
+                state: \.userState.userLogState.logout,
                 action: \.userAction.logoutUser
             ) {
                 UserLoginViewiOS(store: store)
@@ -44,7 +44,7 @@ struct ContentView: View {
 #Preview {
     ContentView(
         store: Store(
-            initialState: .empty,
+            initialState: .empty(),
             reducer: { AppReducer() }
         )
     )

@@ -82,5 +82,14 @@ extension DevicesClient {
             }
         )
     }
+
+    public static func devicesEnvErrorWithDefaults() -> Self {
+        .devicesEnvError(
+            loadError: "loadError",
+            toggleError: "toggleError",
+            getDevicesError: "getDevicesError",
+            changeDevicesError: "changeDevicesError"
+        )
+    }
 }
 #endif

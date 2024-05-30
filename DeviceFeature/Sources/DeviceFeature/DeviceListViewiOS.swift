@@ -412,7 +412,7 @@ struct ContentStyle: ViewModifier {
 #Preview("Link") {
     DeviceListViewiOS(
         store: Store(
-            initialState: .emptyLoggedLink,
+            initialState: .emptyWithLink,
             reducer: { DevicesReducer() }
         )
     )
@@ -422,7 +422,7 @@ struct ContentStyle: ViewModifier {
     DeviceListViewiOS(
         store: Store(
             initialState: .multiRoutes(
-                parentError: "Erorr parent",
+                parentError: "Error parent",
                 childError: "Error child"
             ),
             reducer: { DevicesReducer() }
@@ -454,16 +454,7 @@ struct ContentStyle: ViewModifier {
             initialState: .nDeviceLoaded(n: 4),
             reducer: {
                 DevicesReducer()
-                    .dependency(
-                        \.devicesClient,
-                        .devicesEnvError(
-                            loadError: "loadError",
-                            toggleError: "toggleError",
-                            getDevicesError: "getDevicesError",
-                            changeDevicesError: "changeDevicesError"
-                        )
-                    )
-                    ._printChanges()
+                    .dependency(\.devicesClient, .devicesEnvErrorWithDefaults())
             }
         )
     )

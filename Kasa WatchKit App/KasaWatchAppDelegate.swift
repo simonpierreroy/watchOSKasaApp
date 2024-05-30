@@ -23,7 +23,7 @@ extension AppReducer.State {
 final class KasaWatchAppDelegate: NSObject, WKApplicationDelegate {
 
     static let store = StoreOf<AppReducer>(
-        initialState: .empty,
+        initialState: .empty(),
         reducer: { AppReducer()._printChanges() }
     )
 

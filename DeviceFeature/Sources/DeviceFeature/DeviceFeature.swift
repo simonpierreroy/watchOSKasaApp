@@ -38,20 +38,22 @@ public struct DevicesReducer {
 
     @ObservableState
     public struct State {
-        public static let empty = Self(devices: [], isLoading: .neverLoaded, alert: nil, token: nil)
+        public static func empty(with sharedToken: Shared<Token?>) -> Self {
+            .init(devices: [], isLoading: .neverLoaded, alert: nil, token: sharedToken)
+        }
 
         init(
             devices: [DeviceReducer.State],
             isLoading: Loading,
             alert: AlertState<Action.Alert>?,
-            token: Token?,
-            link: DevicesLink? = nil
+            link: DevicesLink? = nil,
+            token: Shared<Token?>
         ) {
-            self._devices = .init(uniqueElements: devices)
+            self.devices = .init(uniqueElements: devices)
             self.isLoading = isLoading
             self.alert = alert
-            self.token = token
             self.linkToComplete = link
+            self._token = token
         }
 
         public enum Loading {
@@ -70,26 +72,11 @@ public struct DevicesReducer {
             }
         }
 
-        @ObservationStateIgnored
-        private var _devices: IdentifiedArrayOf<DeviceReducer.State>
-        public var devices: IdentifiedArrayOf<DeviceReducer.State> {
-            get {
-                return .init(
-                    uniqueElements: _devices.map {
-                        var copy = $0
-                        copy.token = self.token
-                        return copy
-                    }
-                )
-            }
-            set { self._devices = newValue }
-        }
-
-        @ObservationStateIgnored
-        public var token: Token?
+        public var devices: IdentifiedArrayOf<DeviceReducer.State>
         public var isLoading: Loading
-        @Presents public var alert: AlertState<Action.Alert>?
         public var linkToComplete: DevicesLink?
+        @Presents public var alert: AlertState<Action.Alert>?
+        @Shared public var token: Token?
     }
 
     @Dependency(\.devicesCache.save) var saveToCache
@@ -138,8 +125,9 @@ public struct DevicesReducer {
             case .fetchFromRemote:
                 guard let token = state.token else { return .none }
                 state.isLoading = .loadingDevices
-                return .run { send in
-                    let devices = try await loadDevices(token).map(DeviceReducer.State.init(device:))
+                return .run { [sharedToken = state.$token] send in
+                    let devices = try await loadDevices(token)
+                        .map { DeviceReducer.State.init(device: $0, sharedToken: sharedToken) }
                     let states = IdentifiedArrayOf(uniqueElements: devices)
                     await send(.set(to: states), animation: .default)
                 } catch: { error, send in
@@ -166,7 +154,7 @@ public struct DevicesReducer {
                 return .send(.fetchFromRemote)
             case .deviceDetail: return .none
             case .delegate(.logout):
-                state = .empty
+                state = .empty(with: state.$token)
                 return .send(.saveDevicesToCache)  // Will be provide by an other feature
             }
         }
@@ -199,13 +187,26 @@ public struct DevicesReducer {
 
 extension DeviceReducer.State {
     init(
-        device: Device
+        device: Device,
+        sharedToken: Shared<Token?>
     ) {
         let tmpChildren = device.children.map {
-            DeviceChildReducer.State.init(relay: $0.state, parentId: device.id, id: $0.id, name: $0.name)
+            DeviceChildReducer.State.init(
+                relay: $0.state,
+                parentId: device.id,
+                id: $0.id,
+                name: $0.name,
+                token: sharedToken
+            )
         }
 
-        self.init(id: device.id, name: device.name, children: tmpChildren, details: device.details)
+        self.init(
+            id: device.id,
+            name: device.name,
+            children: tmpChildren,
+            details: device.details,
+            token: sharedToken
+        )
     }
 }
 

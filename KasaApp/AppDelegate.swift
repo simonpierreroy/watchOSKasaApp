@@ -23,7 +23,7 @@ extension AppReducer.State {
 final class AppDelegate: UIResponder, UIApplicationDelegate {
 
     static let store = StoreOf<AppReducer>(
-        initialState: .empty,
+        initialState: .empty(),
         reducer: { AppReducer()._printChanges() }
     )
 
