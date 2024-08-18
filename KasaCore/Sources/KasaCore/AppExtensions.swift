@@ -25,7 +25,7 @@ extension DependencyValues {
             }
         }
 
-        public static let testValue: Value = XCTUnimplemented(#"@Dependency(\.reloadAppExtensions)"#)
+        public static let testValue: Value = unimplemented(#"@Dependency(\.reloadAppExtensions)"#)
         public static let previewValue: Value = {}
     }
 }

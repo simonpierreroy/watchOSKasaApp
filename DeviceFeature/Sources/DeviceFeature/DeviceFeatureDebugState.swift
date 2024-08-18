@@ -37,7 +37,7 @@ extension DevicesReducer.State {
             devices: [
                 .init(
                     isLoading: false,
-                    destination: childError.map { .alert(.init(title: TextState($0))) },
+                    destination: childError.map { error in .alert(.init(title: { TextState(error) })) },
                     id: .init(rawValue: "1"),
                     name: "1",
                     children: .init(),
@@ -46,7 +46,7 @@ extension DevicesReducer.State {
                 )
             ],
             isLoading: .loaded,
-            alert: parentError.map { .init(title: TextState($0)) },
+            alert: parentError.map { error in return .init(title: { TextState(error) }) },
             link: nil,
             token: .init("logged")
         )
