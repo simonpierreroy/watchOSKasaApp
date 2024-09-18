@@ -115,7 +115,7 @@ struct KasaAppWidgetWithAppIntent: Widget {
             )
         }
         .supportedFamilies([.systemExtraLarge, .systemLarge, .systemMedium, .systemSmall])
-        .configurationDisplayName("Kasa 1")
+        .configurationDisplayName("Kasa Devices")
         .description(WidgetFeature.Strings.descriptionWidget.string)
     }
 }
@@ -137,7 +137,7 @@ struct KasaAppWidgetStatic: Widget {
             )
         }
         .supportedFamilies([.systemSmall, .accessoryCircular, .accessoryInline, .accessoryRectangular])
-        .configurationDisplayName("Kasa 2")
+        .configurationDisplayName("Kasa Turn Off")
         .description(WidgetFeature.Strings.descriptionWidget.string)
 
     }

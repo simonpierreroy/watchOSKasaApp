@@ -1,6 +1,16 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "%@" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@"
+          }
+        }
+      }
+    },
     "description_select_devices_intent" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -31,6 +41,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "appareil"
+          }
+        }
+      }
+    },
+    "Kasa Devices" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Appareils Kasa"
+          }
+        }
+      }
+    },
+    "Kasa Turn Off" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kasa  fermer les lumières"
           }
         }
       }

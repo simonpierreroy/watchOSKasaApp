@@ -59,7 +59,7 @@ struct KasaWatchWidgetExtension: Widget {
         ) { entry in
             KasaAppWidgetEntryView(
                 entry: entry,
-                newIntent: { _ in EmptyIntent() },
+                newIntent: { _ in TurnOffAppIntent() },
                 getURL: provider.config.render(link:),
                 mode: .turnOffAllDevices
             )
@@ -70,7 +70,34 @@ struct KasaWatchWidgetExtension: Widget {
     }
 }
 
-#Preview(as: .accessoryCorner) {
+#Preview("accessoryCorner", as: .accessoryCorner) {
+    KasaWatchWidgetExtension()
+} timeline: {
+    DataDeviceEntry.previewLogout
+    DataDeviceEntry.previewNoDevice
+    DataDeviceEntry.preview(1)
+    DataDeviceEntry.preview(3)
+}
+
+#Preview("accessoryInline", as: .accessoryInline) {
+    KasaWatchWidgetExtension()
+} timeline: {
+    DataDeviceEntry.previewLogout
+    DataDeviceEntry.previewNoDevice
+    DataDeviceEntry.preview(1)
+    DataDeviceEntry.preview(3)
+}
+
+#Preview("accessoryRectangular", as: .accessoryRectangular) {
+    KasaWatchWidgetExtension()
+} timeline: {
+    DataDeviceEntry.previewLogout
+    DataDeviceEntry.previewNoDevice
+    DataDeviceEntry.preview(1)
+    DataDeviceEntry.preview(3)
+}
+
+#Preview("accessoryCircular", as: .accessoryCircular) {
     KasaWatchWidgetExtension()
 } timeline: {
     DataDeviceEntry.previewLogout

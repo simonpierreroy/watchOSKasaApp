@@ -1,0 +1,25 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "Kasa" : {
+
+    },
+    "title_toggle_app_intent" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toggle lights superfast"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrir ou fermer les lumières rapidement"
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}
