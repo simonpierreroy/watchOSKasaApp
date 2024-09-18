@@ -211,7 +211,7 @@ struct TurnOffView<I: AppIntent>: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
         }
         .buttonStyle(.plain).invalidatableContent()
-        .widgetURL(getURL(.devices(.turnOffAllDevices)))
+        //.widgetURL(getURL(.devices(.turnOffAllDevices)))
         //  vs Link(destination: getURL(.devices(.turnOffAllDevices)))
     }
 }
