@@ -2,17 +2,16 @@
 GIT_REPO_TOPLEVEL := $(shell git rev-parse --show-toplevel)
 
 # Apple Platform Destinations
-DESTINATION_PLATFORM_IOS_SIMULATOR = "platform=iOS Simulator,name=iPhone 15 Pro Max"
-DESTINATION_PLATFORM_WATCHOS_SIMULATOR = "platform=watchOS Simulator,name=Apple Watch Series 9 (45mm)"
+DESTINATION_PLATFORM_IOS_SIMULATOR = "platform=iOS Simulator,name=iPhone 16 Pro Max"
+DESTINATION_PLATFORM_WATCHOS_SIMULATOR = "platform=watchOS Simulator,name=Apple Watch Series 10 (46mm)"
 
 # Run Results
-IOS_RUN_RESULT_BUNDLE_PATH="$(GIT_REPO_TOPLEVEL)/xcresults/latest_ios_result.xcresult"
-WATCHOS_RUN_RESULT_BUNDLE_PATH="$(GIT_REPO_TOPLEVEL)/xcresults/latest_watchos_result.xcresult"
+IOS_RUN_RESULT_BUNDLE_PATH="$(GIT_REPO_TOPLEVEL)/xcresults/ios_result.xcresult"
+WATCHOS_RUN_RESULT_BUNDLE_PATH="$(GIT_REPO_TOPLEVEL)/xcresults/watchos_result.xcresult"
 
 # Formatting
-SWIFT_FORMAT_VERSION=510.1.0
-SWIFT_FORMAT_FOLDER="$(GIT_REPO_TOPLEVEL)/swift-format"
-SWIFT_FORMAT_CONFIG_FILE := "$(GIT_REPO_TOPLEVEL)/.swift-format.json"
+SWIFT_FORMAT_BIN := swift format
+SWIFT_FORMAT_CONFIG_FILE := $(GIT_REPO_TOPLEVEL)/.swift-format.json
 FORMAT_PATHS := "$(GIT_REPO_TOPLEVEL)"
 
 # Tasks
@@ -59,26 +58,22 @@ test-xcode-watchos:
 		-destination $(DESTINATION_PLATFORM_WATCHOS_SIMULATOR) \
 		-resultBundlePath $(WATCHOS_RUN_RESULT_BUNDLE_PATH) \
 		-quiet
-swift-format/swift-format: 
-	rm -rf $(SWIFT_FORMAT_FOLDER)
-	git clone -b $(SWIFT_FORMAT_VERSION) https://github.com/apple/swift-format.git $(SWIFT_FORMAT_FOLDER)
-	swift build -c release --package-path $(SWIFT_FORMAT_FOLDER)
-	touch $(SWIFT_FORMAT_FOLDER)/swift-format
 
 .PHONY: format
-format: swift-format/swift-format
-	swift run -c release --skip-build --package-path $(SWIFT_FORMAT_FOLDER) swift-format \
+format:
+	$(SWIFT_FORMAT_BIN) \
 		--configuration $(SWIFT_FORMAT_CONFIG_FILE) \
 		--ignore-unparsable-files \
 		--in-place \
+		--parallel \
 		--recursive \
 		$(FORMAT_PATHS)
 
 .PHONY: lint
-lint: swift-format/swift-format
-	swift run -c release --skip-build --package-path $(SWIFT_FORMAT_FOLDER) swift-format \
-		lint \
+lint:
+	$(SWIFT_FORMAT_BIN) lint \
 		--configuration $(SWIFT_FORMAT_CONFIG_FILE) \
 		--ignore-unparsable-files \
+		--parallel \
 		--recursive \
 		$(FORMAT_PATHS)

@@ -12,7 +12,7 @@ import Foundation
 import UserClient
 
 @Reducer
-struct AppDelegateReducer {
+struct AppDelegateReducer: Sendable {
     typealias State = AppReducer.State
     typealias Action = AppReducer.Action
 

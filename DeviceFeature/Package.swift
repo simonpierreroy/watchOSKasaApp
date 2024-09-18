@@ -1,4 +1,4 @@
-// swift-tools-version:5.10
+// swift-tools-version:6.0
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
@@ -6,7 +6,7 @@ import PackageDescription
 let package = Package(
     name: "DeviceFeature",
     defaultLocalization: "en",
-    platforms: [.iOS(.v17), .watchOS(.v10)],
+    platforms: [.iOS(.v18), .watchOS(.v11)],
     products: [
         .library(
             name: "DeviceClient",
@@ -47,5 +47,6 @@ let package = Package(
             name: "DeviceFeatureTests",
             dependencies: ["DeviceFeature"]
         ),
-    ]
+    ],
+    swiftLanguageModes: [.v6]
 )

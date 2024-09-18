@@ -14,12 +14,12 @@ import KasaCore
 import Tagged
 
 @Reducer
-public struct DeviceInfoReducer {
+public struct DeviceInfoReducer: Sendable {
 
     @Dependency(\.dismiss) var dismiss
 
     @ObservableState
-    public struct State: Equatable {
+    public struct State: Equatable, Sendable {
         let info: Device.Info
         let deviceName: String
     }

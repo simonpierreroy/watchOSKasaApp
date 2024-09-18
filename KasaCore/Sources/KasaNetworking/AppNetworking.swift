@@ -42,7 +42,7 @@ extension Networking {
             let result: Model?
         }
 
-        public struct Method: Hashable {
+        public struct Method: Hashable, Sendable {
             public init(
                 endpoint: String
             ) {
@@ -100,26 +100,18 @@ extension Networking {
             return .success(result)
         }
 
-        private static let baseRequest =
-            guaranteeHeaders
-            <> setHeader("Content-Type", "application/json")
-
         private static func performRequest<ModelRequest: Encodable, ModelForResponse: Decodable>(
             requestInfo: RequestInfo<ModelRequest>
         ) async throws -> Response<ModelForResponse> {
 
             let data = try Networking.App.encoder.encode(requestInfo.getRequest())
-            let endpointQuery = baseUrl |> Networking.setQuery(items: requestInfo.queryItems)
+            let items = requestInfo.queryItems.map(URLQueryItem.init(name:value:))
+            let endpoint = baseUrl.appending(queryItems: items)
+            var request = URLRequest(url: endpoint)
 
-            guard let endpoint = endpointQuery else {
-                throw Networking.RequestError(errorDescription: "Invalid endpoint query items")
-            }
-
-            let request =
-                URLRequest(url: endpoint)
-                |> mut(^\.httpMethod, requestInfo.httpMethod.rawValue)
-                <> baseRequest
-                <> mut(^\.httpBody, data)
+            request.httpMethod = requestInfo.httpMethod.rawValue
+            request.allHTTPHeaderFields = ["Content-Type": "application/json"]
+            request.httpBody = data
 
             let response: Response<ModelForResponse> = try await Networking.modelFetcher(
                 decoder: decoder,

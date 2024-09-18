@@ -1,28 +1,22 @@
-# Xcode
+# macOS
+#
 .DS_Store
-node_modules/
-build/
-*.pbxuser
-!default.pbxuser
-*.mode1v3
-!default.mode1v3
-*.mode2v3
-!default.mode2v3
-*.perspectivev3
-!default.perspectivev3
-xcuserdata
-*.xccheckout
-*.moved-aside
-DerivedData
-*.hmap
-*.ipa
-*.xcuserstate
-*.xcscmblueprint
-*.playgrounddata
+
+# editor
+#
+/.vscode
+
+# SwiftPM
+#
+.build/
+Package.resolved
+*.xcodeproj/
+xcuserdata/
+/Packages
+
+# dotenv
+#
+.env
 
 # Results
 xcresults/
-swift-format/
-
-# Swift Package Manager
-.build

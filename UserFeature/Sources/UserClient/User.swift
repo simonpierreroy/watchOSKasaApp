@@ -9,7 +9,7 @@ public struct User: Equatable, Codable, Sendable {
     public enum TerminalIdTag {}
     public typealias TerminalId = Tagged<TerminalIdTag, UUID>
 
-    public struct Credential: Codable, Equatable {
+    public struct Credential: Codable, Equatable, Sendable {
         public init(
             email: String,
             password: String

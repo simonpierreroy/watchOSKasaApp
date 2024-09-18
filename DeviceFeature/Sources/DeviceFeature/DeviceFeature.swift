@@ -13,7 +13,7 @@ import KasaCore
 import Tagged
 
 @Reducer
-public struct DevicesReducer {
+public struct DevicesReducer: Sendable {
 
     public init() {}
 
@@ -29,7 +29,7 @@ public struct DevicesReducer {
         case delegate(Delegate)
         case alert(PresentationAction<Alert>)
 
-        public enum Alert: Equatable {}
+        public enum Alert: Equatable, Sendable {}
 
         public enum Delegate {
             case logout
@@ -37,7 +37,7 @@ public struct DevicesReducer {
     }
 
     @ObservableState
-    public struct State {
+    public struct State: Sendable {
         public static func empty(with sharedToken: Shared<Token?>) -> Self {
             .init(devices: [], isLoading: .neverLoaded, alert: nil, token: sharedToken)
         }
@@ -56,7 +56,7 @@ public struct DevicesReducer {
             self._token = token
         }
 
-        public enum Loading {
+        public enum Loading: Sendable {
             case neverLoaded
             case loadingDevices
             case closingAll

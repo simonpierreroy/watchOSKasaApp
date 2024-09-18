@@ -1,5 +1,5 @@
 {
-  "originHash" : "b38f4520cfcd99e09e63c69e0e17429590ef0a15031eb2df715c66b9caaff9f7",
+  "originHash" : "297c869da72597dd796242779160cbc1a33e36d2c4d7bbd6ca48ede6dda23e85",
   "pins" : [
     {
       "identity" : "combine-schedulers",
@@ -42,8 +42,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/swift-composable-architecture.git",
       "state" : {
-        "revision" : "b432441cbc11a38c678312bad1a01138a7cd64e0",
-        "version" : "1.13.0"
+        "revision" : "8013f1a72af8ccb2b1735d7aed831a8dc07c6fd0",
+        "version" : "1.15.0"
       }
     },
     {
@@ -69,8 +69,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/swift-dependencies",
       "state" : {
-        "revision" : "d7472be6b3c89251ce4c0db07d32405b43426781",
-        "version" : "1.3.7"
+        "revision" : "fd1fb25b68fdb9756cd61d23dbd9e2614b340085",
+        "version" : "1.4.0"
       }
     },
     {
@@ -87,8 +87,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/swift-navigation",
       "state" : {
-        "revision" : "339ba3e305dc727b5baa6ddb476430a842167d4e",
-        "version" : "2.0.5"
+        "revision" : "d1bdbd8a5d1d1dfd2e4bb1f5e2f6facb631404d4",
+        "version" : "2.2.1"
       }
     },
     {
@@ -132,8 +132,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/xctest-dynamic-overlay",
       "state" : {
-        "revision" : "c6809a193975cab4d5308c64bd1d51e0df467928",
-        "version" : "1.2.3"
+        "revision" : "bc2a151366f2cd0e347274544933bc2acb00c9fe",
+        "version" : "1.4.0"
       }
     }
   ],

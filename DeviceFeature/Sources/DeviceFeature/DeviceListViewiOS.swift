@@ -406,7 +406,6 @@ struct ContentStyle: ViewModifier {
             reducer: { DevicesReducer() }
         )
     )
-    .previewDisplayName("empty")
 }
 
 #Preview("Link") {

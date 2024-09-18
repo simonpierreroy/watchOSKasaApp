@@ -6,17 +6,17 @@ import KasaCore
 import Tagged
 
 @Reducer
-public struct DeviceReducer {
+public struct DeviceReducer: Sendable {
 
-    @Reducer(state: .equatable)
-    public enum Destination {
+    @Reducer(state: .equatable, .sendable)
+    public enum Destination: Sendable {
         case alert(AlertState<Alert>)
         case info(DeviceInfoReducer)
-        public enum Alert: Equatable {}
+        public enum Alert: Equatable, Sendable {}
     }
 
     @ObservableState
-    public struct State: Equatable, Identifiable {
+    public struct State: Equatable, Identifiable, Sendable {
 
         init(
             isLoading: Bool = false,
@@ -99,20 +99,20 @@ public struct DeviceReducer {
 }
 
 @Reducer
-public struct DeviceChildReducer {
+public struct DeviceChildReducer: Sendable {
 
-    public enum Action {
+    public enum Action: Sendable {
         case didToggleChild(relay: RelayIsOn)
         case toggleChild
         case setError(Error)
 
         case alert(PresentationAction<Alert>)
-        public enum Alert: Equatable {}
+        public enum Alert: Equatable, Sendable {}
 
     }
 
     @ObservableState
-    public struct State: Equatable, Identifiable {
+    public struct State: Equatable, Identifiable, Sendable {
 
         public var relay: RelayIsOn
         public let parentId: Device.Id

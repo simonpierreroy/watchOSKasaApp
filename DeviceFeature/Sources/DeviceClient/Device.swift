@@ -1,3 +1,4 @@
+import AppIntents
 import CasePaths
 import Combine
 import ComposableArchitecture
@@ -182,20 +183,30 @@ extension [Device] {
     }
 }
 
-public enum DevicesLink: Equatable {
+public enum DevicesLink: Equatable, Sendable {
     case device(Device.ID, Device.Link)
     case turnOffAllDevices
 }
 
 extension Device {
-    public enum Link: Equatable {
+    public enum Link: Equatable, Sendable {
         case child(Device.ID, Device.DeviceChild.Link)
         case toggle
     }
 }
 
 extension Device.DeviceChild {
-    public enum Link: Equatable {
+    public enum Link: Equatable, Sendable {
         case toggle
+    }
+}
+
+extension FlattenDevice.ID: EntityIdentifierConvertible {
+    public var entityIdentifierString: String {
+        self.rawValue
+    }
+
+    public static func entityIdentifier(for entityIdentifierString: String) -> DeviceClient.FlattenDevice.ID? {
+        .init(rawValue: entityIdentifierString)
     }
 }

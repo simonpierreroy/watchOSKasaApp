@@ -159,7 +159,6 @@ struct DeviceDetailViewWatch: View {
             reducer: { DevicesReducer() }
         )
     )
-    .previewDisplayName("Loading")
 }
 
 #Preview("Never Loaded") {
@@ -179,7 +178,6 @@ struct DeviceDetailViewWatch: View {
         )
     )
     .preferredColorScheme(.dark)
-    .previewDisplayName("1 item")
 }
 
 #Preview("5 items") {
@@ -190,7 +188,6 @@ struct DeviceDetailViewWatch: View {
         )
     )
     .preferredColorScheme(.dark)
-    .previewDisplayName("5 items")
 }
 
 #Preview("Group") {

@@ -8,5 +8,5 @@
 import Foundation
 
 extension UserDefaults {
-    public static let kasaAppGroup = UserDefaults(suiteName: "group.appKasa")!
+    nonisolated(unsafe) public static let kasaAppGroup = UserDefaults(suiteName: "group.appKasa")!
 }

@@ -9,7 +9,7 @@ import ComposableArchitecture
 import Foundation
 
 @Reducer
-struct GlueFeatures {
+struct GlueFeatures: Sendable {
     typealias State = AppReducer.State
     typealias Action = AppReducer.Action
 

@@ -20,12 +20,12 @@ import UserClientLive
 import UserFeature
 
 @Reducer
-public struct AppReducer {
+public struct AppReducer: Sendable {
 
     public init() {}
 
     @ObservableState
-    public struct State {
+    public struct State: Sendable {
         public static func empty() -> Self {
             let sharedToken: Shared<Token?> = .init(nil)
             return Self(

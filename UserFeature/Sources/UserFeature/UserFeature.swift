@@ -6,7 +6,7 @@ import Tagged
 import UserClient
 
 @Reducer
-public struct UserReducer {
+public struct UserReducer: Sendable {
 
     public init() {}
 
@@ -16,13 +16,13 @@ public struct UserReducer {
     }
 
     @ObservableState
-    public struct State {
+    public struct State: Sendable {
         public static func empty(with broadcastToken: Shared<Token?>) -> Self {
             .init(userLogState: .logout(.empty), broadcastToken: broadcastToken)
         }
 
         @CasePathable @dynamicMemberLookup
-        public enum UserLogState {
+        public enum UserLogState: Sendable {
             case logged(UserLoggedReducer.State)
             case logout(UserLogoutReducer.State)
         }
@@ -62,10 +62,10 @@ public struct UserReducer {
 }
 
 @Reducer
-public struct UserLoggedReducer {
+public struct UserLoggedReducer: Sendable {
 
     @ObservableState
-    public struct State: Equatable {
+    public struct State: Equatable, Sendable {
 
         init(user: User, broadcastToken: Shared<Token?>) {
             self.user = user
@@ -107,10 +107,10 @@ public struct UserLoggedReducer {
 }
 
 @Reducer
-public struct UserLogoutReducer {
+public struct UserLogoutReducer: Sendable {
 
     @ObservableState
-    public struct State {
+    public struct State: Sendable {
         public static let empty = State(email: "", password: "", isLoading: false, alert: nil)
 
         public var email: String
@@ -119,13 +119,13 @@ public struct UserLogoutReducer {
         @Presents public var alert: AlertState<Action.Alert>?
     }
 
-    public enum Action: BindableAction {
+    public enum Action: BindableAction, Sendable {
 
-        public enum Delegate {
+        public enum Delegate: Sendable {
             case setUser(User)
         }
 
-        public enum Alert: Equatable {}
+        public enum Alert: Equatable, Sendable {}
 
         case login
         case noUserInCacheFound

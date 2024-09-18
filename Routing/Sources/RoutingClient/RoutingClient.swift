@@ -12,18 +12,18 @@ import Foundation
 import KasaCore
 import XCTestDynamicOverlay
 
-public enum AppLink {
+public enum AppLink: Sendable {
     case devices(DevicesLink)
 }
 
 @DependencyClient
-public struct URLRouter {
+public struct URLRouter: Sendable {
     public var parse: @Sendable (URL) throws -> AppLink
     public var print: @Sendable (AppLink) throws -> URL
 }
 
 extension URLRouter: TestDependencyKey {
-    public static var testValue = URLRouter()
+    public static let testValue = URLRouter()
     public static let previewValue = URLRouter.mock(link: .devices(.turnOffAllDevices), print: nil)
 }
 

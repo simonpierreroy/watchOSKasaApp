@@ -8,10 +8,10 @@
 import AppIntents
 
 // This is outside an app, and will not be registered with the system.
-public struct EmptyIntent: AppIntent {
+public struct EmptyIntent: AppIntent, Sendable {
     public init() {}
-    public static var title: LocalizedStringResource = ""
-    static var description = IntentDescription("")
+    public static let title: LocalizedStringResource = ""
+    static let description = IntentDescription("")
 
     public func perform() async throws -> some IntentResult {
         return .result()

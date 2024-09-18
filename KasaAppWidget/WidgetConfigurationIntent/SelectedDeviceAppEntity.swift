@@ -14,16 +14,6 @@ import WidgetClient
 import WidgetClientLive
 import WidgetFeature
 
-extension FlattenDevice.ID: EntityIdentifierConvertible {
-    public var entityIdentifierString: String {
-        self.rawValue
-    }
-
-    public static func entityIdentifier(for entityIdentifierString: String) -> DeviceClient.FlattenDevice.ID? {
-        .init(rawValue: entityIdentifierString)
-    }
-}
-
 struct SelectedDeviceAppEntity: AppEntity {
     static let typeDisplayRepresentation: TypeDisplayRepresentation = "selected_device_entity_representation"
     static let defaultQuery = SelectedDeviceAppEntityQuery()

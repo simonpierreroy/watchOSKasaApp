@@ -47,7 +47,7 @@ extension AppLink {
 }
 
 extension URLRouter: DependencyKey {
-    public static var liveValue = Self(
+    public static let liveValue = Self(
         parse: AppLink.parserDeepLink(url:),
         print: AppLink.getURL(link:)
     )
