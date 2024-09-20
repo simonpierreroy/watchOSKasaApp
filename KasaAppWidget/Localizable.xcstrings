@@ -149,6 +149,16 @@
           }
         }
       }
+    },
+    "Toggle lights super fast" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrir les lumières rapidement"
+          }
+        }
+      }
     }
   },
   "version" : "1.0"

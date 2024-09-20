@@ -16,10 +16,12 @@ public enum Strings: String {
     case descriptionWidget = "description_widget"
     case turnOff = "turn_off"
     case deviceGroup = "device_group"
+    case emptyString = "empty_string"
+    case canNotDisplay = "can_not_display"
 }
 
 extension Strings {
-    var key: LocalizedStringKey {
+    public var key: LocalizedStringKey {
         .init(self.rawValue)
     }
 

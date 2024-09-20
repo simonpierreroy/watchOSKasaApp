@@ -111,7 +111,7 @@ private struct DeviceListViewSideBar: View {
                 } label: {
                     LoadingView(store.isLoading == .closingAll) {
                         HStack {
-                            Image(systemName: "moon.fill")
+                            SharedSystemImages.turnOffAllLights()
                                 .foregroundColor(imageColor(store.isLoading.isInFlight))
                             Text(Strings.turnOff.key, bundle: .module)
                         }
@@ -157,7 +157,7 @@ private struct DeviceListViewBase: View {
                         store.send(.turnOffAllDevices, animation: .default)
                     } label: {
                         LoadingView(store.isLoading == .closingAll) {
-                            Image(systemName: "moon.fill")
+                            SharedSystemImages.turnOffAllLights()
                             Text(Strings.turnOff.key, bundle: .module)
                         }
                     }

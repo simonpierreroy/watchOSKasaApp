@@ -52,7 +52,11 @@ struct WidgetView<I: AppIntent>: View {
             case .accessoryCircular:
                 AccessoryWidgetBackground().clipShape(.circle)
             case .accessoryRectangular:
+                #if os(iOS)
                 AccessoryWidgetBackground().clipShape(.rect(cornerRadius: 8))
+                #elseif os(watchOS)
+                EmptyView()
+                #endif
             case .accessoryCorner, .accessoryInline:
                 EmptyView()
             #if os(iOS)

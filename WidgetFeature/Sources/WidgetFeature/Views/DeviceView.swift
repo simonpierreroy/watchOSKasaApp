@@ -6,6 +6,7 @@
 //
 
 import AppIntents
+import BaseUI
 import DeviceClient
 import RoutingClient
 import SwiftUI
@@ -197,7 +198,7 @@ struct TurnOffView<I: AppIntent>: View {
     var body: some View {
         Button(intent: newIntent()) {
             VStack {
-                Image(systemName: "moon.zzz.fill")
+                SharedSystemImages.turnOffAllLights()
                     .font(TurnOffView.font(for: widgetFamily))
                     .widgetLabelOptional(active: TurnOffView.showWidgetText(for: widgetFamily)) {
                         Text(Strings.turnOff.key, bundle: .module).widgetAccentable(true)
@@ -261,7 +262,7 @@ struct StackList<I: AppIntent>: View {
                 #if os(watchOS)
                 case (.accessoryCircular, .selectableMultiDevices), (.accessoryCorner, .selectableMultiDevices),
                     (.accessoryInline, .selectableMultiDevices), (.accessoryRectangular, .selectableMultiDevices):
-                    Text("ERROR")
+                    Text(Strings.canNotDisplay.key, bundle: .module)
                 #endif
                 @unknown default:
                     EmptyView()

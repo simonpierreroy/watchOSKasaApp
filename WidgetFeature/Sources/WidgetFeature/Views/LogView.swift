@@ -5,6 +5,7 @@
 //  Created by Simon-Pierre Roy on 2/6/21.
 //
 
+import BaseUI
 import DeviceClient
 import RoutingClient
 import SwiftUI
@@ -69,7 +70,7 @@ struct LogoutView: View {
                 .disabled(true).blur(radius: 4.0)
             }
             VStack {
-                Image(systemName: "person.crop.circle.badge.exclamationmark")
+                SharedSystemImages.notLogged()
                     .font(LogoutView.imageFont(for: widgetFamily))
                     .widgetLabelOptional(active: Self.showWidgetText(for: widgetFamily)) {
                         Text(Strings.notLogged.key, bundle: .module).widgetAccentable(true)

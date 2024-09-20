@@ -22,6 +22,9 @@ extension DependencyValues {
         public static let liveValue: Value = {
             await MainActor.run {
                 WidgetCenter.shared.reloadAllTimelines()
+                #if os(iOS)
+                ControlCenter.shared.reloadAllControls()
+                #endif
             }
         }
 

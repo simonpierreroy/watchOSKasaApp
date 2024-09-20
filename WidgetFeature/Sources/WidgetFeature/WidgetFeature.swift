@@ -35,8 +35,7 @@ extension DataDeviceEntry: TimelineEntry {}
 
 public func newEntry(
     cache: WidgetDataCache,
-    intentSelection: [FlattenDevice.ID]?,
-    for context: TimelineProviderContext
+    intentSelection: [FlattenDevice.ID]?
 ) -> DataDeviceEntry {
     guard let state = try? getWidgetState(from: cache) else {
         return DataDeviceEntry(date: Date(), userIsLogged: false, devices: [])

@@ -2,7 +2,14 @@
   "sourceLanguage" : "en",
   "strings" : {
     "Kasa" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kasa"
+          }
+        }
+      }
     },
     "title_toggle_app_intent" : {
       "localizations" : {

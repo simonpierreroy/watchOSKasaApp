@@ -1,11 +1,32 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "" : {
-
-    },
     "%@" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@"
+          }
+        }
+      }
+    },
+    "can_not_display" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nothing to display"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rien à afficher"
+          }
+        }
+      }
     },
     "description_widget" : {
       "extractionState" : "migrated",
@@ -13,7 +34,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Toggle lights superfast"
+            "value" : "Toggle lights super fast"
           }
         },
         "fr" : {
@@ -41,8 +62,21 @@
         }
       }
     },
-    "ERROR" : {
-
+    "empty_string" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : " "
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : " "
+          }
+        }
+      }
     },
     "no_device" : {
       "extractionState" : "migrated",

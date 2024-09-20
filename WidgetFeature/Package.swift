@@ -32,6 +32,7 @@ let package = Package(
             name: "WidgetFeature",
             dependencies: [
                 "KasaCore",
+                .product(name: "BaseUI", package: "KasaCore"),
                 "WidgetClient",
                 .product(name: "RoutingClient", package: "Routing"),
             ]

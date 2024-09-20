@@ -1,13 +1,11 @@
 //
-//  KasaWatchWidgetExtension.swift
-//  KasaWatchWidgetExtension
+//  KasaAppWidgetStatic.swift
+//  KasaAppWidgetExtension
 //
-//  Created by Simon-Pierre Roy on 5/3/23.
-//  Copyright © 2023 Simon. All rights reserved.
+//  Created by Simon-Pierre Roy on 9/20/24.
+//  Copyright © 2024 Simon. All rights reserved.
 //
 
-import AppIntents
-import Intents
 import SwiftUI
 import WidgetClient
 import WidgetClientLive
@@ -15,19 +13,17 @@ import WidgetFeature
 import WidgetKit
 
 struct StaticProvider: TimelineProvider {
-
     let config = ProviderConfig()
 
     func placeholder(in context: Context) -> DataDeviceEntry {
-        .preview(1)
+        .preview(10)
     }
 
     func getSnapshot(in context: Context, completion: @escaping (WidgetClient.DataDeviceEntry) -> Void) {
         completion(
             newEntry(
                 cache: .init(loadDevices: config.loadDevices, loadUser: config.loadUser),
-                intentSelection: nil,
-                for: context
+                intentSelection: nil
             )
         )
     }
@@ -35,8 +31,7 @@ struct StaticProvider: TimelineProvider {
     func getTimeline(in context: Context, completion: @escaping (Timeline<WidgetClient.DataDeviceEntry>) -> Void) {
         let entry = newEntry(
             cache: .init(loadDevices: config.loadDevices, loadUser: config.loadUser),
-            intentSelection: nil,
-            for: context
+            intentSelection: nil
         )
         let timeline = Timeline(
             entries: [entry],
@@ -46,62 +41,49 @@ struct StaticProvider: TimelineProvider {
     }
 }
 
-@main
-struct KasaWatchWidgetExtension: Widget {
-    let kind: String = "KasaWatchWidgetExtensionStatic"
+struct KasaAppWidgetStatic: Widget {
+    let kind: String = "KasaAppWidgetStatic"
+    let provider = StaticProvider()
 
     var body: some WidgetConfiguration {
-        let provider = StaticProvider()
-
-        return StaticConfiguration(
+        StaticConfiguration(
             kind: kind,
             provider: provider
         ) { entry in
             KasaAppWidgetEntryView(
                 entry: entry,
-                newIntent: { _ in TurnOffAppIntent() },
+                newIntent: ToggleAppIntent.init(flattenDevice:),
                 getURL: provider.config.render(link:),
                 mode: .turnOffAllDevices
             )
         }
-        .configurationDisplayName("Kasa")
+        .supportedFamilies([.systemSmall, .accessoryCircular, .accessoryInline, .accessoryRectangular])
+        .configurationDisplayName("Kasa Turn Off")
         .description(WidgetFeature.Strings.descriptionWidget.string)
 
     }
 }
 
-#Preview("accessoryCorner", as: .accessoryCorner) {
-    KasaWatchWidgetExtension()
+#Preview("accessoryRectangular", as: .accessoryInline) {
+    KasaAppWidgetStatic()
 } timeline: {
     DataDeviceEntry.previewLogout
     DataDeviceEntry.previewNoDevice
     DataDeviceEntry.preview(1)
-    DataDeviceEntry.preview(3)
-}
-
-#Preview("accessoryInline", as: .accessoryInline) {
-    KasaWatchWidgetExtension()
-} timeline: {
-    DataDeviceEntry.previewLogout
-    DataDeviceEntry.previewNoDevice
-    DataDeviceEntry.preview(1)
-    DataDeviceEntry.preview(3)
 }
 
 #Preview("accessoryRectangular", as: .accessoryRectangular) {
-    KasaWatchWidgetExtension()
+    KasaAppWidgetStatic()
 } timeline: {
     DataDeviceEntry.previewLogout
     DataDeviceEntry.previewNoDevice
     DataDeviceEntry.preview(1)
-    DataDeviceEntry.preview(3)
 }
 
-#Preview("accessoryCircular", as: .accessoryCircular) {
-    KasaWatchWidgetExtension()
+#Preview("systemSmall", as: .systemSmall) {
+    KasaAppWidgetStatic()
 } timeline: {
     DataDeviceEntry.previewLogout
     DataDeviceEntry.previewNoDevice
     DataDeviceEntry.preview(1)
-    DataDeviceEntry.preview(3)
 }

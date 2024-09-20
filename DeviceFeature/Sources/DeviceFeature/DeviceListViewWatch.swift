@@ -39,7 +39,7 @@ public struct DeviceListViewWatch: View {
                 } label: {
                     LoadingView(store.isLoading == .closingAll) {
                         HStack {
-                            Image(systemName: "moon.fill")
+                            SharedSystemImages.turnOffAllLights()
                             Text(Strings.turnOff.key, bundle: .module)
                         }
                     }
