@@ -16,5 +16,6 @@ struct KasaAppWidgets: WidgetBundle {
         KasaAppWidgetWithAppIntent()
         KasaAppWidgetStatic()
         KasaAppStaticControl()
+        KasaAppWithAppIntentControl()
     }
 }

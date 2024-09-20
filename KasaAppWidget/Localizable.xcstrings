@@ -11,6 +11,22 @@
         }
       }
     },
+    "description_select_device" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select a devices to display for quick access."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sélectionnez un d'appareil à afficher pour un accès rapide."
+          }
+        }
+      }
+    },
     "description_select_devices_intent" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -45,6 +61,16 @@
         }
       }
     },
+    "Kasa Device" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Appareil Kasa"
+          }
+        }
+      }
+    },
     "Kasa Devices" : {
       "localizations" : {
         "fr" : {
@@ -60,7 +86,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Kasa  fermer les lumières"
+            "value" : "Kasa fermer les lumières"
           }
         }
       }
@@ -95,6 +121,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Un appareil de l'app Kasa"
+          }
+        }
+      }
+    },
+    "title_intent_select_device" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select a device"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sélection d’un appareil"
           }
         }
       }

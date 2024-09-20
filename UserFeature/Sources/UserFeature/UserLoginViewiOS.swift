@@ -24,7 +24,7 @@ public struct UserLoginViewiOS: View {
     public var body: some View {
         ScrollView {
             Text(Strings.kasaName.key, bundle: .module).font(.largeTitle)
-            Image(systemName: "light.max").font(.largeTitle)
+            SharedSystemImages.toggleALight().font(.largeTitle)
             Spacer(minLength: 32)
             VStack {
                 HStack {

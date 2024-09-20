@@ -23,7 +23,11 @@ struct KasaAppStaticControl: ControlWidget {
         ) { value in
             ControlWidgetButton(action: ToggleAppIntent(flattenDevice: nil)) {
                 if value.userIsLogged {
-                    Label(WidgetFeature.Strings.turnOff.string, systemImage: SharedSystemImages.turnOffAllLights())
+                    if value.devices.isEmpty {
+                        Label(WidgetFeature.Strings.noDevice.string, systemImage: SharedSystemImages.noDevice())
+                    } else {
+                        Label(WidgetFeature.Strings.turnOff.string, systemImage: SharedSystemImages.turnOffAllLights())
+                    }
                 } else {
                     Label(WidgetFeature.Strings.notLogged.string, systemImage: SharedSystemImages.notLogged())
                 }

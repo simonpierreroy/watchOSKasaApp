@@ -60,8 +60,8 @@ struct NoDevicesView: View {
 
     static func imageName(for mode: WidgetEntryMode) -> String {
         switch mode {
-        case .selectableMultiDevices: "square.and.pencil.circle"
-        case .turnOffAllDevices: "lightbulb.slash.fill"
+        case .selectableMultiDevices: SharedSystemImages.selectDevices()
+        case .turnOffAllDevices: SharedSystemImages.noDevice()
         }
     }
 
@@ -116,7 +116,7 @@ struct DeviceView<I: AppIntent>: View {
     var body: some View {
         Button(intent: newIntent(self.device)) {
             VStack {
-                Image(systemName: "light.max")
+                SharedSystemImages.toggleALight()
                     .font(DeviceView.font(for: widgetFamily).0)
                 Text("\(device.displayName)")
                     .multilineTextAlignment(.center)

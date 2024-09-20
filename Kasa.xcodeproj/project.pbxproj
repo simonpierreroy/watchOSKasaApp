@@ -39,6 +39,8 @@
 		B37AD5FA2C9DC83300E95C3D /* KasaAppWidgetStatic.swift in Sources */ = {isa = PBXBuildFile; fileRef = B37AD5F92C9DC83300E95C3D /* KasaAppWidgetStatic.swift */; };
 		B37AD5FC2C9DC88400E95C3D /* KasaAppStaticControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = B37AD5FB2C9DC88400E95C3D /* KasaAppStaticControl.swift */; };
 		B37AD5FE2C9DF2A500E95C3D /* KasaWatchWidgets.swift in Sources */ = {isa = PBXBuildFile; fileRef = B37AD5FD2C9DF2A500E95C3D /* KasaWatchWidgets.swift */; };
+		B37AD6552C9DF8BA00E95C3D /* KasaAppWithAppIntentControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = B37AD6542C9DF8BA00E95C3D /* KasaAppWithAppIntentControl.swift */; };
+		B37AD6572C9DFA7F00E95C3D /* ControlConfigurationIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = B37AD6562C9DFA7F00E95C3D /* ControlConfigurationIntent.swift */; };
 		B3B6386B2C9B9172008E91BE /* ToggleAppIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3B6386A2C9B9172008E91BE /* ToggleAppIntent.swift */; };
 		B3D4044029B83BCF00CA1E8C /* KasaAppMain.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3D4043F29B83BCF00CA1E8C /* KasaAppMain.swift */; };
 		B3DDD5F52ABE95C7006410F3 /* ToggleAppIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3DDD5F42ABE95C7006410F3 /* ToggleAppIntent.swift */; };
@@ -173,6 +175,8 @@
 		B37AD5F92C9DC83300E95C3D /* KasaAppWidgetStatic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KasaAppWidgetStatic.swift; sourceTree = "<group>"; };
 		B37AD5FB2C9DC88400E95C3D /* KasaAppStaticControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KasaAppStaticControl.swift; sourceTree = "<group>"; };
 		B37AD5FD2C9DF2A500E95C3D /* KasaWatchWidgets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KasaWatchWidgets.swift; sourceTree = "<group>"; };
+		B37AD6542C9DF8BA00E95C3D /* KasaAppWithAppIntentControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KasaAppWithAppIntentControl.swift; sourceTree = "<group>"; };
+		B37AD6562C9DFA7F00E95C3D /* ControlConfigurationIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ControlConfigurationIntent.swift; sourceTree = "<group>"; };
 		B3A1D47C2AB1706000858529 /* mul */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; name = mul; path = mul.lproj/LaunchScreen.xcstrings; sourceTree = "<group>"; };
 		B3B6386A2C9B9172008E91BE /* ToggleAppIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToggleAppIntent.swift; sourceTree = "<group>"; };
 		B3D4043F29B83BCF00CA1E8C /* KasaAppMain.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KasaAppMain.swift; sourceTree = "<group>"; };
@@ -234,6 +238,8 @@
 				B37AD5F72C9DC75600E95C3D /* KasaAppWidgetWithAppIntent.swift */,
 				B37AD5F92C9DC83300E95C3D /* KasaAppWidgetStatic.swift */,
 				B37AD5FB2C9DC88400E95C3D /* KasaAppStaticControl.swift */,
+				B37AD6542C9DF8BA00E95C3D /* KasaAppWithAppIntentControl.swift */,
+				B37AD6582C9E024300E95C3D /* ConfigurationIntent */,
 				B36C76982ABAAB1A002F5851 /* ToggleAppIntent */,
 				32213C8125283032009F42FD /* Assets.xcassets */,
 				32213C8325283032009F42FD /* Info.plist */,
@@ -359,10 +365,18 @@
 			isa = PBXGroup;
 			children = (
 				B3DDD5F42ABE95C7006410F3 /* ToggleAppIntent.swift */,
-				B36C76992ABAAB1A002F5851 /* SelectedDeviceAppEntity.swift */,
-				B36C769A2ABAAB1A002F5851 /* WidgetConfigurationIntent .swift */,
 			);
 			path = ToggleAppIntent;
+			sourceTree = "<group>";
+		};
+		B37AD6582C9E024300E95C3D /* ConfigurationIntent */ = {
+			isa = PBXGroup;
+			children = (
+				B36C76992ABAAB1A002F5851 /* SelectedDeviceAppEntity.swift */,
+				B36C769A2ABAAB1A002F5851 /* WidgetConfigurationIntent .swift */,
+				B37AD6562C9DFA7F00E95C3D /* ControlConfigurationIntent.swift */,
+			);
+			path = ConfigurationIntent;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -608,7 +622,9 @@
 				B3F109BD2ABAAB8400074BEA /* WidgetConfigurationIntent .swift in Sources */,
 				B3DDD5F52ABE95C7006410F3 /* ToggleAppIntent.swift in Sources */,
 				32213C8025283032009F42FD /* KasaAppWidgets.swift in Sources */,
+				B37AD6552C9DF8BA00E95C3D /* KasaAppWithAppIntentControl.swift in Sources */,
 				B37AD5FA2C9DC83300E95C3D /* KasaAppWidgetStatic.swift in Sources */,
+				B37AD6572C9DFA7F00E95C3D /* ControlConfigurationIntent.swift in Sources */,
 				B3F109BE2ABAAB8800074BEA /* SelectedDeviceAppEntity.swift in Sources */,
 				B37AD5F82C9DC75600E95C3D /* KasaAppWidgetWithAppIntent.swift in Sources */,
 				B37AD5FC2C9DC88400E95C3D /* KasaAppStaticControl.swift in Sources */,

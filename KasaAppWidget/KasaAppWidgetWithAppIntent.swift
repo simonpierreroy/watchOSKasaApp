@@ -12,7 +12,7 @@ import WidgetClientLive
 import WidgetFeature
 import WidgetKit
 
-struct AppIntentProvider: AppIntentTimelineProvider {
+struct AppIntentWidgetProvider: AppIntentTimelineProvider {
     let config = ProviderConfig()
 
     func placeholder(in context: Context) -> DataDeviceEntry {
@@ -52,7 +52,7 @@ struct AppIntentProvider: AppIntentTimelineProvider {
 
 struct KasaAppWidgetWithAppIntent: Widget {
     let kind: String = "KasaAppWidgetWithAppIntent"
-    let provider = AppIntentProvider()
+    let provider = AppIntentWidgetProvider()
 
     var body: some WidgetConfiguration {
         AppIntentConfiguration(

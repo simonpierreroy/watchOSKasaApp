@@ -12,7 +12,7 @@ import WidgetClientLive
 import WidgetFeature
 import WidgetKit
 
-struct StaticProvider: TimelineProvider {
+struct StaticWidgetProvider: TimelineProvider {
     let config = ProviderConfig()
 
     func placeholder(in context: Context) -> DataDeviceEntry {
@@ -43,7 +43,7 @@ struct StaticProvider: TimelineProvider {
 
 struct KasaAppWidgetStatic: Widget {
     let kind: String = "KasaAppWidgetStatic"
-    let provider = StaticProvider()
+    let provider = StaticWidgetProvider()
 
     var body: some WidgetConfiguration {
         StaticConfiguration(
