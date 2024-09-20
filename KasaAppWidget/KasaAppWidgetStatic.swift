@@ -12,6 +12,29 @@ import WidgetClientLive
 import WidgetFeature
 import WidgetKit
 
+struct KasaAppWidgetStatic: Widget {
+    let kind: String = "KasaAppWidgetStatic"
+    let provider = StaticWidgetProvider()
+
+    var body: some WidgetConfiguration {
+        StaticConfiguration(
+            kind: kind,
+            provider: provider
+        ) { entry in
+            KasaAppWidgetEntryView(
+                entry: entry,
+                newIntent: ToggleAppIntent.init(flattenDevice:),
+                getURL: provider.config.render(link:),
+                mode: .turnOffAllDevices
+            )
+        }
+        .supportedFamilies([.systemSmall, .accessoryCircular, .accessoryInline, .accessoryRectangular])
+        .configurationDisplayName("Kasa Turn Off")
+        .description(WidgetFeature.Strings.descriptionWidget.string)
+
+    }
+}
+
 struct StaticWidgetProvider: TimelineProvider {
     let config = ProviderConfig()
 
@@ -38,29 +61,6 @@ struct StaticWidgetProvider: TimelineProvider {
             policy: .never
         )
         completion(timeline)
-    }
-}
-
-struct KasaAppWidgetStatic: Widget {
-    let kind: String = "KasaAppWidgetStatic"
-    let provider = StaticWidgetProvider()
-
-    var body: some WidgetConfiguration {
-        StaticConfiguration(
-            kind: kind,
-            provider: provider
-        ) { entry in
-            KasaAppWidgetEntryView(
-                entry: entry,
-                newIntent: ToggleAppIntent.init(flattenDevice:),
-                getURL: provider.config.render(link:),
-                mode: .turnOffAllDevices
-            )
-        }
-        .supportedFamilies([.systemSmall, .accessoryCircular, .accessoryInline, .accessoryRectangular])
-        .configurationDisplayName("Kasa Turn Off")
-        .description(WidgetFeature.Strings.descriptionWidget.string)
-
     }
 }
 

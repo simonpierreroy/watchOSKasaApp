@@ -12,6 +12,28 @@ import WidgetClientLive
 import WidgetFeature
 import WidgetKit
 
+struct KasaWatchWidgetStatic: Widget {
+    let kind: String = "KasaWatchWidgetStatic"
+    var body: some WidgetConfiguration {
+        let provider = StaticProvider()
+
+        return StaticConfiguration(
+            kind: kind,
+            provider: provider
+        ) { entry in
+            KasaAppWidgetEntryView(
+                entry: entry,
+                newIntent: { _ in TurnOffAppIntent() },
+                getURL: provider.config.render(link:),
+                mode: .turnOffAllDevices
+            )
+        }
+        .configurationDisplayName("Kasa")
+        .description(WidgetFeature.Strings.descriptionWidget.string)
+
+    }
+}
+
 struct StaticProvider: TimelineProvider {
 
     let config = ProviderConfig()
@@ -39,28 +61,6 @@ struct StaticProvider: TimelineProvider {
             policy: .never
         )
         completion(timeline)
-    }
-}
-
-struct KasaWatchWidgetStatic: Widget {
-    let kind: String = "KasaWatchWidgetStatic"
-    var body: some WidgetConfiguration {
-        let provider = StaticProvider()
-
-        return StaticConfiguration(
-            kind: kind,
-            provider: provider
-        ) { entry in
-            KasaAppWidgetEntryView(
-                entry: entry,
-                newIntent: { _ in TurnOffAppIntent() },
-                getURL: provider.config.render(link:),
-                mode: .turnOffAllDevices
-            )
-        }
-        .configurationDisplayName("Kasa")
-        .description(WidgetFeature.Strings.descriptionWidget.string)
-
     }
 }
 

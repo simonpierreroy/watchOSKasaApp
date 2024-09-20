@@ -12,6 +12,29 @@ import WidgetClientLive
 import WidgetFeature
 import WidgetKit
 
+struct KasaAppWidgetWithAppIntent: Widget {
+    let kind: String = "KasaAppWidgetWithAppIntent"
+    let provider = AppIntentWidgetProvider()
+
+    var body: some WidgetConfiguration {
+        AppIntentConfiguration(
+            kind: kind,
+            intent: SelectDevicesWidgetConfigurationIntent.self,
+            provider: provider
+        ) { entry in
+            KasaAppWidgetEntryView(
+                entry: entry,
+                newIntent: ToggleAppIntent.init(flattenDevice:),
+                getURL: provider.config.render(link:),
+                mode: .selectableMultiDevices
+            )
+        }.promptsForUserConfiguration()
+            .supportedFamilies([.systemExtraLarge, .systemLarge, .systemMedium, .systemSmall])
+            .configurationDisplayName("Kasa Devices")
+            .description(WidgetFeature.Strings.descriptionWidget.string)
+    }
+}
+
 struct AppIntentWidgetProvider: AppIntentTimelineProvider {
     let config = ProviderConfig()
 
@@ -47,29 +70,6 @@ struct AppIntentWidgetProvider: AppIntentTimelineProvider {
             entries: [entry],
             policy: .after(entryDate)
         )
-    }
-}
-
-struct KasaAppWidgetWithAppIntent: Widget {
-    let kind: String = "KasaAppWidgetWithAppIntent"
-    let provider = AppIntentWidgetProvider()
-
-    var body: some WidgetConfiguration {
-        AppIntentConfiguration(
-            kind: kind,
-            intent: SelectDevicesWidgetConfigurationIntent.self,
-            provider: provider
-        ) { entry in
-            KasaAppWidgetEntryView(
-                entry: entry,
-                newIntent: ToggleAppIntent.init(flattenDevice:),
-                getURL: provider.config.render(link:),
-                mode: .selectableMultiDevices
-            )
-        }.promptsForUserConfiguration()
-            .supportedFamilies([.systemExtraLarge, .systemLarge, .systemMedium, .systemSmall])
-            .configurationDisplayName("Kasa Devices")
-            .description(WidgetFeature.Strings.descriptionWidget.string)
     }
 }
 
